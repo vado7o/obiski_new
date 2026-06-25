@@ -1,7 +1,9 @@
+import { useState } from 'react'
 import { motion } from 'framer-motion'
 import './WordCard.css'
 
 export default function WordCard({ word, index, feedback, onClick }) {
+  const [imgError, setImgError] = useState(false)
   const isCorrect = feedback === 'correct'
   const isWrong = feedback === 'wrong'
 
@@ -22,8 +24,19 @@ export default function WordCard({ word, index, feedback, onClick }) {
       whileHover={{ scale: 1.04, y: -3 }}
       whileTap={{ scale: 0.96 }}
     >
-      <div className="word-emoji-wrap">
-        <span className="word-emoji">{word.emoji}</span>
+      <div className="word-img-wrap">
+        {!imgError ? (
+          <img
+            className="word-photo"
+            src={word.imageUrl}
+            alt={word.name}
+            onError={() => setImgError(true)}
+            draggable={false}
+          />
+        ) : (
+          <span className="word-emoji-fallback">{word.emoji}</span>
+        )}
+
         {isCorrect && (
           <motion.div
             className="feedback-overlay correct-overlay"
