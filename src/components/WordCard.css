@@ -10,13 +10,20 @@
   position: relative;
   overflow: hidden;
   box-shadow: 0 3px 14px rgba(0,0,0,0.12);
-  transition: border-color 0.15s, box-shadow 0.15s;
+  transition: border-color 0.15s, box-shadow 0.15s, opacity 0.3s;
   padding: 0;
 }
 
-.word-card:hover {
+.word-card:hover:not(.answered) {
   border-color: var(--theme-color, #7C4DFF);
   box-shadow: 0 8px 28px rgba(0,0,0,0.18);
+}
+
+.word-card.answered {
+  cursor: default;
+  opacity: 0.72;
+  border-color: #4CAF50;
+  box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.25);
 }
 
 .word-card.correct {
@@ -79,4 +86,22 @@
 .wrong-overlay {
   background: rgba(244, 67, 54, 0.72);
   color: white;
+}
+
+.answered-overlay {
+  background: rgba(30, 30, 30, 0.38);
+}
+
+.check-circle {
+  width: clamp(44px, 12vw, 72px);
+  height: clamp(44px, 12vw, 72px);
+  border-radius: 50%;
+  background: #4CAF50;
+  color: white;
+  font-size: clamp(24px, 6vw, 40px);
+  font-weight: 900;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 16px rgba(76, 175, 80, 0.5);
 }

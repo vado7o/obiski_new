@@ -26,6 +26,7 @@ export default function GameScreen({ selectedThemes, onComplete }) {
   const [feedback, setFeedback] = useState(null)
   const [isLocked, setIsLocked] = useState(false)
   const [progress, setProgress] = useState(0)
+  const [answeredIds, setAnsweredIds] = useState(new Set())
   const speakTimeoutRef = useRef(null)
 
   useEffect(() => {
@@ -36,6 +37,7 @@ export default function GameScreen({ selectedThemes, onComplete }) {
     setWordIndex(0)
     setBatchOffset(0)
     setProgress(0)
+    setAnsweredIds(new Set())
   }, [selectedThemes])
 
   const currentTarget = currentBatch[wordIndex] ?? null
@@ -58,32 +60,44 @@ export default function GameScreen({ selectedThemes, onComplete }) {
   }, [currentTarget, speakCurrent])
 
   const handleCardClick = useCallback((word) => {
-    if (isLocked || !currentTarget) return
+    if (isLocked || !currentTarget || answeredIds.has(word.id)) return
+
     if (word.id === currentTarget.id) {
       setIsLocked(true)
       setFeedback({ id: word.id, type: 'correct' })
       speak('Correct!')
+
       const newProgress = batchOffset + wordIndex + 1
       setProgress(newProgress)
+
       setTimeout(() => {
         setFeedback(null)
+
+        const newAnswered = new Set(answeredIds)
+        newAnswered.add(word.id)
+        setAnsweredIds(newAnswered)
+
         const nextIndex = wordIndex + 1
+
         if (nextIndex >= currentBatch.length) {
           const nextOffset = batchOffset + BATCH_SIZE
-          if (nextOffset >= wordList.length) {
-            onComplete()
-          } else {
-            const nextBatch = wordList.slice(nextOffset, nextOffset + BATCH_SIZE)
-            setCurrentBatch(nextBatch)
-            setBatchOffset(nextOffset)
-            setWordIndex(0)
-            setIsLocked(false)
-          }
+          setTimeout(() => {
+            if (nextOffset >= wordList.length) {
+              onComplete()
+            } else {
+              const nextBatch = wordList.slice(nextOffset, nextOffset + BATCH_SIZE)
+              setCurrentBatch(nextBatch)
+              setBatchOffset(nextOffset)
+              setWordIndex(0)
+              setAnsweredIds(new Set())
+              setIsLocked(false)
+            }
+          }, 600)
         } else {
           setWordIndex(nextIndex)
           setIsLocked(false)
         }
-      }, 900)
+      }, 700)
     } else {
       setFeedback({ id: word.id, type: 'wrong' })
       speak('Try again!')
@@ -92,7 +106,7 @@ export default function GameScreen({ selectedThemes, onComplete }) {
         speakCurrent(currentTarget)
       }, 800)
     }
-  }, [isLocked, currentTarget, wordIndex, currentBatch, batchOffset, wordList, onComplete, speakCurrent])
+  }, [isLocked, currentTarget, wordIndex, currentBatch, batchOffset, wordList, answeredIds, onComplete, speakCurrent])
 
   const handleRepeat = () => {
     if (currentTarget) speakCurrent(currentTarget)
@@ -131,22 +145,20 @@ export default function GameScreen({ selectedThemes, onComplete }) {
       </div>
 
       <div className="cards-grid">
-        <AnimatePresence mode="wait">
-          {currentBatch.map((word, i) => {
-            const fb = feedback?.id === word.id ? feedback.type : null
-            const isTarget = word.id === currentTarget?.id
-            return (
-              <WordCard
-                key={`${batchOffset}-${word.id}`}
-                word={word}
-                index={i}
-                feedback={fb}
-                isTarget={isTarget}
-                onClick={() => handleCardClick(word)}
-              />
-            )
-          })}
-        </AnimatePresence>
+        {currentBatch.map((word, i) => {
+          const fb = feedback?.id === word.id ? feedback.type : null
+          const isAnswered = answeredIds.has(word.id)
+          return (
+            <WordCard
+              key={`${batchOffset}-${word.id}`}
+              word={word}
+              index={i}
+              feedback={fb}
+              isAnswered={isAnswered}
+              onClick={() => handleCardClick(word)}
+            />
+          )
+        })}
       </div>
     </div>
   )

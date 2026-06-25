@@ -2,16 +2,17 @@ import { useState } from 'react'
 import { motion } from 'framer-motion'
 import './WordCard.css'
 
-export default function WordCard({ word, index, feedback, onClick }) {
+export default function WordCard({ word, index, feedback, isAnswered, onClick }) {
   const [imgError, setImgError] = useState(false)
   const isCorrect = feedback === 'correct'
   const isWrong = feedback === 'wrong'
 
   return (
     <motion.button
-      className={`word-card ${isCorrect ? 'correct' : ''} ${isWrong ? 'wrong' : ''}`}
+      className={`word-card ${isCorrect ? 'correct' : ''} ${isWrong ? 'wrong' : ''} ${isAnswered ? 'answered' : ''}`}
       style={{ '--theme-color': word.themeColor }}
-      onClick={onClick}
+      onClick={isAnswered ? undefined : onClick}
+      disabled={isAnswered}
       initial={{ opacity: 0, scale: 0.7 }}
       animate={{ opacity: 1, scale: 1 }}
       transition={{
@@ -21,8 +22,8 @@ export default function WordCard({ word, index, feedback, onClick }) {
         stiffness: 260,
         damping: 20,
       }}
-      whileHover={{ scale: 1.04, y: -3 }}
-      whileTap={{ scale: 0.96 }}
+      whileHover={!isAnswered ? { scale: 1.04, y: -3 } : {}}
+      whileTap={!isAnswered ? { scale: 0.96 } : {}}
     >
       <div className="word-img-wrap">
         {!imgError ? (
@@ -37,7 +38,18 @@ export default function WordCard({ word, index, feedback, onClick }) {
           <span className="word-emoji-fallback">{word.emoji}</span>
         )}
 
-        {isCorrect && (
+        {isAnswered && (
+          <motion.div
+            className="feedback-overlay answered-overlay"
+            initial={{ opacity: 0, scale: 0.4 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ type: 'spring', stiffness: 350, damping: 20 }}
+          >
+            <div className="check-circle">✓</div>
+          </motion.div>
+        )}
+
+        {!isAnswered && isCorrect && (
           <motion.div
             className="feedback-overlay correct-overlay"
             initial={{ opacity: 0, scale: 0.5 }}
@@ -47,7 +59,8 @@ export default function WordCard({ word, index, feedback, onClick }) {
             ✓
           </motion.div>
         )}
-        {isWrong && (
+
+        {!isAnswered && isWrong && (
           <motion.div
             className="feedback-overlay wrong-overlay"
             initial={{ opacity: 0, scale: 0.5 }}
