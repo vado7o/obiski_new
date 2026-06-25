@@ -1,0 +1,53 @@
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+:root {
+  --primary: #7C4DFF;
+  --primary-light: #B39DDB;
+  --primary-dark: #512DA8;
+  --accent: #FF6D00;
+  --bg: #F3F0FF;
+  --card-bg: #FFFFFF;
+  --text: #2D2D48;
+  --text-muted: #7B7B9E;
+  --correct: #4CAF50;
+  --wrong: #F44336;
+  --radius: 20px;
+  --shadow: 0 4px 20px rgba(124, 77, 255, 0.15);
+  --shadow-hover: 0 8px 32px rgba(124, 77, 255, 0.25);
+}
+
+html, body, #root {
+  height: 100%;
+  width: 100%;
+}
+
+body {
+  font-family: 'Nunito', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+button {
+  font-family: 'Nunito', sans-serif;
+  cursor: pointer;
+  border: none;
+  outline: none;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--primary-light);
+  border-radius: 3px;
+}

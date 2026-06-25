@@ -1,0 +1,66 @@
+.victory-screen {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #EDE7FF 0%, #FFF8E7 50%, #E8F4FF 100%);
+  padding: 24px;
+}
+
+.victory-content {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  background: white;
+  border-radius: 32px;
+  padding: 48px 40px;
+  box-shadow: 0 12px 60px rgba(124, 77, 255, 0.18);
+  max-width: 440px;
+  width: 100%;
+}
+
+.trophy {
+  font-size: 96px;
+  line-height: 1;
+  filter: drop-shadow(0 8px 16px rgba(255, 193, 7, 0.4));
+}
+
+.victory-title {
+  font-size: 48px;
+  font-weight: 900;
+  background: linear-gradient(135deg, #7C4DFF, #FF6D00);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.victory-subtitle {
+  font-size: 20px;
+  font-weight: 600;
+  color: #7B7B9E;
+}
+
+.stars {
+  display: flex;
+  gap: 12px;
+}
+
+.star {
+  font-size: 40px;
+  filter: drop-shadow(0 2px 8px rgba(255, 215, 0, 0.5));
+}
+
+.play-again-btn {
+  margin-top: 12px;
+  padding: 18px 48px;
+  border-radius: 16px;
+  font-size: 20px;
+  font-weight: 800;
+  background: linear-gradient(135deg, #7C4DFF, #651FFF);
+  color: white;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 4px 20px rgba(124, 77, 255, 0.4);
+}
