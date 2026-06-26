@@ -1,5 +1,5 @@
 import { useState, useEffect, useLayoutEffect, useCallback, useRef } from 'react'
-import { motion } from 'framer-motion'
+import { motion, AnimatePresence } from 'framer-motion'
 import { themes, shuffleArray, BATCH_SIZE } from '../data/themes.js'
 import { speak } from '../hooks/useSpeech.js'
 import { useLang } from '../contexts/LanguageContext.jsx'
@@ -68,6 +68,7 @@ export default function GameScreen({ selectedThemes, onComplete, onMenu }) {
   const [answeredIds, setAnsweredIds] = useState(new Set())
   const speakTimeoutRef = useRef(null)
   const wrapRef = useRef(null)
+  const debounceRef = useRef(null)
   const [gridLayout, setGridLayout] = useState({ cols: 4, rows: 2, gridW: null, gridH: null })
 
   useLayoutEffect(() => {
@@ -77,13 +78,22 @@ export default function GameScreen({ selectedThemes, onComplete, onMenu }) {
       const W = el.clientWidth
       const H = el.clientHeight
       if (W > 0 && H > 0) {
-        setGridLayout(computeOptimalLayout(W, H, BATCH_SIZE))
+        setGridLayout(prev => {
+          const next = computeOptimalLayout(W, H, BATCH_SIZE)
+          if (prev.cols === next.cols && prev.rows === next.rows &&
+              prev.gridW === next.gridW && prev.gridH === next.gridH) return prev
+          return next
+        })
       }
     }
+    const debouncedUpdate = () => {
+      clearTimeout(debounceRef.current)
+      debounceRef.current = setTimeout(update, 80)
+    }
     update()
-    const ro = new ResizeObserver(update)
+    const ro = new ResizeObserver(debouncedUpdate)
     ro.observe(el)
-    return () => ro.disconnect()
+    return () => { ro.disconnect(); clearTimeout(debounceRef.current) }
   }, [])
 
   useEffect(() => {
@@ -172,6 +182,8 @@ export default function GameScreen({ selectedThemes, onComplete, onMenu }) {
   const totalWords = wordList.length
   const progressPct = totalWords > 0 ? (progress / totalWords) * 100 : 0
 
+  const layoutKey = `${gridLayout.cols}x${gridLayout.rows}`
+
   return (
     <div className="game-screen">
       <div className="game-nav">
@@ -208,30 +220,46 @@ export default function GameScreen({ selectedThemes, onComplete, onMenu }) {
       </div>
 
       <div className="cards-grid-wrap" ref={wrapRef}>
-        <div
-          className="cards-grid"
-          style={{
-            gridTemplateColumns: `repeat(${gridLayout.cols}, 1fr)`,
-            gridTemplateRows: `repeat(${gridLayout.rows}, 1fr)`,
-            ...(gridLayout.gridW ? { width: gridLayout.gridW, height: gridLayout.gridH } : {}),
-          }}
-        >
-          {batchState.displayOrder.map((wordIdx, i) => {
-            const word = batchState.words[wordIdx]
-            const fb = feedback?.id === word.id ? feedback.type : null
-            const isAnswered = answeredIds.has(word.id)
-            return (
-              <WordCard
-                key={`${batchOffset}-${word.id}`}
-                word={word}
-                index={i}
-                feedback={fb}
-                isAnswered={isAnswered}
-                onClick={() => handleCardClick(word)}
-              />
-            )
-          })}
-        </div>
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={layoutKey}
+            className="cards-grid"
+            initial={{ opacity: 0, scale: 0.88 }}
+            animate={{
+              opacity: 1,
+              scale: 1,
+              width: gridLayout.gridW ?? undefined,
+              height: gridLayout.gridH ?? undefined,
+            }}
+            exit={{ opacity: 0, scale: 0.88 }}
+            transition={{
+              opacity: { duration: 0.18, ease: 'easeInOut' },
+              scale: { duration: 0.22, ease: [0.34, 1.26, 0.64, 1] },
+              width: { type: 'spring', stiffness: 280, damping: 28 },
+              height: { type: 'spring', stiffness: 280, damping: 28 },
+            }}
+            style={{
+              gridTemplateColumns: `repeat(${gridLayout.cols}, 1fr)`,
+              gridTemplateRows: `repeat(${gridLayout.rows}, 1fr)`,
+            }}
+          >
+            {batchState.displayOrder.map((wordIdx, i) => {
+              const word = batchState.words[wordIdx]
+              const fb = feedback?.id === word.id ? feedback.type : null
+              const isAnswered = answeredIds.has(word.id)
+              return (
+                <WordCard
+                  key={`${batchOffset}-${word.id}`}
+                  word={word}
+                  index={i}
+                  feedback={fb}
+                  isAnswered={isAnswered}
+                  onClick={() => handleCardClick(word)}
+                />
+              )
+            })}
+          </motion.div>
+        </AnimatePresence>
       </div>
     </div>
   )
