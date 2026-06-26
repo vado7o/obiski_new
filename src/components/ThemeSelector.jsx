@@ -13,10 +13,11 @@ export default function ThemeSelector({ selected, onToggle, onStart }) {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4 }}
       >
-        <span className="app-title">Obiski</span>
-        <div className="app-nav-right">
+        <div className="app-nav-left">
+          <span className="app-title">Obiski</span>
           <p className="tagline">Choose your themes and start learning!</p>
         </div>
+        <button className="menu-btn">☰ Меню</button>
       </motion.div>
 
       <motion.div
