@@ -2,9 +2,11 @@ import { useEffect, useRef } from 'react'
 import { motion } from 'framer-motion'
 import confetti from 'canvas-confetti'
 import { speak } from '../hooks/useSpeech.js'
+import { useLang } from '../contexts/LanguageContext.jsx'
 import './VictoryScreen.css'
 
 export default function VictoryScreen({ onPlayAgain }) {
+  const { t } = useLang()
   const hasSpoken = useRef(false)
 
   useEffect(() => {
@@ -35,11 +37,11 @@ export default function VictoryScreen({ onPlayAgain }) {
 
     if (!hasSpoken.current) {
       hasSpoken.current = true
-      setTimeout(() => speak('Congratulations! You did it!'), 500)
+      setTimeout(() => speak(t.congrats), 500)
     }
 
     return () => clearInterval(interval)
-  }, [])
+  }, [t])
 
   return (
     <div className="victory-screen">
@@ -63,7 +65,7 @@ export default function VictoryScreen({ onPlayAgain }) {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3 }}
         >
-          Amazing!
+          {t.amazing}
         </motion.h1>
 
         <motion.p
@@ -72,7 +74,7 @@ export default function VictoryScreen({ onPlayAgain }) {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.45 }}
         >
-          You completed all the words!
+          {t.completedAll}
         </motion.p>
 
         <motion.div
@@ -103,7 +105,7 @@ export default function VictoryScreen({ onPlayAgain }) {
           whileHover={{ scale: 1.06 }}
           whileTap={{ scale: 0.95 }}
         >
-          🎮 Play Again
+          {t.playAgain}
         </motion.button>
       </motion.div>
     </div>

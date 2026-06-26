@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback, useRef } from 'react'
 import { motion } from 'framer-motion'
 import { themes, shuffleArray, BATCH_SIZE } from '../data/themes.js'
 import { speak } from '../hooks/useSpeech.js'
+import { useLang } from '../contexts/LanguageContext.jsx'
 import WordCard from './WordCard.jsx'
 import './GameScreen.css'
 
@@ -27,6 +28,7 @@ function makeBatchState(batch) {
 }
 
 export default function GameScreen({ selectedThemes, onComplete, onMenu }) {
+  const { t } = useLang()
   const [wordList, setWordList] = useState([])
   const [batchState, setBatchState] = useState({ words: [], displayOrder: [], questionOrder: [] })
   const [questionIndex, setQuestionIndex] = useState(0)
@@ -73,7 +75,7 @@ export default function GameScreen({ selectedThemes, onComplete, onMenu }) {
     if (word.id === currentTarget.id) {
       setIsLocked(true)
       setFeedback({ id: word.id, type: 'correct' })
-      speak('Correct!')
+      speak(t.correct)
 
       const newProgress = batchOffset + questionIndex + 1
       setProgress(newProgress)
@@ -108,7 +110,7 @@ export default function GameScreen({ selectedThemes, onComplete, onMenu }) {
       }, 700)
     } else {
       setFeedback({ id: word.id, type: 'wrong' })
-      speak('Try again!')
+      speak(t.tryAgain)
       setTimeout(() => {
         setFeedback(null)
         speakCurrent(currentTarget)
@@ -128,7 +130,7 @@ export default function GameScreen({ selectedThemes, onComplete, onMenu }) {
       <div className="game-nav">
         <span className="app-title">Obiski</span>
         <button className="menu-btn" onClick={onMenu}>
-          ☰ Меню
+          {t.menuBtn}
         </button>
       </div>
       <div className="game-header">
@@ -140,7 +142,7 @@ export default function GameScreen({ selectedThemes, onComplete, onMenu }) {
           />
         </div>
         <div className="game-stats">
-          <span className="stat">{progress} / {totalWords} words</span>
+          <span className="stat">{t.wordsProgress(progress, totalWords)}</span>
         </div>
       </div>
 
@@ -153,7 +155,7 @@ export default function GameScreen({ selectedThemes, onComplete, onMenu }) {
         >
           <span className="speaker-icon">🔊</span>
           {currentTarget && (
-            <span className="speaker-hint">Tap to hear again</span>
+            <span className="speaker-hint">{t.tapToHear}</span>
           )}
         </motion.button>
       </div>

@@ -1,9 +1,25 @@
-import { motion } from 'framer-motion'
+import { useState, useRef, useEffect } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
 import { themes } from '../data/themes.js'
+import { useLang } from '../contexts/LanguageContext.jsx'
+import { LANGUAGES } from '../i18n/translations.js'
 import './ThemeSelector.css'
 
 export default function ThemeSelector({ selected, onToggle, onStart }) {
+  const { t, lang, setLang } = useLang()
   const canStart = selected.length > 0
+  const [menuOpen, setMenuOpen] = useState(false)
+  const menuRef = useRef(null)
+
+  useEffect(() => {
+    function handleClick(e) {
+      if (menuRef.current && !menuRef.current.contains(e.target)) {
+        setMenuOpen(false)
+      }
+    }
+    if (menuOpen) document.addEventListener('mousedown', handleClick)
+    return () => document.removeEventListener('mousedown', handleClick)
+  }, [menuOpen])
 
   return (
     <div className="theme-selector">
@@ -15,9 +31,39 @@ export default function ThemeSelector({ selected, onToggle, onStart }) {
       >
         <div className="app-nav-left">
           <span className="app-title">Obiski</span>
-          <p className="tagline">Choose your themes and start learning!</p>
+          <p className="tagline">{t.tagline}</p>
         </div>
-        <button className="menu-btn">☰ Меню</button>
+
+        <div className="menu-wrap" ref={menuRef}>
+          <button className="menu-btn" onClick={() => setMenuOpen(o => !o)}>
+            {t.menuBtn}
+          </button>
+
+          <AnimatePresence>
+            {menuOpen && (
+              <motion.div
+                className="lang-dropdown"
+                initial={{ opacity: 0, y: -8, scale: 0.96 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                exit={{ opacity: 0, y: -8, scale: 0.96 }}
+                transition={{ duration: 0.18 }}
+              >
+                <p className="lang-dropdown-title">{t.language}</p>
+                {LANGUAGES.map(l => (
+                  <button
+                    key={l.code}
+                    className={`lang-option ${lang === l.code ? 'active' : ''}`}
+                    onClick={() => { setLang(l.code); setMenuOpen(false) }}
+                  >
+                    <span className="lang-flag">{l.flag}</span>
+                    <span className="lang-label">{l.label}</span>
+                    {lang === l.code && <span className="lang-check">✓</span>}
+                  </button>
+                ))}
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
       </motion.div>
 
       <motion.div
@@ -28,14 +74,12 @@ export default function ThemeSelector({ selected, onToggle, onStart }) {
       >
         {themes.map((theme, i) => {
           const isSelected = selected.includes(theme.id)
+          const themeName = t.themeNames[theme.id] || theme.name
           return (
             <motion.button
               key={theme.id}
               className={`theme-card ${isSelected ? 'selected' : ''}`}
-              style={{
-                '--theme-color': theme.color,
-                '--theme-bg': theme.bgColor,
-              }}
+              style={{ '--theme-color': theme.color, '--theme-bg': theme.bgColor }}
               onClick={() => onToggle(theme.id)}
               initial={{ opacity: 0, scale: 0.8 }}
               animate={{ opacity: 1, scale: 1 }}
@@ -56,8 +100,8 @@ export default function ThemeSelector({ selected, onToggle, onStart }) {
                   </motion.div>
                 )}
               </div>
-              <span className="theme-name">{theme.name}</span>
-              <span className="theme-count">{theme.words.length} words</span>
+              <span className="theme-name">{themeName}</span>
+              <span className="theme-count">{t.words(theme.words.length)}</span>
             </motion.button>
           )
         })}
@@ -70,12 +114,8 @@ export default function ThemeSelector({ selected, onToggle, onStart }) {
         transition={{ duration: 0.5, delay: 0.3 }}
       >
         {selected.length > 0 && (
-          <motion.p
-            className="selected-hint"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-          >
-            {selected.length} theme{selected.length > 1 ? 's' : ''} selected
+          <motion.p className="selected-hint" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+            {t.themesSelected(selected.length)}
           </motion.p>
         )}
         <motion.button
@@ -84,7 +124,7 @@ export default function ThemeSelector({ selected, onToggle, onStart }) {
           whileHover={canStart ? { scale: 1.05 } : {}}
           whileTap={canStart ? { scale: 0.96 } : {}}
         >
-          {canStart ? '▶  Start Learning' : 'Select a theme to begin'}
+          {canStart ? t.startLearning : t.selectTheme}
         </motion.button>
       </motion.div>
     </div>
