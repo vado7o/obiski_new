@@ -136,7 +136,6 @@
   align-items: center;
   justify-content: center;
   width: 100%;
-  padding: 0 4px;
   box-sizing: border-box;
 }
 
@@ -145,27 +144,26 @@
   grid-template-columns: repeat(4, 1fr);
   grid-template-rows: repeat(2, 1fr);
   gap: 8px;
-  /* Keep square cells: grid is 4×2 squares → aspect-ratio 2:1 */
   aspect-ratio: 2 / 1;
-  width: 100%;
+  /*
+    Max size = min(available width, available height × 2).
+    ~140px = nav + progress bar + speaker button heights.
+    This fills screen as much as possible while keeping cells square.
+  */
+  width: min(calc(100vw - 24px), calc((100vh - 140px) * 2));
   max-width: 900px;
-  max-height: 100%;
 }
 
 @media (max-width: 600px) {
   .cards-grid {
     gap: 6px;
-  }
-  .game-screen {
-    padding: 0 8px 8px;
+    width: min(calc(100vw - 16px), calc((100vh - 130px) * 2));
   }
 }
 
 @media (min-width: 900px) {
   .cards-grid {
     gap: 12px;
-  }
-  .game-screen {
-    padding: 0 24px 16px;
+    width: min(calc(100vw - 48px), calc((100vh - 140px) * 2));
   }
 }
