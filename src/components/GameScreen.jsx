@@ -160,6 +160,7 @@ export default function GameScreen({ selectedThemes, onComplete, onMenu }) {
         </motion.button>
       </div>
 
+      <div className="cards-grid-wrap">
       <div className="cards-grid">
         {batchState.displayOrder.map((wordIdx, i) => {
           const word = batchState.words[wordIdx]
@@ -176,6 +177,7 @@ export default function GameScreen({ selectedThemes, onComplete, onMenu }) {
             />
           )
         })}
+      </div>
       </div>
     </div>
   )
