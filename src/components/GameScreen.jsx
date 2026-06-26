@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useRef } from 'react'
+import { useState, useEffect, useLayoutEffect, useCallback, useRef } from 'react'
 import { motion } from 'framer-motion'
 import { themes, shuffleArray, BATCH_SIZE } from '../data/themes.js'
 import { speak } from '../hooks/useSpeech.js'
@@ -27,6 +27,35 @@ function makeBatchState(batch) {
   }
 }
 
+const GAP = 8
+
+function computeOptimalLayout(W, H, n) {
+  let bestSize = 0
+  let bestCols = 4
+  let bestRows = Math.ceil(n / 4)
+  for (let cols = 1; cols <= n; cols++) {
+    const rows = Math.ceil(n / cols)
+    const cardW = (W - GAP * (cols - 1)) / cols
+    const cardH = (H - GAP * (rows - 1)) / rows
+    const size = Math.min(cardW, cardH)
+    if (size > bestSize) {
+      bestSize = size
+      bestCols = cols
+      bestRows = rows
+    }
+  }
+  const cardSize = Math.min(
+    (W - GAP * (bestCols - 1)) / bestCols,
+    (H - GAP * (bestRows - 1)) / bestRows
+  )
+  return {
+    cols: bestCols,
+    rows: bestRows,
+    gridW: Math.floor(cardSize * bestCols + GAP * (bestCols - 1)),
+    gridH: Math.floor(cardSize * bestRows + GAP * (bestRows - 1)),
+  }
+}
+
 export default function GameScreen({ selectedThemes, onComplete, onMenu }) {
   const { t } = useLang()
   const [wordList, setWordList] = useState([])
@@ -38,6 +67,24 @@ export default function GameScreen({ selectedThemes, onComplete, onMenu }) {
   const [progress, setProgress] = useState(0)
   const [answeredIds, setAnsweredIds] = useState(new Set())
   const speakTimeoutRef = useRef(null)
+  const wrapRef = useRef(null)
+  const [gridLayout, setGridLayout] = useState({ cols: 4, rows: 2, gridW: null, gridH: null })
+
+  useLayoutEffect(() => {
+    const el = wrapRef.current
+    if (!el) return
+    const update = () => {
+      const W = el.clientWidth
+      const H = el.clientHeight
+      if (W > 0 && H > 0) {
+        setGridLayout(computeOptimalLayout(W, H, BATCH_SIZE))
+      }
+    }
+    update()
+    const ro = new ResizeObserver(update)
+    ro.observe(el)
+    return () => ro.disconnect()
+  }, [])
 
   useEffect(() => {
     const list = buildWordList(selectedThemes)
@@ -160,24 +207,31 @@ export default function GameScreen({ selectedThemes, onComplete, onMenu }) {
         </motion.button>
       </div>
 
-      <div className="cards-grid-wrap">
-      <div className="cards-grid">
-        {batchState.displayOrder.map((wordIdx, i) => {
-          const word = batchState.words[wordIdx]
-          const fb = feedback?.id === word.id ? feedback.type : null
-          const isAnswered = answeredIds.has(word.id)
-          return (
-            <WordCard
-              key={`${batchOffset}-${word.id}`}
-              word={word}
-              index={i}
-              feedback={fb}
-              isAnswered={isAnswered}
-              onClick={() => handleCardClick(word)}
-            />
-          )
-        })}
-      </div>
+      <div className="cards-grid-wrap" ref={wrapRef}>
+        <div
+          className="cards-grid"
+          style={{
+            gridTemplateColumns: `repeat(${gridLayout.cols}, 1fr)`,
+            gridTemplateRows: `repeat(${gridLayout.rows}, 1fr)`,
+            ...(gridLayout.gridW ? { width: gridLayout.gridW, height: gridLayout.gridH } : {}),
+          }}
+        >
+          {batchState.displayOrder.map((wordIdx, i) => {
+            const word = batchState.words[wordIdx]
+            const fb = feedback?.id === word.id ? feedback.type : null
+            const isAnswered = answeredIds.has(word.id)
+            return (
+              <WordCard
+                key={`${batchOffset}-${word.id}`}
+                word={word}
+                index={i}
+                feedback={fb}
+                isAnswered={isAnswered}
+                onClick={() => handleCardClick(word)}
+              />
+            )
+          })}
+        </div>
       </div>
     </div>
   )

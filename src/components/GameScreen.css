@@ -135,22 +135,8 @@
   box-sizing: border-box;
 }
 
-/*
-  UI fixed height estimate:
-    nav:     8+4+20  = 32px
-    header:  2+4+7+3+14 = 30px
-    speaker: 3+6+34  = 43px
-    padding bottom: 8px
-    total ≈ 113px → use 115px for safety
-
-  Grid is 4×2 square cells → aspect-ratio 2:1
-  Width = min(screen_width, available_height × 2)
-*/
 .cards-grid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  grid-template-rows: repeat(2, 1fr);
   gap: 8px;
-  aspect-ratio: 2 / 1;
-  width: min(calc(100vw - 20px), calc((100vh - 115px) * 2));
+  /* cols / rows / width / height are set via inline styles by computeOptimalLayout() in GameScreen.jsx */
 }
