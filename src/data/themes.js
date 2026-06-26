@@ -1,5 +1,5 @@
 function img(keyword, lock) {
-  return `https://loremflickr.com/400/400/${keyword}?lock=${lock}`
+  return `https://loremflickr.com/400/400/${keyword}?lock=${lock}&type=photo`
 }
 
 export const themes = [
