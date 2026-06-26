@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
+import { motion } from 'framer-motion'
 import { themes, shuffleArray, BATCH_SIZE } from '../data/themes.js'
 import { speak } from '../hooks/useSpeech.js'
 import WordCard from './WordCard.jsx'
@@ -18,10 +18,18 @@ function buildWordList(selectedIds) {
   return shuffleArray(allWords)
 }
 
+function makeBatchState(batch) {
+  return {
+    words: batch,
+    displayOrder: shuffleArray([...Array(batch.length).keys()]),
+    questionOrder: shuffleArray([...Array(batch.length).keys()]),
+  }
+}
+
 export default function GameScreen({ selectedThemes, onComplete }) {
   const [wordList, setWordList] = useState([])
-  const [currentBatch, setCurrentBatch] = useState([])
-  const [wordIndex, setWordIndex] = useState(0)
+  const [batchState, setBatchState] = useState({ words: [], displayOrder: [], questionOrder: [] })
+  const [questionIndex, setQuestionIndex] = useState(0)
   const [batchOffset, setBatchOffset] = useState(0)
   const [feedback, setFeedback] = useState(null)
   const [isLocked, setIsLocked] = useState(false)
@@ -33,14 +41,14 @@ export default function GameScreen({ selectedThemes, onComplete }) {
     const list = buildWordList(selectedThemes)
     setWordList(list)
     const batch = list.slice(0, BATCH_SIZE)
-    setCurrentBatch(batch)
-    setWordIndex(0)
+    setBatchState(makeBatchState(batch))
+    setQuestionIndex(0)
     setBatchOffset(0)
     setProgress(0)
     setAnsweredIds(new Set())
   }, [selectedThemes])
 
-  const currentTarget = currentBatch[wordIndex] ?? null
+  const currentTarget = batchState.words[batchState.questionOrder[questionIndex]] ?? null
 
   const speakCurrent = useCallback((word) => {
     if (!word) return
@@ -67,7 +75,7 @@ export default function GameScreen({ selectedThemes, onComplete }) {
       setFeedback({ id: word.id, type: 'correct' })
       speak('Correct!')
 
-      const newProgress = batchOffset + wordIndex + 1
+      const newProgress = batchOffset + questionIndex + 1
       setProgress(newProgress)
 
       setTimeout(() => {
@@ -77,24 +85,24 @@ export default function GameScreen({ selectedThemes, onComplete }) {
         newAnswered.add(word.id)
         setAnsweredIds(newAnswered)
 
-        const nextIndex = wordIndex + 1
+        const nextQIndex = questionIndex + 1
 
-        if (nextIndex >= currentBatch.length) {
+        if (nextQIndex >= batchState.words.length) {
           const nextOffset = batchOffset + BATCH_SIZE
           setTimeout(() => {
             if (nextOffset >= wordList.length) {
               onComplete()
             } else {
               const nextBatch = wordList.slice(nextOffset, nextOffset + BATCH_SIZE)
-              setCurrentBatch(nextBatch)
+              setBatchState(makeBatchState(nextBatch))
               setBatchOffset(nextOffset)
-              setWordIndex(0)
+              setQuestionIndex(0)
               setAnsweredIds(new Set())
               setIsLocked(false)
             }
           }, 600)
         } else {
-          setWordIndex(nextIndex)
+          setQuestionIndex(nextQIndex)
           setIsLocked(false)
         }
       }, 700)
@@ -106,7 +114,7 @@ export default function GameScreen({ selectedThemes, onComplete }) {
         speakCurrent(currentTarget)
       }, 800)
     }
-  }, [isLocked, currentTarget, wordIndex, currentBatch, batchOffset, wordList, answeredIds, onComplete, speakCurrent])
+  }, [isLocked, currentTarget, questionIndex, batchState, batchOffset, wordList, answeredIds, onComplete, speakCurrent])
 
   const handleRepeat = () => {
     if (currentTarget) speakCurrent(currentTarget)
@@ -145,7 +153,8 @@ export default function GameScreen({ selectedThemes, onComplete }) {
       </div>
 
       <div className="cards-grid">
-        {currentBatch.map((word, i) => {
+        {batchState.displayOrder.map((wordIdx, i) => {
+          const word = batchState.words[wordIdx]
           const fb = feedback?.id === word.id ? feedback.type : null
           const isAnswered = answeredIds.has(word.id)
           return (
