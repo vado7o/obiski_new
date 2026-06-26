@@ -1,23 +1,26 @@
 .game-screen {
-  min-height: 100vh;
+  height: 100vh;
+  overflow: hidden;
   display: flex;
   flex-direction: column;
   background: linear-gradient(160deg, #EDE7FF 0%, #F8F6FF 100%);
-  padding: 0 12px 24px;
+  padding: 0 12px 10px;
+  box-sizing: border-box;
 }
 
 .game-nav {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 16px 12px 8px;
+  padding: 12px 4px 6px;
   max-width: 900px;
   width: 100%;
   margin: 0 auto;
+  flex-shrink: 0;
 }
 
 .app-title {
-  font-size: 24px;
+  font-size: 22px;
   font-weight: 900;
   background: linear-gradient(135deg, #7C4DFF, #FF6D00);
   -webkit-background-clip: text;
@@ -31,16 +34,17 @@
   display: flex;
   align-items: center;
   gap: 6px;
-  padding: 8px 18px;
+  padding: 7px 16px;
   border-radius: 10px;
   background: white;
   border: none;
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 700;
   color: #7C4DFF;
   cursor: pointer;
   box-shadow: 0 2px 10px rgba(124, 77, 255, 0.15);
   transition: box-shadow 0.2s, transform 0.15s;
+  flex-shrink: 0;
 }
 
 .menu-btn:hover {
@@ -53,20 +57,20 @@
 }
 
 .game-header {
-  padding: 16px 12px 8px;
-  position: sticky;
-  top: 0;
-  z-index: 10;
-  background: transparent;
+  padding: 4px 4px 6px;
+  max-width: 900px;
+  width: 100%;
+  margin: 0 auto;
+  flex-shrink: 0;
 }
 
 .progress-bar-wrap {
   width: 100%;
-  height: 10px;
+  height: 8px;
   background: rgba(124, 77, 255, 0.12);
   border-radius: 99px;
   overflow: hidden;
-  margin-bottom: 8px;
+  margin-bottom: 4px;
 }
 
 .progress-bar-fill {
@@ -83,7 +87,7 @@
 }
 
 .stat {
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 700;
   color: #7B7B9E;
 }
@@ -92,33 +96,35 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: 12px 0 16px;
+  padding: 4px 0 8px;
+  flex-shrink: 0;
 }
 
 .speaker-btn {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   align-items: center;
-  gap: 4px;
+  gap: 8px;
   background: white;
   border: none;
-  border-radius: 20px;
-  padding: 16px 32px;
-  box-shadow: 0 4px 20px rgba(124, 77, 255, 0.15);
+  border-radius: 50px;
+  padding: 9px 20px 9px 14px;
+  box-shadow: 0 3px 14px rgba(124, 77, 255, 0.15);
   cursor: pointer;
   transition: box-shadow 0.2s;
 }
 
 .speaker-btn:hover {
-  box-shadow: 0 8px 32px rgba(124, 77, 255, 0.25);
+  box-shadow: 0 6px 24px rgba(124, 77, 255, 0.25);
 }
 
 .speaker-icon {
-  font-size: 40px;
+  font-size: 22px;
+  line-height: 1;
 }
 
 .speaker-hint {
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 700;
   color: #A89CD8;
 }
@@ -126,26 +132,31 @@
 .cards-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 10px;
+  grid-template-rows: repeat(2, 1fr);
+  gap: 8px;
   width: 100%;
   max-width: 900px;
   margin: 0 auto;
   flex: 1;
+  min-height: 0;
 }
 
 @media (max-width: 600px) {
   .cards-grid {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 8px;
+    grid-template-columns: repeat(4, 1fr);
+    grid-template-rows: repeat(2, 1fr);
+    gap: 6px;
+  }
+  .game-screen {
+    padding: 0 8px 8px;
   }
 }
 
 @media (min-width: 900px) {
   .cards-grid {
-    grid-template-columns: repeat(4, 1fr);
-    gap: 14px;
+    gap: 12px;
   }
   .game-screen {
-    padding: 0 24px 32px;
+    padding: 0 24px 16px;
   }
 }
