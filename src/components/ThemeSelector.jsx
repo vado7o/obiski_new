@@ -8,23 +8,22 @@ export default function ThemeSelector({ selected, onToggle, onStart }) {
   return (
     <div className="theme-selector">
       <motion.div
-        className="theme-header"
-        initial={{ opacity: 0, y: -30 }}
+        className="app-nav"
+        initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
+        transition={{ duration: 0.4 }}
       >
-        <div className="logo">
-          <span className="logo-icon">🌟</span>
-          <h1 className="logo-text">Obiski</h1>
+        <span className="app-title">Obiski</span>
+        <div className="app-nav-right">
+          <p className="tagline">Choose your themes and start learning!</p>
         </div>
-        <p className="tagline">Choose your themes and start learning!</p>
       </motion.div>
 
       <motion.div
         className="themes-grid"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        transition={{ duration: 0.5, delay: 0.2 }}
+        transition={{ duration: 0.5, delay: 0.15 }}
       >
         {themes.map((theme, i) => {
           const isSelected = selected.includes(theme.id)
@@ -67,7 +66,7 @@ export default function ThemeSelector({ selected, onToggle, onStart }) {
         className="start-bar"
         initial={{ opacity: 0, y: 40 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5, delay: 0.4 }}
+        transition={{ duration: 0.5, delay: 0.3 }}
       >
         {selected.length > 0 && (
           <motion.p

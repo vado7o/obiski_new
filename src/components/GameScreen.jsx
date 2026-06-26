@@ -26,7 +26,7 @@ function makeBatchState(batch) {
   }
 }
 
-export default function GameScreen({ selectedThemes, onComplete }) {
+export default function GameScreen({ selectedThemes, onComplete, onMenu }) {
   const [wordList, setWordList] = useState([])
   const [batchState, setBatchState] = useState({ words: [], displayOrder: [], questionOrder: [] })
   const [questionIndex, setQuestionIndex] = useState(0)
@@ -125,6 +125,12 @@ export default function GameScreen({ selectedThemes, onComplete }) {
 
   return (
     <div className="game-screen">
+      <div className="game-nav">
+        <span className="app-title">Obiski</span>
+        <button className="menu-btn" onClick={onMenu}>
+          ☰ Меню
+        </button>
+      </div>
       <div className="game-header">
         <div className="progress-bar-wrap">
           <motion.div

@@ -6,6 +6,52 @@
   padding: 0 12px 24px;
 }
 
+.game-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 12px 8px;
+  max-width: 900px;
+  width: 100%;
+  margin: 0 auto;
+}
+
+.app-title {
+  font-size: 24px;
+  font-weight: 900;
+  background: linear-gradient(135deg, #7C4DFF, #FF6D00);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  letter-spacing: -0.5px;
+  line-height: 1;
+}
+
+.menu-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 18px;
+  border-radius: 10px;
+  background: white;
+  border: none;
+  font-size: 14px;
+  font-weight: 700;
+  color: #7C4DFF;
+  cursor: pointer;
+  box-shadow: 0 2px 10px rgba(124, 77, 255, 0.15);
+  transition: box-shadow 0.2s, transform 0.15s;
+}
+
+.menu-btn:hover {
+  box-shadow: 0 4px 18px rgba(124, 77, 255, 0.28);
+  transform: translateY(-1px);
+}
+
+.menu-btn:active {
+  transform: translateY(0);
+}
+
 .game-header {
   padding: 16px 12px 8px;
   position: sticky;

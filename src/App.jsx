@@ -69,6 +69,7 @@ export default function App() {
           <GameScreen
             selectedThemes={selectedThemes}
             onComplete={handleComplete}
+            onMenu={handlePlayAgain}
           />
         </motion.div>
       )}
