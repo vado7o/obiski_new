@@ -1,3 +1,5 @@
+let currentAudio = null
+
 export function speak(text, onEnd) {
   if (!window.speechSynthesis) {
     if (onEnd) onEnd()
@@ -14,4 +16,37 @@ export function speak(text, onEnd) {
 
 export function speakWord(word) {
   speak(word)
+}
+
+function stopAudio() {
+  if (currentAudio) {
+    currentAudio.pause()
+    currentAudio.currentTime = 0
+    currentAudio = null
+  }
+}
+
+export function speakWordObject(word, onEnd) {
+  if (!word) {
+    if (onEnd) onEnd()
+    return
+  }
+  if (word.audioUrl) {
+    if (window.speechSynthesis) window.speechSynthesis.cancel()
+    stopAudio()
+    const audio = new Audio(word.audioUrl)
+    currentAudio = audio
+    if (onEnd) audio.onended = onEnd
+    audio.onerror = () => {
+      currentAudio = null
+      speak(word.name, onEnd)
+    }
+    audio.play().catch(() => {
+      currentAudio = null
+      speak(word.name, onEnd)
+    })
+    return
+  }
+  stopAudio()
+  speak(word.name, onEnd)
 }

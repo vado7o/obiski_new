@@ -1,12 +1,13 @@
 import { useState, useEffect, useLayoutEffect, useCallback, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { themes, shuffleArray, BATCH_SIZE } from '../data/themes.js'
-import { speak } from '../hooks/useSpeech.js'
+import { shuffleArray, BATCH_SIZE } from '../data/themes.js'
+import { speak, speakWordObject } from '../hooks/useSpeech.js'
 import { useLang } from '../contexts/LanguageContext.jsx'
+import { useContent } from '../contexts/ContentContext.jsx'
 import WordCard from './WordCard.jsx'
 import './GameScreen.css'
 
-function buildWordList(selectedIds) {
+function buildWordList(selectedIds, themes) {
   const allWords = []
   for (const id of selectedIds) {
     const theme = themes.find(t => t.id === id)
@@ -58,6 +59,7 @@ function computeOptimalLayout(W, H, n) {
 
 export default function GameScreen({ selectedThemes, onComplete, onMenu }) {
   const { t } = useLang()
+  const { themes } = useContent()
   const [wordList, setWordList] = useState([])
   const [batchState, setBatchState] = useState({ words: [], displayOrder: [], questionOrder: [] })
   const [questionIndex, setQuestionIndex] = useState(0)
@@ -97,7 +99,7 @@ export default function GameScreen({ selectedThemes, onComplete, onMenu }) {
   }, [])
 
   useEffect(() => {
-    const list = buildWordList(selectedThemes)
+    const list = buildWordList(selectedThemes, themes)
     setWordList(list)
     const batch = list.slice(0, BATCH_SIZE)
     setBatchState(makeBatchState(batch))
@@ -111,7 +113,7 @@ export default function GameScreen({ selectedThemes, onComplete, onMenu }) {
 
   const speakCurrent = useCallback((word) => {
     if (!word) return
-    speak(word.name)
+    speakWordObject(word)
   }, [])
 
   useEffect(() => {

@@ -1,9 +1,12 @@
 import { useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { LanguageProvider } from './contexts/LanguageContext.jsx'
+import { ContentProvider } from './contexts/ContentContext.jsx'
+import { AuthProvider } from './contexts/AuthContext.jsx'
 import ThemeSelector from './components/ThemeSelector.jsx'
 import GameScreen from './components/GameScreen.jsx'
 import VictoryScreen from './components/VictoryScreen.jsx'
+import AdminPanel from './components/AdminPanel.jsx'
 
 const SCREEN = {
   SELECT: 'select',
@@ -20,6 +23,7 @@ const pageVariants = {
 function AppInner() {
   const [screen, setScreen] = useState(SCREEN.SELECT)
   const [selectedThemes, setSelectedThemes] = useState([])
+  const [adminOpen, setAdminOpen] = useState(false)
 
   const toggleTheme = (id) => {
     setSelectedThemes(prev =>
@@ -35,30 +39,40 @@ function AppInner() {
   }
 
   return (
-    <AnimatePresence mode="wait">
-      {screen === SCREEN.SELECT && (
-        <motion.div key="select" variants={pageVariants} initial="initial" animate="animate" exit="exit" transition={{ duration: 0.3 }}>
-          <ThemeSelector selected={selectedThemes} onToggle={toggleTheme} onStart={startGame} />
-        </motion.div>
-      )}
-      {screen === SCREEN.GAME && (
-        <motion.div key="game" variants={pageVariants} initial="initial" animate="animate" exit="exit" transition={{ duration: 0.3 }}>
-          <GameScreen selectedThemes={selectedThemes} onComplete={handleComplete} onMenu={handlePlayAgain} />
-        </motion.div>
-      )}
-      {screen === SCREEN.VICTORY && (
-        <motion.div key="victory" variants={pageVariants} initial="initial" animate="animate" exit="exit" transition={{ duration: 0.3 }}>
-          <VictoryScreen onPlayAgain={handlePlayAgain} />
-        </motion.div>
-      )}
-    </AnimatePresence>
+    <>
+      <AnimatePresence mode="wait">
+        {screen === SCREEN.SELECT && (
+          <motion.div key="select" variants={pageVariants} initial="initial" animate="animate" exit="exit" transition={{ duration: 0.3 }}>
+            <ThemeSelector selected={selectedThemes} onToggle={toggleTheme} onStart={startGame} onOpenAdmin={() => setAdminOpen(true)} />
+          </motion.div>
+        )}
+        {screen === SCREEN.GAME && (
+          <motion.div key="game" variants={pageVariants} initial="initial" animate="animate" exit="exit" transition={{ duration: 0.3 }}>
+            <GameScreen selectedThemes={selectedThemes} onComplete={handleComplete} onMenu={handlePlayAgain} />
+          </motion.div>
+        )}
+        {screen === SCREEN.VICTORY && (
+          <motion.div key="victory" variants={pageVariants} initial="initial" animate="animate" exit="exit" transition={{ duration: 0.3 }}>
+            <VictoryScreen onPlayAgain={handlePlayAgain} />
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      <AnimatePresence>
+        {adminOpen && <AdminPanel onClose={() => setAdminOpen(false)} />}
+      </AnimatePresence>
+    </>
   )
 }
 
 export default function App() {
   return (
     <LanguageProvider>
-      <AppInner />
+      <AuthProvider>
+        <ContentProvider>
+          <AppInner />
+        </ContentProvider>
+      </AuthProvider>
     </LanguageProvider>
   )
 }

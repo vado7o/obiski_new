@@ -26,7 +26,7 @@ export default function WordCard({ word, index, feedback, isAnswered, onClick })
       whileTap={!isAnswered ? { scale: 0.96 } : {}}
     >
       <div className="word-img-wrap">
-        {!imgError ? (
+        {word.imageUrl && !imgError ? (
           <img
             className="word-photo"
             src={word.imageUrl}
