@@ -13,18 +13,26 @@ export default function ThemeSelector({ selected, onToggle, onStart, onOpenAdmin
   const { isAdmin, logout } = useAuth()
   const canStart = selected.length > 0
   const [menuOpen, setMenuOpen] = useState(false)
+  const [langView, setLangView] = useState(false)
   const [loginOpen, setLoginOpen] = useState(false)
   const menuRef = useRef(null)
+
+  function closeMenu() {
+    setMenuOpen(false)
+    setLangView(false)
+  }
 
   useEffect(() => {
     function handleClick(e) {
       if (menuRef.current && !menuRef.current.contains(e.target)) {
-        setMenuOpen(false)
+        closeMenu()
       }
     }
     if (menuOpen) document.addEventListener('mousedown', handleClick)
     return () => document.removeEventListener('mousedown', handleClick)
   }, [menuOpen])
+
+  const currentLang = LANGUAGES.find(l => l.code === lang)
 
   return (
     <div className="theme-selector">
@@ -53,42 +61,64 @@ export default function ThemeSelector({ selected, onToggle, onStart, onOpenAdmin
                 exit={{ opacity: 0, y: -8, scale: 0.96 }}
                 transition={{ duration: 0.18 }}
               >
-                <p className="lang-dropdown-title">{t.language}</p>
-                {LANGUAGES.map(l => (
-                  <button
-                    key={l.code}
-                    className={`lang-option ${lang === l.code ? 'active' : ''}`}
-                    onClick={() => { setLang(l.code); setMenuOpen(false) }}
-                  >
-                    <span className="lang-flag">{l.flag}</span>
-                    <span className="lang-label">{l.label}</span>
-                    {lang === l.code && <span className="lang-check">✓</span>}
-                  </button>
-                ))}
-
-                <div className="menu-divider" />
-                {isAdmin ? (
+                {langView ? (
+                  <>
+                    <button
+                      className="lang-option lang-back"
+                      onClick={() => setLangView(false)}
+                    >
+                      <span className="lang-flag">‹</span>
+                      <span className="lang-label">{t.admin.back}</span>
+                    </button>
+                    <div className="menu-divider" />
+                    {LANGUAGES.map(l => (
+                      <button
+                        key={l.code}
+                        className={`lang-option ${lang === l.code ? 'active' : ''}`}
+                        onClick={() => { setLang(l.code); closeMenu() }}
+                      >
+                        <span className="lang-flag">{l.flag}</span>
+                        <span className="lang-label">{l.label}</span>
+                        {lang === l.code && <span className="lang-check">✓</span>}
+                      </button>
+                    ))}
+                  </>
+                ) : (
                   <>
                     <button
                       className="lang-option"
-                      onClick={() => { setMenuOpen(false); onOpenAdmin() }}
+                      onClick={() => setLangView(true)}
                     >
-                      <span className="lang-label">{t.admin.menuManage}</span>
+                      {currentLang && <span className="lang-flag">{currentLang.flag}</span>}
+                      <span className="lang-label">{t.language}</span>
+                      <span className="lang-chevron">›</span>
                     </button>
-                    <button
-                      className="lang-option"
-                      onClick={() => { setMenuOpen(false); logout() }}
-                    >
-                      <span className="lang-label">{t.admin.menuLogout}</span>
-                    </button>
+
+                    <div className="menu-divider" />
+                    {isAdmin ? (
+                      <>
+                        <button
+                          className="lang-option"
+                          onClick={() => { closeMenu(); onOpenAdmin() }}
+                        >
+                          <span className="lang-label">{t.admin.menuManage}</span>
+                        </button>
+                        <button
+                          className="lang-option"
+                          onClick={() => { closeMenu(); logout() }}
+                        >
+                          <span className="lang-label">{t.admin.menuLogout}</span>
+                        </button>
+                      </>
+                    ) : (
+                      <button
+                        className="lang-option"
+                        onClick={() => { closeMenu(); setLoginOpen(true) }}
+                      >
+                        <span className="lang-label">{t.admin.menuLogin}</span>
+                      </button>
+                    )}
                   </>
-                ) : (
-                  <button
-                    className="lang-option"
-                    onClick={() => { setMenuOpen(false); setLoginOpen(true) }}
-                  >
-                    <span className="lang-label">{t.admin.menuLogin}</span>
-                  </button>
                 )}
               </motion.div>
             )}

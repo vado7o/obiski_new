@@ -132,6 +132,23 @@
   color: #7C4DFF;
 }
 
+.lang-chevron {
+  font-size: 18px;
+  font-weight: 700;
+  color: #B0A8C8;
+  line-height: 1;
+}
+
+.lang-back .lang-flag {
+  font-size: 22px;
+  font-weight: 700;
+  color: #7C4DFF;
+}
+
+.lang-back .lang-label {
+  color: #7C4DFF;
+}
+
 .tagline {
   font-size: 14px;
   color: #7B7B9E;
