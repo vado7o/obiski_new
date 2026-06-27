@@ -9,6 +9,12 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const isProd = process.env.NODE_ENV === 'production'
 const port = Number(process.env.PORT) || 5000
 
+const sessionSecret = process.env.SESSION_SECRET
+if (!sessionSecret) {
+  console.error('SESSION_SECRET is not set. Refusing to start with an insecure session secret.')
+  process.exit(1)
+}
+
 const app = express()
 const httpServer = createHttpServer(app)
 
@@ -16,7 +22,7 @@ app.set('trust proxy', 1)
 app.use(express.json())
 app.use(
   session({
-    secret: process.env.SESSION_SECRET || 'obiski-dev-secret',
+    secret: sessionSecret,
     resave: false,
     saveUninitialized: false,
     cookie: {

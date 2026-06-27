@@ -1,0 +1,3 @@
+- [Replit bash background jobs](replit-bash-background-jobs.md) — nohup'd jobs get killed when the bash tool call returns; use setsid to fully detach long migrations.
+- [Express 5 routing](express5-routing.md) — path-to-regexp v8 changed wildcard syntax; old `(*)` and `app.get('*')` patterns throw at boot.
+- [Obiski seed photos](obiski-seed-photos.md) — loremflickr is unreliable for bulk seeding; ~32/220 consistently 500, gaps covered by emoji fallback + owner upload.
