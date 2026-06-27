@@ -100,7 +100,7 @@ export const translations = {
     congrats: 'Поздравляю! Ты справился!',
     admin: {
       menuManage: '🔧 Управление контентом',
-      menuLogin: '🔑 Вход для владельца',
+      menuLogin: '🔑 Войти',
       menuLogout: '🚪 Выйти',
       loginTitle: 'Вход для владельца',
       passwordPlaceholder: 'Пароль',
