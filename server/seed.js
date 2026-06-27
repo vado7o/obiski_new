@@ -1,27 +1,19 @@
+import fs from 'fs'
+import path from 'path'
+import { fileURLToPath } from 'url'
 import { themes } from './seedData.js'
-import { pool, query } from './db.js'
+import { pool, query, ensureSchema } from './db.js'
 import { uploadObject } from './storage.js'
 
-async function fetchImage(url, attempt = 0) {
-  const ac = new AbortController()
-  const to = setTimeout(() => ac.abort(), 20000)
-  try {
-    const r = await fetch(url, { signal: ac.signal, redirect: 'follow' })
-    if (!r.ok) throw new Error(`status ${r.status}`)
-    const ct = r.headers.get('content-type') || 'image/jpeg'
-    if (!ct.startsWith('image/')) throw new Error(`not image (${ct})`)
-    const buf = Buffer.from(await r.arrayBuffer())
-    if (buf.length < 1000) throw new Error('image too small')
-    return { buf, ct }
-  } catch (err) {
-    if (attempt < 2) {
-      await new Promise((res) => setTimeout(res, 800 * (attempt + 1)))
-      return fetchImage(url, attempt + 1)
-    }
-    throw err
-  } finally {
-    clearTimeout(to)
-  }
+const __dirname = path.dirname(fileURLToPath(import.meta.url))
+const ASSET_DIR = path.join(__dirname, 'seed-assets')
+
+function readAsset(wordId) {
+  const file = path.join(ASSET_DIR, `${wordId}.jpg`)
+  if (!fs.existsSync(file)) return null
+  const buf = fs.readFileSync(file)
+  if (buf.length < 100) return null
+  return buf
 }
 
 async function runPool(items, concurrency, worker) {
@@ -44,6 +36,8 @@ async function runPool(items, concurrency, worker) {
 }
 
 async function seed() {
+  await ensureSchema()
+
   console.log('Seeding themes & words...')
   for (let ti = 0; ti < themes.length; ti++) {
     const t = themes[ti]
@@ -78,19 +72,27 @@ async function seed() {
       if (!haveImage.has(w.id)) pending.push({ word: w })
     }
   }
-  console.log(`Fetching ${pending.length} photos (skipping ${haveImage.size} already stored)...`)
+  console.log(`Uploading ${pending.length} photos from local assets (skipping ${haveImage.size} already stored)...`)
 
   let ok = 0
-  await runPool(pending, 5, async ({ word }) => {
-    const { buf, ct } = await fetchImage(word.imageUrl)
-    const path = await uploadObject(buf, ct)
-    await query('UPDATE words SET image_path = $2 WHERE id = $1', [word.id, path])
+  await runPool(pending, 8, async ({ word }) => {
+    const buf = readAsset(word.id)
+    if (!buf) throw new Error(`missing local asset server/seed-assets/${word.id}.jpg`)
+    const objPath = await uploadObject(buf, 'image/jpeg')
+    await query('UPDATE words SET image_path = $2 WHERE id = $1', [word.id, objPath])
     ok++
   })
 
+  const missing = await query('SELECT id FROM words WHERE image_path IS NULL')
   const withImg = await query('SELECT COUNT(*)::int AS c FROM words WHERE image_path IS NOT NULL')
   const totalWords = await query('SELECT COUNT(*)::int AS c FROM words')
   console.log(`Done. Newly stored: ${ok}. Words with photos: ${withImg.rows[0].c}/${totalWords.rows[0].c}`)
+
+  if (missing.rows.length > 0) {
+    throw new Error(
+      `Seed incomplete: ${missing.rows.length} baseline words have no photo: ${missing.rows.map((r) => r.id).join(', ')}`
+    )
+  }
 }
 
 seed()
