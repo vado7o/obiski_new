@@ -191,7 +191,7 @@ export default function GameScreen({ selectedThemes, onComplete, onMenu }) {
       <div className="game-nav">
         <span className="app-title">Obiski</span>
         <button className="menu-btn" onClick={onMenu}>
-          {t.menuBtn}
+          {t.backBtn}
         </button>
       </div>
       <div className="game-header">

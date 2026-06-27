@@ -11,6 +11,7 @@ export const translations = {
   en: {
     tagline: 'Choose your themes and start learning!',
     menuBtn: '☰ Menu',
+    backBtn: '‹ Back',
     language: 'Language',
     words: (n) => `${n} words`,
     selectTheme: 'Select a theme to begin',
@@ -85,6 +86,7 @@ export const translations = {
   ru: {
     tagline: 'Выбери темы и начни учиться!',
     menuBtn: '☰ Меню',
+    backBtn: '‹ Назад',
     language: 'Язык',
     words: (n) => `${n} слов`,
     selectTheme: 'Выбери тему для начала',
@@ -159,6 +161,7 @@ export const translations = {
   es: {
     tagline: '¡Elige tus temas y empieza a aprender!',
     menuBtn: '☰ Menú',
+    backBtn: '‹ Atrás',
     language: 'Idioma',
     words: (n) => `${n} palabras`,
     selectTheme: 'Selecciona un tema para comenzar',
@@ -189,6 +192,7 @@ export const translations = {
   fr: {
     tagline: 'Choisis tes thèmes et commence à apprendre !',
     menuBtn: '☰ Menu',
+    backBtn: '‹ Retour',
     language: 'Langue',
     words: (n) => `${n} mots`,
     selectTheme: 'Sélectionne un thème pour commencer',
@@ -219,6 +223,7 @@ export const translations = {
   de: {
     tagline: 'Wähle deine Themen und fange an zu lernen!',
     menuBtn: '☰ Menü',
+    backBtn: '‹ Zurück',
     language: 'Sprache',
     words: (n) => `${n} Wörter`,
     selectTheme: 'Wähle ein Thema zum Starten',
@@ -249,6 +254,7 @@ export const translations = {
   zh: {
     tagline: '选择你的主题，开始学习！',
     menuBtn: '☰ 菜单',
+    backBtn: '‹ 返回',
     language: '语言',
     words: (n) => `${n} 个词`,
     selectTheme: '请选择一个主题开始',
