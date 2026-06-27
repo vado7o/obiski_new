@@ -4,8 +4,16 @@ import { shuffleArray, BATCH_SIZE } from '../data/themes.js'
 import { speak, speakWordObject } from '../hooks/useSpeech.js'
 import { useLang } from '../contexts/LanguageContext.jsx'
 import { useContent } from '../contexts/ContentContext.jsx'
+import { getFeedbackSounds } from '../api.js'
 import WordCard from './WordCard.jsx'
 import './GameScreen.css'
+
+function playRandom(urls) {
+  if (!urls || urls.length === 0) return false
+  const url = urls[Math.floor(Math.random() * urls.length)]
+  try { new Audio(url).play() } catch {}
+  return true
+}
 
 function buildWordList(selectedIds, themes) {
   const allWords = []
@@ -58,7 +66,7 @@ function computeOptimalLayout(W, H, n) {
 }
 
 export default function GameScreen({ selectedThemes, onComplete, onMenu }) {
-  const { t } = useLang()
+  const { t, lang } = useLang()
   const { themes } = useContent()
   const [wordList, setWordList] = useState([])
   const [batchState, setBatchState] = useState({ words: [], displayOrder: [], questionOrder: [] })
@@ -68,6 +76,7 @@ export default function GameScreen({ selectedThemes, onComplete, onMenu }) {
   const [isLocked, setIsLocked] = useState(false)
   const [progress, setProgress] = useState(0)
   const [answeredIds, setAnsweredIds] = useState(new Set())
+  const [feedbackSounds, setFeedbackSounds] = useState({ correct: [], incorrect: [] })
   const speakTimeoutRef = useRef(null)
   const wrapRef = useRef(null)
   const debounceRef = useRef(null)
@@ -109,6 +118,12 @@ export default function GameScreen({ selectedThemes, onComplete, onMenu }) {
     setAnsweredIds(new Set())
   }, [selectedThemes])
 
+  useEffect(() => {
+    getFeedbackSounds(lang)
+      .then((data) => setFeedbackSounds(data))
+      .catch(() => {})
+  }, [lang])
+
   const currentTarget = batchState.words[batchState.questionOrder[questionIndex]] ?? null
 
   const speakCurrent = useCallback((word) => {
@@ -134,7 +149,7 @@ export default function GameScreen({ selectedThemes, onComplete, onMenu }) {
     if (word.id === currentTarget.id) {
       setIsLocked(true)
       setFeedback({ id: word.id, type: 'correct' })
-      speak(t.correct)
+      if (!playRandom(feedbackSounds.correct)) speak(t.correct)
 
       const newProgress = batchOffset + questionIndex + 1
       setProgress(newProgress)
@@ -169,13 +184,13 @@ export default function GameScreen({ selectedThemes, onComplete, onMenu }) {
       }, 700)
     } else {
       setFeedback({ id: word.id, type: 'wrong' })
-      speak(t.tryAgain)
+      if (!playRandom(feedbackSounds.incorrect)) speak(t.tryAgain)
       setTimeout(() => {
         setFeedback(null)
         speakCurrent(currentTarget)
       }, 800)
     }
-  }, [isLocked, currentTarget, questionIndex, batchState, batchOffset, wordList, answeredIds, onComplete, speakCurrent])
+  }, [isLocked, currentTarget, questionIndex, batchState, batchOffset, wordList, answeredIds, feedbackSounds, onComplete, speakCurrent])
 
   const handleRepeat = () => {
     if (currentTarget) speakCurrent(currentTarget)

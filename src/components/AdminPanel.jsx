@@ -7,6 +7,7 @@ import {
   createWord, updateWord, deleteWord,
   uploadWordPhoto, uploadWordAudio, deleteWordAudio,
 } from '../api.js'
+import FeedbackSoundsSection from './FeedbackSoundsSection.jsx'
 import './AdminPanel.css'
 
 const DEFAULT_THEME = { name: '', icon: '📚', color: '#6C63FF', bgColor: '#EDEBFF' }
@@ -18,6 +19,7 @@ export default function AdminPanel({ onClose }) {
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState(null)
 
+  const [activeTab, setActiveTab] = useState('cards')
   const [themeForm, setThemeForm] = useState(null) // {mode, data}
   const [wordForm, setWordForm] = useState(null)
 
@@ -98,8 +100,28 @@ export default function AdminPanel({ onClose }) {
           <button className="btn-ghost" onClick={onClose}>{t.admin.close}</button>
         </div>
 
+        <div className="admin-tabs">
+          <button
+            className={`admin-tab ${activeTab === 'cards' ? 'active' : ''}`}
+            onClick={() => setActiveTab('cards')}
+          >
+            🃏 {t.admin.tabCards}
+          </button>
+          <button
+            className={`admin-tab ${activeTab === 'sounds' ? 'active' : ''}`}
+            onClick={() => setActiveTab('sounds')}
+          >
+            🔊 {t.admin.tabFeedback}
+          </button>
+        </div>
+
         {error && <p className="admin-error admin-error-bar">{error}</p>}
 
+        {activeTab === 'sounds' ? (
+          <div className="admin-feedback-wrap">
+            <FeedbackSoundsSection />
+          </div>
+        ) : (
         <div className="admin-body">
           {/* Theme list */}
           <aside className="admin-themes">
@@ -160,6 +182,7 @@ export default function AdminPanel({ onClose }) {
             )}
           </section>
         </div>
+        )}
       </motion.div>
 
       {themeForm && (

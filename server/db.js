@@ -67,4 +67,16 @@ export async function ensureSchema() {
       updated_at TIMESTAMPTZ DEFAULT NOW()
     );
   `)
+
+  // Feedback sounds: up to 5 per language per type (correct / incorrect)
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS feedback_sounds (
+      lang TEXT NOT NULL,
+      type TEXT NOT NULL CHECK (type IN ('correct', 'incorrect')),
+      slot INTEGER NOT NULL CHECK (slot >= 1 AND slot <= 5),
+      object_path TEXT NOT NULL,
+      updated_at TIMESTAMPTZ DEFAULT NOW(),
+      PRIMARY KEY (lang, type, slot)
+    );
+  `)
 }

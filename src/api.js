@@ -82,3 +82,19 @@ export function uploadWordAudio(id, file) {
 export function deleteWordAudio(id) {
   return jsonRequest(`/api/admin/words/${id}/audio`, { method: 'DELETE' })
 }
+
+export function getFeedbackSounds(lang) {
+  return jsonRequest(`/api/feedback-sounds/${encodeURIComponent(lang)}`)
+}
+
+export function getAdminFeedbackSounds() {
+  return jsonRequest('/api/admin/feedback-sounds')
+}
+
+export function uploadFeedbackSound(lang, type, slot, file) {
+  return uploadFile(`/api/admin/feedback-sounds/${encodeURIComponent(lang)}/${type}/${slot}`, file)
+}
+
+export function deleteFeedbackSound(lang, type, slot) {
+  return jsonRequest(`/api/admin/feedback-sounds/${encodeURIComponent(lang)}/${type}/${slot}`, { method: 'DELETE' })
+}

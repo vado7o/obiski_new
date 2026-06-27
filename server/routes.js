@@ -54,6 +54,8 @@ async function uniqueThemeId(base) {
   return id
 }
 
+const VALID_LANGS = new Set(['en', 'ru', 'es', 'fr', 'de', 'zh'])
+
 export function registerRoutes(app) {
   registerAuthRoutes(app)
 
@@ -84,6 +86,27 @@ export function registerRoutes(app) {
     } catch (err) {
       console.error('PUT /api/me/settings failed:', err)
       res.status(500).json({ error: 'failed_to_save_settings' })
+    }
+  })
+
+  // ---- Public: feedback sounds for current language ----
+  app.get('/api/feedback-sounds/:lang', async (req, res) => {
+    try {
+      const { lang } = req.params
+      const rows = await query(
+        'SELECT type, slot, object_path FROM feedback_sounds WHERE lang = $1 ORDER BY type, slot',
+        [lang]
+      )
+      const correct = []
+      const incorrect = []
+      for (const row of rows.rows) {
+        if (row.type === 'correct') correct.push(row.object_path)
+        else incorrect.push(row.object_path)
+      }
+      res.json({ correct, incorrect })
+    } catch (err) {
+      console.error('GET /api/feedback-sounds/:lang failed:', err)
+      res.status(500).json({ error: 'failed_to_load' })
     }
   })
 
@@ -293,6 +316,77 @@ export function registerRoutes(app) {
       res.json(mapWord(result.rows[0]))
     } catch (err) {
       console.error('audio delete failed:', err)
+      res.status(500).json({ error: 'delete_failed' })
+    }
+  })
+
+  // ---- Admin: feedback sounds ----
+  app.get('/api/admin/feedback-sounds', requireOwner, async (req, res) => {
+    try {
+      const rows = await query(
+        'SELECT lang, type, slot, object_path FROM feedback_sounds ORDER BY lang, type, slot'
+      )
+      res.json({ sounds: rows.rows })
+    } catch (err) {
+      console.error('GET /api/admin/feedback-sounds failed:', err)
+      res.status(500).json({ error: 'failed_to_load' })
+    }
+  })
+
+  app.post(
+    '/api/admin/feedback-sounds/:lang/:type/:slot',
+    requireOwner,
+    upload.single('file'),
+    async (req, res) => {
+      try {
+        const { lang, type, slot } = req.params
+        const slotNum = parseInt(slot, 10)
+        if (!VALID_LANGS.has(lang)) return res.status(400).json({ error: 'invalid_lang' })
+        if (!['correct', 'incorrect'].includes(type)) return res.status(400).json({ error: 'invalid_type' })
+        if (!Number.isInteger(slotNum) || slotNum < 1 || slotNum > 5)
+          return res.status(400).json({ error: 'invalid_slot' })
+        if (!req.file) return res.status(400).json({ error: 'file_required' })
+        if (!req.file.mimetype.startsWith('audio/'))
+          return res.status(400).json({ error: 'invalid_file_type' })
+
+        const existing = await query(
+          'SELECT object_path FROM feedback_sounds WHERE lang = $1 AND type = $2 AND slot = $3',
+          [lang, type, slotNum]
+        )
+        const objectPath = await uploadObject(req.file.buffer, req.file.mimetype)
+        await query(
+          `INSERT INTO feedback_sounds (lang, type, slot, object_path, updated_at)
+           VALUES ($1, $2, $3, $4, NOW())
+           ON CONFLICT (lang, type, slot) DO UPDATE
+             SET object_path = EXCLUDED.object_path, updated_at = NOW()`,
+          [lang, type, slotNum, objectPath]
+        )
+        if (existing.rowCount > 0) await deleteObject(existing.rows[0].object_path)
+        res.json({ lang, type, slot: slotNum, objectPath })
+      } catch (err) {
+        console.error('POST /api/admin/feedback-sounds failed:', err)
+        res.status(500).json({ error: 'upload_failed' })
+      }
+    }
+  )
+
+  app.delete('/api/admin/feedback-sounds/:lang/:type/:slot', requireOwner, async (req, res) => {
+    try {
+      const { lang, type, slot } = req.params
+      const slotNum = parseInt(slot, 10)
+      const existing = await query(
+        'SELECT object_path FROM feedback_sounds WHERE lang = $1 AND type = $2 AND slot = $3',
+        [lang, type, slotNum]
+      )
+      if (existing.rowCount === 0) return res.status(404).json({ error: 'not_found' })
+      await query(
+        'DELETE FROM feedback_sounds WHERE lang = $1 AND type = $2 AND slot = $3',
+        [lang, type, slotNum]
+      )
+      await deleteObject(existing.rows[0].object_path)
+      res.json({ ok: true })
+    } catch (err) {
+      console.error('DELETE /api/admin/feedback-sounds failed:', err)
       res.status(500).json({ error: 'delete_failed' })
     }
   })
