@@ -4,6 +4,7 @@ import { createServer as createHttpServer } from 'http'
 import path from 'path'
 import { fileURLToPath } from 'url'
 import { registerRoutes } from './routes.js'
+import { ensureSchema } from './db.js'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const isProd = process.env.NODE_ENV === 'production'
@@ -37,6 +38,8 @@ app.use(
 registerRoutes(app)
 
 async function start() {
+  await ensureSchema()
+
   if (isProd) {
     const distPath = path.resolve(__dirname, '..', 'dist')
     app.use(express.static(distPath))

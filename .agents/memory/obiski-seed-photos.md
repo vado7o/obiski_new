@@ -1,20 +1,19 @@
 ---
-name: Obiski seed photos
-description: How card photos are seeded into object storage and why some are missing.
+name: Obiski card photos
+description: Where card photos come from and the rule to keep baseline cards fully covered.
 ---
 
-The seed pipeline fetches photos server-side and uploads them to Replit object
-storage, writing the object path to `words.image_path`. The game serves them from
-`/objects/*` (own storage), not from external URLs.
+Card photos live in Replit object storage; `words.image_path` holds the `/objects/*`
+path and the game serves them from there (never external URLs).
 
-**Why loremflickr was abandoned in the browser:** it works via curl/server fetch but
-fails to load in the browser; that motivated migrating to own storage.
+**Rule:** every baseline word must have a stored image so the emoji fallback is only
+for owner-added cards, not shipped content.
 
-**Known gap:** loremflickr also rate-limits/500s during bulk server seeding —
-~32 of 220 words consistently failed even across retries. Those rows keep
-`image_path = NULL`; the UI falls back to the word's emoji, and the owner can
-upload a real photo via the admin panel.
+**Why:** loremflickr (the original bulk source) is unreliable — it serves via curl
+but fails in-browser and rate-limits during bulk seeding, leaving gaps. Generated
+images were used to backfill the cards it could not cover.
 
-**How to apply:** the seed (`npm run seed`) is idempotent — it only fetches words
-whose `image_path` is still NULL, so it is safe to re-run. Don't expect 220/220
-from loremflickr; treat the admin upload path as the reliable source of truth.
+**How to apply:** if baseline cards show emoji instead of photos, backfill them
+(generate or upload) and set `image_path`; don't rely on re-running the loremflickr
+seed to reach full coverage. The seed (`npm run seed`) is idempotent — it only
+touches rows where `image_path IS NULL`.

@@ -1,0 +1,194 @@
+uploads = []
+outputs = []
+
+[[generated]]
+id = "B2LUzWhYj6rF6CQwPGiFB"
+uri = "file://attached_assets/generated_images/card_animals_bear.png"
+type = "image"
+title = "bear flashcard"
+
+[[generated]]
+id = "5QkM7LwMZXc4BELMxofgH"
+uri = "file://attached_assets/generated_images/card_animals_crocodile.png"
+type = "image"
+title = "crocodile flashcard"
+
+[[generated]]
+id = "nQZRwxJSabzpfxmVH8VdU"
+uri = "file://attached_assets/generated_images/card_animals_duck.png"
+type = "image"
+title = "duck flashcard"
+
+[[generated]]
+id = "gecXM5f-xUF-bC4z1Mmz7"
+uri = "file://attached_assets/generated_images/card_animals_lion.png"
+type = "image"
+title = "lion flashcard"
+
+[[generated]]
+id = "IXx4rorCTrQRHsc9yMQzg"
+uri = "file://attached_assets/generated_images/card_animals_tiger.png"
+type = "image"
+title = "tiger flashcard"
+
+[[generated]]
+id = "JMQ312EnRiy8vzkeSXQXq"
+uri = "file://attached_assets/generated_images/card_clothes_bag.png"
+type = "image"
+title = "bag flashcard"
+
+[[generated]]
+id = "3h180ucdxbYKViuvzJyr5"
+uri = "file://attached_assets/generated_images/card_clothes_dress.png"
+type = "image"
+title = "dress flashcard"
+
+[[generated]]
+id = "_vjlUDMPIILTy7MtKKZ2P"
+uri = "file://attached_assets/generated_images/card_clothes_glasses.png"
+type = "image"
+title = "glasses flashcard"
+
+[[generated]]
+id = "IIFsnLPB4JGfgJ6B9I2VW"
+uri = "file://attached_assets/generated_images/card_clothes_shoe.png"
+type = "image"
+title = "shoe flashcard"
+
+[[generated]]
+id = "YeGQs3mJnWmZRsScCuSjg"
+uri = "file://attached_assets/generated_images/card_clothes_watch.png"
+type = "image"
+title = "watch flashcard"
+
+[[generated]]
+id = "wetndq5rcDol64_UmFNyM"
+uri = "file://attached_assets/generated_images/card_food_bread.png"
+type = "image"
+title = "bread flashcard"
+
+[[generated]]
+id = "M_S0zTlBjV2Yjz2fOdrF8"
+uri = "file://attached_assets/generated_images/card_food_chocolate.png"
+type = "image"
+title = "chocolate flashcard"
+
+[[generated]]
+id = "CoOXmoocMCthauljSdE2F"
+uri = "file://attached_assets/generated_images/card_food_cookie.png"
+type = "image"
+title = "cookie flashcard"
+
+[[generated]]
+id = "Lb1p1dOHWe6UFBYPMlLDN"
+uri = "file://attached_assets/generated_images/card_food_pancakes.png"
+type = "image"
+title = "pancakes flashcard"
+
+[[generated]]
+id = "wAeiCo1lyRBzatJQcU0bx"
+uri = "file://attached_assets/generated_images/card_fruits_banana.png"
+type = "image"
+title = "banana flashcard"
+
+[[generated]]
+id = "VvKNseoIFB6zOOgo3xgW9"
+uri = "file://attached_assets/generated_images/card_fruits_fig.png"
+type = "image"
+title = "fig flashcard"
+
+[[generated]]
+id = "YbL1Ouh5HVM67f7-3uJOs"
+uri = "file://attached_assets/generated_images/card_fruits_strawberry.png"
+type = "image"
+title = "strawberry flashcard"
+
+[[generated]]
+id = "qkod7UKI_nI_MfJPWI126"
+uri = "file://attached_assets/generated_images/card_insects_ant.png"
+type = "image"
+title = "ant flashcard"
+
+[[generated]]
+id = "R8CwDjZ31KMJFQizeAfWP"
+uri = "file://attached_assets/generated_images/card_insects_cockroach.png"
+type = "image"
+title = "cockroach flashcard"
+
+[[generated]]
+id = "jy2aUZw-0FFlAE8dfJmiO"
+uri = "file://attached_assets/generated_images/card_insects_dragonfly.png"
+type = "image"
+title = "dragonfly flashcard"
+
+[[generated]]
+id = "JyBwCddDn7VyZNRO95Me-"
+uri = "file://attached_assets/generated_images/card_insects_ladybug.png"
+type = "image"
+title = "ladybug flashcard"
+
+[[generated]]
+id = "ToSQRPyULwX70E9S18HiQ"
+uri = "file://attached_assets/generated_images/card_nature_desert.png"
+type = "image"
+title = "desert flashcard"
+
+[[generated]]
+id = "73v48nVNMvovQo-nMWX_-"
+uri = "file://attached_assets/generated_images/card_nature_leaf.png"
+type = "image"
+title = "leaf flashcard"
+
+[[generated]]
+id = "bLBsSaFig_T8zC_QCucE8"
+uri = "file://attached_assets/generated_images/card_nature_waterfall.png"
+type = "image"
+title = "waterfall flashcard"
+
+[[generated]]
+id = "Q8v5YYwjz3Lvke7HrnDsx"
+uri = "file://attached_assets/generated_images/card_sports_tennis.png"
+type = "image"
+title = "tennis flashcard"
+
+[[generated]]
+id = "a77fSH2GSPqE_p0qlGvwx"
+uri = "file://attached_assets/generated_images/card_vehicles_airplane.png"
+type = "image"
+title = "airplane flashcard"
+
+[[generated]]
+id = "h-uFK0zKMO8AgemSfK0sq"
+uri = "file://attached_assets/generated_images/card_vehicles_boat.png"
+type = "image"
+title = "boat flashcard"
+
+[[generated]]
+id = "Mo2McmwTA6eyNTRbgPz24"
+uri = "file://attached_assets/generated_images/card_vehicles_motorcycle.png"
+type = "image"
+title = "motorcycle flashcard"
+
+[[generated]]
+id = "y5eWrOuNKsHpdY42Y98Yl"
+uri = "file://attached_assets/generated_images/card_vehicles_skateboard.png"
+type = "image"
+title = "skateboard flashcard"
+
+[[generated]]
+id = "Nytm5gWdMhGoPXsJib04I"
+uri = "file://attached_assets/generated_images/card_vehicles_submarine.png"
+type = "image"
+title = "submarine flashcard"
+
+[[generated]]
+id = "M-gKSHtOP1_275HJlh_qq"
+uri = "file://attached_assets/generated_images/card_vehicles_train.png"
+type = "image"
+title = "train flashcard"
+
+[[generated]]
+id = "6xXB_iztsmjyrPZFdU43I"
+uri = "file://attached_assets/generated_images/card_vehicles_truck.png"
+type = "image"
+title = "truck flashcard"
