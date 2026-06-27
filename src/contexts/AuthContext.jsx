@@ -1,32 +1,38 @@
 import { createContext, useContext, useState, useEffect, useCallback } from 'react'
-import { getMe, login as apiLogin, logout as apiLogout } from '../api.js'
+import { getMe } from '../api.js'
 
 const AuthContext = createContext(null)
 
 export function AuthProvider({ children }) {
-  const [isAdmin, setIsAdmin] = useState(false)
+  const [user, setUser] = useState(null)
+  const [isOwner, setIsOwner] = useState(false)
   const [ready, setReady] = useState(false)
 
   useEffect(() => {
     getMe()
-      .then((d) => setIsAdmin(!!(d && d.authenticated)))
-      .catch(() => setIsAdmin(false))
+      .then((d) => {
+        setUser(d && d.authenticated ? d.user : null)
+        setIsOwner(!!(d && d.isOwner))
+      })
+      .catch(() => {
+        setUser(null)
+        setIsOwner(false)
+      })
       .finally(() => setReady(true))
   }, [])
 
-  const login = useCallback(async (password) => {
-    const d = await apiLogin(password)
-    setIsAdmin(!!(d && d.authenticated))
-    return d
+  const login = useCallback(() => {
+    window.location.href = '/api/login'
   }, [])
 
-  const logout = useCallback(async () => {
-    await apiLogout()
-    setIsAdmin(false)
+  const logout = useCallback(() => {
+    window.location.href = '/api/logout'
   }, [])
 
   return (
-    <AuthContext.Provider value={{ isAdmin, ready, login, logout }}>
+    <AuthContext.Provider
+      value={{ user, isOwner, isAdmin: isOwner, ready, login, logout }}
+    >
       {children}
     </AuthContext.Provider>
   )

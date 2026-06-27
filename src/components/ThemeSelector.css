@@ -149,6 +149,17 @@
   color: #7C4DFF;
 }
 
+.menu-user {
+  padding: 8px 14px 6px;
+  font-size: 12px;
+  font-weight: 700;
+  color: #9B93B5;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 220px;
+}
+
 .tagline {
   font-size: 14px;
   color: #7B7B9E;

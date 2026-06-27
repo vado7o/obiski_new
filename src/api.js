@@ -19,18 +19,18 @@ export function getContent() {
 }
 
 export function getMe() {
-  return jsonRequest('/api/auth/me')
+  return jsonRequest('/api/auth/user')
 }
 
-export function login(password) {
-  return jsonRequest('/api/auth/login', {
-    method: 'POST',
-    body: JSON.stringify({ password }),
+export function getSettings() {
+  return jsonRequest('/api/me/settings')
+}
+
+export function saveSettings(data) {
+  return jsonRequest('/api/me/settings', {
+    method: 'PUT',
+    body: JSON.stringify(data || {}),
   })
-}
-
-export function logout() {
-  return jsonRequest('/api/auth/logout', { method: 'POST' })
 }
 
 export function createTheme(payload) {

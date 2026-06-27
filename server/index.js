@@ -1,9 +1,9 @@
 import express from 'express'
-import session from 'express-session'
 import { createServer as createHttpServer } from 'http'
 import path from 'path'
 import { fileURLToPath } from 'url'
 import { registerRoutes } from './routes.js'
+import { setupAuth } from './replitAuth.js'
 import { ensureSchema } from './db.js'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
@@ -19,26 +19,12 @@ if (!sessionSecret) {
 const app = express()
 const httpServer = createHttpServer(app)
 
-app.set('trust proxy', 1)
 app.use(express.json())
-app.use(
-  session({
-    secret: sessionSecret,
-    resave: false,
-    saveUninitialized: false,
-    cookie: {
-      httpOnly: true,
-      sameSite: 'lax',
-      secure: isProd,
-      maxAge: 1000 * 60 * 60 * 24 * 30,
-    },
-  })
-)
-
-registerRoutes(app)
 
 async function start() {
   await ensureSchema()
+  await setupAuth(app)
+  registerRoutes(app)
 
   if (isProd) {
     const distPath = path.resolve(__dirname, '..', 'dist')

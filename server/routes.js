@@ -1,7 +1,8 @@
 import multer from 'multer'
 import { nanoid } from 'nanoid'
 import { query } from './db.js'
-import { requireAdmin, registerAuthRoutes } from './auth.js'
+import { requireOwner, registerAuthRoutes } from './auth.js'
+import { isAuthenticated } from './replitAuth.js'
 import {
   uploadObject,
   deleteObject,
@@ -56,6 +57,36 @@ async function uniqueThemeId(base) {
 export function registerRoutes(app) {
   registerAuthRoutes(app)
 
+  // ---- Per-user personal settings ("personal folder") ----
+  app.get('/api/me/settings', isAuthenticated, async (req, res) => {
+    try {
+      const id = req.user.claims.sub
+      const r = await query('SELECT data FROM user_settings WHERE user_id = $1', [id])
+      res.json({ settings: r.rows[0]?.data || {} })
+    } catch (err) {
+      console.error('GET /api/me/settings failed:', err)
+      res.status(500).json({ error: 'failed_to_load_settings' })
+    }
+  })
+
+  app.put('/api/me/settings', isAuthenticated, async (req, res) => {
+    try {
+      const id = req.user.claims.sub
+      const data = req.body && typeof req.body === 'object' && !Array.isArray(req.body) ? req.body : {}
+      const r = await query(
+        `INSERT INTO user_settings (user_id, data, updated_at)
+         VALUES ($1, $2::jsonb, NOW())
+         ON CONFLICT (user_id) DO UPDATE SET data = EXCLUDED.data, updated_at = NOW()
+         RETURNING data`,
+        [id, JSON.stringify(data)]
+      )
+      res.json({ settings: r.rows[0].data })
+    } catch (err) {
+      console.error('PUT /api/me/settings failed:', err)
+      res.status(500).json({ error: 'failed_to_save_settings' })
+    }
+  })
+
   // ---- Public content (game) ----
   app.get('/api/content', async (req, res) => {
     try {
@@ -88,7 +119,7 @@ export function registerRoutes(app) {
   })
 
   // ---- Admin: themes ----
-  app.post('/api/admin/themes', requireAdmin, async (req, res) => {
+  app.post('/api/admin/themes', requireOwner, async (req, res) => {
     try {
       const { name, icon, color, bgColor } = req.body || {}
       if (!name || !String(name).trim()) {
@@ -109,7 +140,7 @@ export function registerRoutes(app) {
     }
   })
 
-  app.put('/api/admin/themes/:id', requireAdmin, async (req, res) => {
+  app.put('/api/admin/themes/:id', requireOwner, async (req, res) => {
     try {
       const { name, icon, color, bgColor } = req.body || {}
       const result = await query(
@@ -129,7 +160,7 @@ export function registerRoutes(app) {
     }
   })
 
-  app.delete('/api/admin/themes/:id', requireAdmin, async (req, res) => {
+  app.delete('/api/admin/themes/:id', requireOwner, async (req, res) => {
     try {
       const media = await query(
         'SELECT image_path, audio_path FROM words WHERE theme_id = $1',
@@ -149,7 +180,7 @@ export function registerRoutes(app) {
   })
 
   // ---- Admin: words ----
-  app.post('/api/admin/words', requireAdmin, async (req, res) => {
+  app.post('/api/admin/words', requireOwner, async (req, res) => {
     try {
       const { themeId, name, emoji } = req.body || {}
       if (!themeId) return res.status(400).json({ error: 'theme_required' })
@@ -173,7 +204,7 @@ export function registerRoutes(app) {
     }
   })
 
-  app.put('/api/admin/words/:id', requireAdmin, async (req, res) => {
+  app.put('/api/admin/words/:id', requireOwner, async (req, res) => {
     try {
       const { name, emoji, themeId } = req.body || {}
       if (themeId) {
@@ -196,7 +227,7 @@ export function registerRoutes(app) {
     }
   })
 
-  app.delete('/api/admin/words/:id', requireAdmin, async (req, res) => {
+  app.delete('/api/admin/words/:id', requireOwner, async (req, res) => {
     try {
       const existing = await query(
         'SELECT image_path, audio_path FROM words WHERE id = $1',
@@ -234,7 +265,7 @@ export function registerRoutes(app) {
     res.json(mapWord(result.rows[0]))
   }
 
-  app.post('/api/admin/words/:id/photo', requireAdmin, upload.single('file'), async (req, res) => {
+  app.post('/api/admin/words/:id/photo', requireOwner, upload.single('file'), async (req, res) => {
     try {
       await handleMediaUpload(req, res, 'image_path', 'image/')
     } catch (err) {
@@ -243,7 +274,7 @@ export function registerRoutes(app) {
     }
   })
 
-  app.post('/api/admin/words/:id/audio', requireAdmin, upload.single('file'), async (req, res) => {
+  app.post('/api/admin/words/:id/audio', requireOwner, upload.single('file'), async (req, res) => {
     try {
       await handleMediaUpload(req, res, 'audio_path', 'audio/')
     } catch (err) {
@@ -252,7 +283,7 @@ export function registerRoutes(app) {
     }
   })
 
-  app.delete('/api/admin/words/:id/audio', requireAdmin, async (req, res) => {
+  app.delete('/api/admin/words/:id/audio', requireOwner, async (req, res) => {
     try {
       const existing = await query('SELECT audio_path FROM words WHERE id = $1', [req.params.id])
       if (existing.rowCount === 0) return res.status(404).json({ error: 'not_found' })

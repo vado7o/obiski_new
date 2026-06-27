@@ -1,3 +1,1 @@
-- [Replit bash background jobs](replit-bash-background-jobs.md) — nohup'd jobs get killed when the bash tool call returns; use setsid to fully detach long migrations.
-- [Express 5 routing](express5-routing.md) — path-to-regexp v8 changed wildcard syntax; old `(*)` and `app.get('*')` patterns throw at boot.
-- [Obiski card photos](obiski-seed-photos.md) — every baseline word must have a stored photo; loremflickr is unreliable, backfill gaps instead of relying on it.
+- [Replit Auth on a JS/pg stack](replit-auth-js-stack.md) — implement OIDC manually in plain JS; the TS/Drizzle blueprint does not fit; gotchas for session TTL and localhost login.

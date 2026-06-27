@@ -1,40 +1,43 @@
-import { timingSafeEqual } from 'crypto'
+import { isAuthenticated } from './replitAuth.js'
 
-function safeEqual(a, b) {
-  const ab = Buffer.from(String(a))
-  const bb = Buffer.from(String(b))
-  if (ab.length !== bb.length) return false
-  return timingSafeEqual(ab, bb)
+const OWNER_EMAILS = (process.env.OWNER_EMAILS || 'pvb0700@rambler.ru')
+  .split(',')
+  .map((e) => e.trim().toLowerCase())
+  .filter(Boolean)
+
+function userEmail(req) {
+  return (req.user?.claims?.email || '').toLowerCase()
 }
 
-export function requireAdmin(req, res, next) {
-  if (req.session && req.session.isAdmin) return next()
-  return res.status(401).json({ error: 'unauthorized' })
+export function isOwner(req) {
+  return !!(req.isAuthenticated?.() && OWNER_EMAILS.includes(userEmail(req)))
+}
+
+// Allow access only to the owner (identified by email). Ensures the session is
+// authenticated (and refreshed) first, then checks the owner email.
+export function requireOwner(req, res, next) {
+  isAuthenticated(req, res, () => {
+    if (isOwner(req)) return next()
+    return res.status(403).json({ error: 'forbidden' })
+  })
 }
 
 export function registerAuthRoutes(app) {
-  app.get('/api/auth/me', (req, res) => {
-    res.json({ authenticated: !!(req.session && req.session.isAdmin) })
-  })
-
-  app.post('/api/auth/login', (req, res) => {
-    const adminPassword = process.env.ADMIN_PASSWORD
-    if (!adminPassword) {
-      return res.status(503).json({ error: 'admin_password_not_configured' })
+  app.get('/api/auth/user', (req, res) => {
+    if (!req.isAuthenticated?.() || !req.user?.claims) {
+      return res.json({ authenticated: false, user: null, isOwner: false })
     }
-    const password = req.body && req.body.password
-    if (typeof password === 'string' && safeEqual(password, adminPassword)) {
-      req.session.isAdmin = true
-      return res.json({ authenticated: true })
-    }
-    return res.status(401).json({ authenticated: false, error: 'invalid_password' })
-  })
-
-  app.post('/api/auth/logout', (req, res) => {
-    if (req.session) {
-      req.session.destroy(() => res.json({ authenticated: false }))
-    } else {
-      res.json({ authenticated: false })
-    }
+    const c = req.user.claims
+    res.json({
+      authenticated: true,
+      user: {
+        id: c.sub,
+        email: c.email || null,
+        firstName: c.first_name || null,
+        lastName: c.last_name || null,
+        profileImageUrl: c.profile_image_url || null,
+      },
+      isOwner: isOwner(req),
+    })
   })
 }

@@ -4,18 +4,19 @@ import { useLang } from '../contexts/LanguageContext.jsx'
 import { useContent } from '../contexts/ContentContext.jsx'
 import { useAuth } from '../contexts/AuthContext.jsx'
 import { LANGUAGES } from '../i18n/translations.js'
-import LoginModal from './LoginModal.jsx'
 import './ThemeSelector.css'
 
 export default function ThemeSelector({ selected, onToggle, onStart, onOpenAdmin }) {
   const { t, lang, setLang } = useLang()
   const { themes, loading } = useContent()
-  const { isAdmin, logout } = useAuth()
+  const { user, isAdmin, login, logout } = useAuth()
   const canStart = selected.length > 0
   const [menuOpen, setMenuOpen] = useState(false)
   const [langView, setLangView] = useState(false)
-  const [loginOpen, setLoginOpen] = useState(false)
   const menuRef = useRef(null)
+
+  const userName =
+    user && (([user.firstName, user.lastName].filter(Boolean).join(' ')) || user.email)
 
   function closeMenu() {
     setMenuOpen(false)
@@ -95,14 +96,19 @@ export default function ThemeSelector({ selected, onToggle, onStart, onOpenAdmin
                     </button>
 
                     <div className="menu-divider" />
-                    {isAdmin ? (
+                    {user ? (
                       <>
-                        <button
-                          className="lang-option"
-                          onClick={() => { closeMenu(); onOpenAdmin() }}
-                        >
-                          <span className="lang-label">{t.admin.menuManage}</span>
-                        </button>
+                        {userName && (
+                          <div className="menu-user">{userName}</div>
+                        )}
+                        {isAdmin && (
+                          <button
+                            className="lang-option"
+                            onClick={() => { closeMenu(); onOpenAdmin() }}
+                          >
+                            <span className="lang-label">{t.admin.menuManage}</span>
+                          </button>
+                        )}
                         <button
                           className="lang-option"
                           onClick={() => { closeMenu(); logout() }}
@@ -113,7 +119,7 @@ export default function ThemeSelector({ selected, onToggle, onStart, onOpenAdmin
                     ) : (
                       <button
                         className="lang-option"
-                        onClick={() => { closeMenu(); setLoginOpen(true) }}
+                        onClick={() => { closeMenu(); login() }}
                       >
                         <span className="lang-label">{t.admin.menuLogin}</span>
                       </button>
@@ -187,10 +193,6 @@ export default function ThemeSelector({ selected, onToggle, onStart, onOpenAdmin
           {canStart ? t.startLearning : t.selectTheme}
         </motion.button>
       </motion.div>
-
-      <AnimatePresence>
-        {loginOpen && <LoginModal onClose={() => setLoginOpen(false)} />}
-      </AnimatePresence>
     </div>
   )
 }
