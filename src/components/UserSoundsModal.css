@@ -1,0 +1,101 @@
+.usersounds-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(40, 32, 80, 0.45);
+  z-index: 300;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+}
+
+.usersounds-modal {
+  background: #f6f4ff;
+  border-radius: 24px;
+  box-shadow: 0 20px 60px rgba(108, 99, 255, 0.18);
+  width: 100%;
+  max-width: 640px;
+  max-height: 88vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.usersounds-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 22px 14px;
+  border-bottom: 1px solid #ece9f7;
+  flex-shrink: 0;
+}
+
+.usersounds-head h2 {
+  margin: 0;
+  font-size: 1.1rem;
+  color: #3a3656;
+}
+
+.usersounds-head-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.btn-ghost-danger {
+  color: #c0392b;
+}
+.btn-ghost-danger:hover { background: #fdecea; }
+
+.usersounds-lang-badge {
+  display: inline-block;
+  background: #ece9ff;
+  color: #5a52d5;
+  font-weight: 700;
+  font-size: 0.88rem;
+  border-radius: 10px;
+  padding: 4px 14px;
+  margin: 14px 22px 0;
+}
+
+.usersounds-hint {
+  color: #7a768e;
+  font-size: 0.83rem;
+  margin: 8px 22px 0;
+  line-height: 1.5;
+}
+
+.usersounds-body {
+  overflow-y: auto;
+  padding: 16px 22px 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+}
+
+.btn-mini-rec {
+  background: #eef4ff;
+  color: #3563b9;
+}
+.btn-mini-rec:hover:not(:disabled) { background: #dce9ff; }
+.btn-mini-rec.active {
+  background: #ffecec;
+  color: #c0392b;
+  animation: pulse-rec 1s infinite;
+}
+
+@keyframes pulse-rec {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.65; }
+}
+
+.mic-error {
+  font-size: 0.78rem;
+  color: #c0392b;
+}
+
+@media (max-width: 600px) {
+  .usersounds-modal { border-radius: 18px; }
+  .feedback-slot { flex-wrap: wrap; }
+  .feedback-audio { min-width: 100%; }
+}

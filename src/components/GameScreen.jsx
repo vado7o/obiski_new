@@ -5,6 +5,7 @@ import { speak, speakWordObject } from '../hooks/useSpeech.js'
 import { useLang } from '../contexts/LanguageContext.jsx'
 import { useContent } from '../contexts/ContentContext.jsx'
 import { getFeedbackSounds } from '../api.js'
+import { getAllBlobsForLang } from '../db/userSoundsDB.js'
 import WordCard from './WordCard.jsx'
 import './GameScreen.css'
 
@@ -119,9 +120,38 @@ export default function GameScreen({ selectedThemes, onComplete, onMenu }) {
   }, [selectedThemes])
 
   useEffect(() => {
-    getFeedbackSounds(lang)
-      .then((data) => setFeedbackSounds(data))
-      .catch(() => {})
+    let active = true
+    const createdUrls = []
+
+    async function load() {
+      try {
+        const userBlobs = await getAllBlobsForLang(lang)
+        const correctUrls = userBlobs.correct
+          .filter(Boolean)
+          .map((b) => { const u = URL.createObjectURL(b); createdUrls.push(u); return u })
+        const incorrectUrls = userBlobs.incorrect
+          .filter(Boolean)
+          .map((b) => { const u = URL.createObjectURL(b); createdUrls.push(u); return u })
+
+        if (correctUrls.length > 0 || incorrectUrls.length > 0) {
+          if (active) setFeedbackSounds({ correct: correctUrls, incorrect: incorrectUrls })
+          return
+        }
+        const serverSounds = await getFeedbackSounds(lang)
+        if (active) setFeedbackSounds(serverSounds)
+      } catch {
+        try {
+          const serverSounds = await getFeedbackSounds(lang)
+          if (active) setFeedbackSounds(serverSounds)
+        } catch {}
+      }
+    }
+
+    load()
+    return () => {
+      active = false
+      for (const url of createdUrls) URL.revokeObjectURL(url)
+    }
   }, [lang])
 
   const currentTarget = batchState.words[batchState.questionOrder[questionIndex]] ?? null

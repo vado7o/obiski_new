@@ -6,6 +6,7 @@ import {
   uploadFeedbackSound,
   deleteFeedbackSound,
 } from '../api.js'
+import MicRecorder from './MicRecorder.jsx'
 
 const SLOTS = [1, 2, 3, 4, 5]
 
@@ -150,6 +151,16 @@ function SoundSlot({ slot, type, row, onUpload, onDelete, busy, a }) {
             >
               {a.replaceSound}
             </button>
+            <MicRecorder
+              disabled={busy}
+              labelRecord={a.recordMic}
+              labelStop={a.stopRec}
+              labelError={a.micError}
+              onRecorded={(blob) => {
+                const file = new File([blob], 'recording.webm', { type: blob.type })
+                onUpload(type, slot, file)
+              }}
+            />
             <button
               className="btn-mini btn-mini-danger"
               disabled={busy}
@@ -169,6 +180,16 @@ function SoundSlot({ slot, type, row, onUpload, onDelete, busy, a }) {
             >
               {a.uploadSound}
             </button>
+            <MicRecorder
+              disabled={busy}
+              labelRecord={a.recordMic}
+              labelStop={a.stopRec}
+              labelError={a.micError}
+              onRecorded={(blob) => {
+                const file = new File([blob], 'recording.webm', { type: blob.type })
+                onUpload(type, slot, file)
+              }}
+            />
           </>
         )}
         <input

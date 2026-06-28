@@ -6,7 +6,7 @@ import { useAuth } from '../contexts/AuthContext.jsx'
 import { LANGUAGES } from '../i18n/translations.js'
 import './ThemeSelector.css'
 
-export default function ThemeSelector({ selected, onToggle, onStart, onOpenAdmin }) {
+export default function ThemeSelector({ selected, onToggle, onStart, onOpenAdmin, onOpenUserSounds }) {
   const { t, lang, setLang } = useLang()
   const { themes, loading } = useContent()
   const { user, isAdmin, login, logout } = useAuth()
@@ -93,6 +93,17 @@ export default function ThemeSelector({ selected, onToggle, onStart, onOpenAdmin
                       {currentLang && <span className="lang-flag">{currentLang.flag}</span>}
                       <span className="lang-label">{t.language}</span>
                       <span className="lang-chevron">›</span>
+                    </button>
+
+                    <button
+                      className="lang-option"
+                      onClick={() => {
+                        closeMenu()
+                        if (user) onOpenUserSounds()
+                        else login()
+                      }}
+                    >
+                      <span className="lang-label">{t.admin.recordSounds}</span>
                     </button>
 
                     <div className="menu-divider" />
