@@ -88,6 +88,8 @@ export const translations = {
       userSoundsHint: 'Your recordings are saved on this device and play instead of the default sounds. Record up to 5 correct and 5 incorrect answer sounds.',
       resetToDefault: 'Reset to defaults',
       resetConfirm: 'Delete all your custom sounds and go back to defaults?',
+      loginPrompt: 'Your child will be delighted if the encouraging words are voiced in your own voice! To record your own sounds, a free sign-in is required. You will be redirected to sign in.',
+      loginPromptBtn: 'Go to sign in',
     },
     themeNames: {
       animals: 'Animals',
@@ -183,6 +185,8 @@ export const translations = {
       userSoundsHint: 'Ваши записи сохраняются на этом устройстве и воспроизводятся вместо стандартных звуков. Запишите до 5 звуков правильного и 5 звуков неправильного ответа.',
       resetToDefault: 'Вернуть звуки по умолчанию',
       resetConfirm: 'Удалить все ваши звуки и вернуться к стандартным?',
+      loginPrompt: 'Ваш ребёнок будет в восторге, если слова ободрения будут озвучены именно Вашим голосом! Для возможности записи собственных звуков необходим бесплатный вход. Вы будете перенаправлены для входа.',
+      loginPromptBtn: 'Перейти ко входу',
     },
     themeNames: {
       animals: 'Животные',

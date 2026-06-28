@@ -13,6 +13,7 @@ export default function ThemeSelector({ selected, onToggle, onStart, onOpenAdmin
   const canStart = selected.length > 0
   const [menuOpen, setMenuOpen] = useState(false)
   const [langView, setLangView] = useState(false)
+  const [loginPromptOpen, setLoginPromptOpen] = useState(false)
   const menuRef = useRef(null)
 
   const userName =
@@ -102,8 +103,7 @@ export default function ThemeSelector({ selected, onToggle, onStart, onOpenAdmin
                         if (user) {
                           onOpenUserSounds()
                         } else {
-                          sessionStorage.setItem('loginIntent', 'recordSounds')
-                          login()
+                          setLoginPromptOpen(true)
                         }
                       }}
                     >
@@ -208,6 +208,48 @@ export default function ThemeSelector({ selected, onToggle, onStart, onOpenAdmin
           {canStart ? t.startLearning : t.selectTheme}
         </motion.button>
       </motion.div>
+
+      <AnimatePresence>
+        {loginPromptOpen && (
+          <motion.div
+            className="login-prompt-overlay"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={() => setLoginPromptOpen(false)}
+          >
+            <motion.div
+              className="login-prompt-modal"
+              initial={{ opacity: 0, scale: 0.88, y: 24 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.88, y: 24 }}
+              transition={{ type: 'spring', stiffness: 340, damping: 28 }}
+              onClick={e => e.stopPropagation()}
+            >
+              <div className="login-prompt-icon">🎤</div>
+              <p className="login-prompt-text">{t.admin.loginPrompt}</p>
+              <div className="login-prompt-btns">
+                <button
+                  className="login-prompt-cancel"
+                  onClick={() => setLoginPromptOpen(false)}
+                >
+                  {t.admin.cancel}
+                </button>
+                <button
+                  className="login-prompt-confirm"
+                  onClick={() => {
+                    setLoginPromptOpen(false)
+                    sessionStorage.setItem('loginIntent', 'recordSounds')
+                    login()
+                  }}
+                >
+                  {t.admin.loginPromptBtn}
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   )
 }

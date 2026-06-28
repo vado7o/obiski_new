@@ -291,3 +291,84 @@
     font-size: 20px;
   }
 }
+
+.login-prompt-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  background: rgba(60, 40, 120, 0.45);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+
+.login-prompt-modal {
+  background: white;
+  border-radius: 24px;
+  padding: 36px 32px 28px;
+  max-width: 420px;
+  width: 100%;
+  box-shadow: 0 20px 60px rgba(60, 40, 120, 0.25);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 18px;
+  text-align: center;
+}
+
+.login-prompt-icon {
+  font-size: 52px;
+  line-height: 1;
+}
+
+.login-prompt-text {
+  font-size: 16px;
+  line-height: 1.6;
+  color: #3d2b6e;
+  margin: 0;
+}
+
+.login-prompt-btns {
+  display: flex;
+  gap: 12px;
+  width: 100%;
+  margin-top: 4px;
+}
+
+.login-prompt-cancel {
+  flex: 1;
+  padding: 12px 0;
+  border-radius: 12px;
+  border: 2px solid #E8E0FF;
+  background: white;
+  color: #9B89D8;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.login-prompt-cancel:hover {
+  background: #F3F0FF;
+}
+
+.login-prompt-confirm {
+  flex: 2;
+  padding: 12px 0;
+  border-radius: 12px;
+  border: none;
+  background: linear-gradient(135deg, #7C4DFF, #651FFF);
+  color: white;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 4px 16px rgba(124, 77, 255, 0.35);
+  transition: opacity 0.15s;
+}
+
+.login-prompt-confirm:hover {
+  opacity: 0.9;
+}
