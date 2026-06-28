@@ -1,8 +1,9 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { LanguageProvider } from './contexts/LanguageContext.jsx'
 import { ContentProvider } from './contexts/ContentContext.jsx'
 import { AuthProvider } from './contexts/AuthContext.jsx'
+import { useAuth } from './contexts/AuthContext.jsx'
 import ThemeSelector from './components/ThemeSelector.jsx'
 import GameScreen from './components/GameScreen.jsx'
 import VictoryScreen from './components/VictoryScreen.jsx'
@@ -22,10 +23,20 @@ const pageVariants = {
 }
 
 function AppInner() {
+  const { user, ready } = useAuth()
   const [screen, setScreen] = useState(SCREEN.SELECT)
   const [selectedThemes, setSelectedThemes] = useState([])
   const [adminOpen, setAdminOpen] = useState(false)
   const [userSoundsOpen, setUserSoundsOpen] = useState(false)
+
+  useEffect(() => {
+    if (!ready || !user) return
+    const intent = sessionStorage.getItem('loginIntent')
+    if (intent === 'recordSounds') {
+      sessionStorage.removeItem('loginIntent')
+      setUserSoundsOpen(true)
+    }
+  }, [ready, user])
 
   const toggleTheme = (id) => {
     setSelectedThemes(prev =>

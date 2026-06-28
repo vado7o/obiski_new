@@ -99,8 +99,12 @@ export default function ThemeSelector({ selected, onToggle, onStart, onOpenAdmin
                       className="lang-option"
                       onClick={() => {
                         closeMenu()
-                        if (user) onOpenUserSounds()
-                        else login()
+                        if (user) {
+                          onOpenUserSounds()
+                        } else {
+                          sessionStorage.setItem('loginIntent', 'recordSounds')
+                          login()
+                        }
                       }}
                     >
                       <span className="lang-label">{t.admin.recordSounds}</span>
