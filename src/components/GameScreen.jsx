@@ -9,10 +9,18 @@ import { getAllBlobsForLang } from '../db/userSoundsDB.js'
 import WordCard from './WordCard.jsx'
 import './GameScreen.css'
 
-function playRandom(urls) {
+function playRandom(urls, onEnd) {
   if (!urls || urls.length === 0) return false
   const url = urls[Math.floor(Math.random() * urls.length)]
-  try { new Audio(url).play() } catch {}
+  try {
+    const audio = new Audio(url)
+    const done = () => { if (onEnd) onEnd() }
+    audio.onended = done
+    audio.onerror = done
+    audio.play().catch(done)
+  } catch {
+    if (onEnd) onEnd()
+  }
   return true
 }
 
@@ -79,6 +87,7 @@ export default function GameScreen({ selectedThemes, onComplete, onMenu }) {
   const [answeredIds, setAnsweredIds] = useState(new Set())
   const [feedbackSounds, setFeedbackSounds] = useState({ correct: [], incorrect: [] })
   const speakTimeoutRef = useRef(null)
+  const suppressAutoSpeakRef = useRef(false)
   const wrapRef = useRef(null)
   const debounceRef = useRef(null)
   const [gridLayout, setGridLayout] = useState({ cols: 4, rows: 2, gridW: null, gridH: null })
@@ -156,18 +165,21 @@ export default function GameScreen({ selectedThemes, onComplete, onMenu }) {
 
   const currentTarget = batchState.words[batchState.questionOrder[questionIndex]] ?? null
 
-  const speakCurrent = useCallback((word) => {
-    if (!word) return
-    speakWordObject(word)
+  const speakCurrent = useCallback((word, onEnd) => {
+    if (!word) { onEnd?.(); return }
+    speakWordObject(word, onEnd)
   }, [])
 
   useEffect(() => {
-    if (currentTarget) {
-      if (speakTimeoutRef.current) clearTimeout(speakTimeoutRef.current)
-      speakTimeoutRef.current = setTimeout(() => {
-        speakCurrent(currentTarget)
-      }, 400)
+    if (!currentTarget) return
+    if (suppressAutoSpeakRef.current) {
+      suppressAutoSpeakRef.current = false
+      return
     }
+    if (speakTimeoutRef.current) clearTimeout(speakTimeoutRef.current)
+    speakTimeoutRef.current = setTimeout(() => {
+      speakCurrent(currentTarget)
+    }, 400)
     return () => {
       if (speakTimeoutRef.current) clearTimeout(speakTimeoutRef.current)
     }
@@ -176,15 +188,19 @@ export default function GameScreen({ selectedThemes, onComplete, onMenu }) {
   const handleCardClick = useCallback((word) => {
     if (isLocked || !currentTarget || answeredIds.has(word.id)) return
 
+    // Cancel any pending auto-speak before we take control
+    if (speakTimeoutRef.current) clearTimeout(speakTimeoutRef.current)
+
+    // Lock cards immediately for BOTH correct and incorrect
+    setIsLocked(true)
+
     if (word.id === currentTarget.id) {
-      setIsLocked(true)
+      // ── CORRECT ──────────────────────────────────────────────
       setFeedback({ id: word.id, type: 'correct' })
-      if (!playRandom(feedbackSounds.correct)) speak(t.correct)
+      setProgress(batchOffset + questionIndex + 1)
 
-      const newProgress = batchOffset + questionIndex + 1
-      setProgress(newProgress)
-
-      setTimeout(() => {
+      // After feedback sound ends → advance state → speak next word → unlock
+      const afterFeedback = () => {
         setFeedback(null)
 
         const newAnswered = new Set(answeredIds)
@@ -192,35 +208,52 @@ export default function GameScreen({ selectedThemes, onComplete, onMenu }) {
         setAnsweredIds(newAnswered)
 
         const nextQIndex = questionIndex + 1
+        const unlock = () => setIsLocked(false)
 
         if (nextQIndex >= batchState.words.length) {
+          // Batch finished
           const nextOffset = batchOffset + BATCH_SIZE
-          setTimeout(() => {
-            if (nextOffset >= wordList.length) {
-              onComplete()
-            } else {
-              const nextBatch = wordList.slice(nextOffset, nextOffset + BATCH_SIZE)
-              setBatchState(makeBatchState(nextBatch))
-              setBatchOffset(nextOffset)
-              setQuestionIndex(0)
-              setAnsweredIds(new Set())
-              setIsLocked(false)
-            }
-          }, 600)
+          if (nextOffset >= wordList.length) {
+            onComplete()
+          } else {
+            const nextBatch = wordList.slice(nextOffset, nextOffset + BATCH_SIZE)
+            const nextState = makeBatchState(nextBatch)
+            suppressAutoSpeakRef.current = true
+            setBatchState(nextState)
+            setBatchOffset(nextOffset)
+            setQuestionIndex(0)
+            setAnsweredIds(new Set())
+            const firstWord = nextState.words[nextState.questionOrder[0]]
+            speakCurrent(firstWord, unlock)
+          }
         } else {
+          // Next card in same batch
+          const nextWord = batchState.words[batchState.questionOrder[nextQIndex]]
+          suppressAutoSpeakRef.current = true
           setQuestionIndex(nextQIndex)
-          setIsLocked(false)
+          speakCurrent(nextWord, unlock)
         }
-      }, 700)
+      }
+
+      if (!playRandom(feedbackSounds.correct, afterFeedback)) {
+        speak(t.correct, afterFeedback)
+      }
+
     } else {
+      // ── INCORRECT ────────────────────────────────────────────
       setFeedback({ id: word.id, type: 'wrong' })
-      if (!playRandom(feedbackSounds.incorrect)) speak(t.tryAgain)
-      setTimeout(() => {
+
+      // After feedback sound ends → clear visual → re-speak current word → unlock
+      const afterFeedback = () => {
         setFeedback(null)
-        speakCurrent(currentTarget)
-      }, 800)
+        speakCurrent(currentTarget, () => setIsLocked(false))
+      }
+
+      if (!playRandom(feedbackSounds.incorrect, afterFeedback)) {
+        speak(t.tryAgain, afterFeedback)
+      }
     }
-  }, [isLocked, currentTarget, questionIndex, batchState, batchOffset, wordList, answeredIds, feedbackSounds, onComplete, speakCurrent])
+  }, [isLocked, currentTarget, questionIndex, batchState, batchOffset, wordList, answeredIds, feedbackSounds, onComplete, speakCurrent, t])
 
   const handleRepeat = () => {
     if (currentTarget) speakCurrent(currentTarget)
