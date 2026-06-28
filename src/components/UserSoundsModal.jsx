@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
-import { motion } from 'framer-motion'
+import { motion, AnimatePresence } from 'framer-motion'
 import { useLang } from '../contexts/LanguageContext.jsx'
 import { LANGUAGES } from '../i18n/translations.js'
 import { getAllBlobsForLang, setBlob, removeBlob, clearAllForLang } from '../db/userSoundsDB.js'
@@ -12,6 +12,7 @@ const TYPES = ['correct', 'incorrect']
 export default function UserSoundsModal({ onClose }) {
   const { t, lang } = useLang()
   const a = t.admin
+  const [showHint, setShowHint] = useState(true)
   const [blobs, setBlobs] = useState({ correct: Array(5).fill(null), incorrect: Array(5).fill(null) })
   const [urls, setUrls] = useState({ correct: Array(5).fill(null), incorrect: Array(5).fill(null) })
   const [busy, setBusy] = useState(false)
@@ -84,6 +85,34 @@ export default function UserSoundsModal({ onClose }) {
       exit={{ opacity: 0 }}
       onClick={(e) => { if (e.target === e.currentTarget) onClose() }}
     >
+      <AnimatePresence>
+        {showHint && (
+          <motion.div
+            className="userhint-overlay"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+          >
+            <motion.div
+              className="userhint-modal"
+              initial={{ opacity: 0, scale: 0.88, y: 24 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.88, y: 24 }}
+              transition={{ type: 'spring', stiffness: 340, damping: 28 }}
+            >
+              <div className="userhint-icon">🎤</div>
+              <p className="userhint-text">{a.recordSoundsHintText}</p>
+              <button
+                className="userhint-ok"
+                onClick={() => setShowHint(false)}
+              >
+                {a.recordSoundsHintOk}
+              </button>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       <motion.div
         className="usersounds-modal"
         initial={{ scale: 0.96, opacity: 0 }}

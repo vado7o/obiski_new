@@ -90,6 +90,8 @@ export const translations = {
       resetConfirm: 'Delete all your custom sounds and go back to defaults?',
       loginPrompt: 'Your child will be delighted if the encouraging words are voiced in your own voice! To record your own sounds, a free sign-in is required. You will be redirected to sign in.',
       loginPromptBtn: 'Go to sign in',
+      recordSoundsHintText: 'Record short sounds that tell your child whether their answer was right or wrong.\n\nFor example:\n— "Great job, Tim!"\n— "You\'re amazing, Sam!"\n— "Try again, Mike!"\n\nTip: Keep the sounds as short as possible so they don\'t annoy your child.',
+      recordSoundsHintOk: 'Got it!',
     },
     themeNames: {
       animals: 'Animals',
@@ -187,6 +189,8 @@ export const translations = {
       resetConfirm: 'Удалить все ваши звуки и вернуться к стандартным?',
       loginPrompt: 'Ваш ребёнок будет в восторге, если слова ободрения будут озвучены именно Вашим голосом! Для возможности записи собственных звуков необходим бесплатный вход. Вы будете перенаправлены для входа.',
       loginPromptBtn: 'Перейти ко входу',
+      recordSoundsHintText: 'Запишите короткие звуки, указывающие на то, что ответ Вашего ребёнка был правильным или неправильным.\n\nНапример:\n— «Правильно, Дима!»\n— «Ты молодец, Ваня!»\n— «Попробуй ещё раз, Петя!»\n\nСовет: По возможности, ответы должны быть максимально короткими, чтобы не раздражать ребёнка.',
+      recordSoundsHintOk: 'Понятно!',
     },
     themeNames: {
       animals: 'Животные',
