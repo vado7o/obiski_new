@@ -4,6 +4,7 @@ import { LanguageProvider } from './contexts/LanguageContext.jsx'
 import { ContentProvider } from './contexts/ContentContext.jsx'
 import { AuthProvider } from './contexts/AuthContext.jsx'
 import { useAuth } from './contexts/AuthContext.jsx'
+import { DifficultyProvider } from './contexts/DifficultyContext.jsx'
 import ThemeSelector from './components/ThemeSelector.jsx'
 import GameScreen from './components/GameScreen.jsx'
 import VictoryScreen from './components/VictoryScreen.jsx'
@@ -84,11 +85,13 @@ function AppInner() {
 export default function App() {
   return (
     <LanguageProvider>
-      <AuthProvider>
-        <ContentProvider>
-          <AppInner />
-        </ContentProvider>
-      </AuthProvider>
+      <DifficultyProvider>
+        <AuthProvider>
+          <ContentProvider>
+            <AppInner />
+          </ContentProvider>
+        </AuthProvider>
+      </DifficultyProvider>
     </LanguageProvider>
   )
 }

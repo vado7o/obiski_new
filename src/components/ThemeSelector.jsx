@@ -4,15 +4,18 @@ import { useLang } from '../contexts/LanguageContext.jsx'
 import { useContent } from '../contexts/ContentContext.jsx'
 import { useAuth } from '../contexts/AuthContext.jsx'
 import { LANGUAGES } from '../i18n/translations.js'
+import { useDifficulty } from '../contexts/DifficultyContext.jsx'
 import './ThemeSelector.css'
 
 export default function ThemeSelector({ selected, onToggle, onStart, onOpenAdmin, onOpenUserSounds }) {
   const { t, lang, setLang } = useLang()
   const { themes, loading } = useContent()
   const { user, isAdmin, login, logout } = useAuth()
+  const { difficulty, setDifficulty, DIFFICULTY_OPTIONS } = useDifficulty()
   const canStart = selected.length > 0
   const [menuOpen, setMenuOpen] = useState(false)
   const [langView, setLangView] = useState(false)
+  const [difficultyView, setDifficultyView] = useState(false)
   const [loginPromptOpen, setLoginPromptOpen] = useState(false)
   const menuRef = useRef(null)
 
@@ -22,6 +25,7 @@ export default function ThemeSelector({ selected, onToggle, onStart, onOpenAdmin
   function closeMenu() {
     setMenuOpen(false)
     setLangView(false)
+    setDifficultyView(false)
   }
 
   useEffect(() => {
@@ -85,14 +89,34 @@ export default function ThemeSelector({ selected, onToggle, onStart, onOpenAdmin
                       </button>
                     ))}
                   </>
+                ) : difficultyView ? (
+                  <>
+                    <button
+                      className="lang-option lang-back"
+                      onClick={() => setDifficultyView(false)}
+                    >
+                      <span className="lang-flag">‹</span>
+                      <span className="lang-label">{t.admin.back}</span>
+                    </button>
+                    <div className="menu-divider" />
+                    {DIFFICULTY_OPTIONS.map(n => (
+                      <button
+                        key={n}
+                        className={`lang-option ${difficulty === n ? 'active' : ''}`}
+                        onClick={() => { setDifficulty(n); closeMenu() }}
+                      >
+                        <span className="lang-label">{t.admin.difficultyLabel(n)}</span>
+                        {difficulty === n && <span className="lang-check">✓</span>}
+                      </button>
+                    ))}
+                  </>
                 ) : (
                   <>
                     <button
                       className="lang-option"
-                      onClick={() => setLangView(true)}
+                      onClick={() => setDifficultyView(true)}
                     >
-                      {currentLang && <span className="lang-flag">{currentLang.flag}</span>}
-                      <span className="lang-label">{t.language}</span>
+                      <span className="lang-label">{t.admin.difficulty}</span>
                       <span className="lang-chevron">›</span>
                     </button>
 
@@ -108,6 +132,15 @@ export default function ThemeSelector({ selected, onToggle, onStart, onOpenAdmin
                       }}
                     >
                       <span className="lang-label">{t.admin.recordSounds}</span>
+                    </button>
+
+                    <button
+                      className="lang-option"
+                      onClick={() => setLangView(true)}
+                    >
+                      {currentLang && <span className="lang-flag">{currentLang.flag}</span>}
+                      <span className="lang-label">{t.language}</span>
+                      <span className="lang-chevron">›</span>
                     </button>
 
                     <div className="menu-divider" />

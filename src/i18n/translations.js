@@ -92,6 +92,8 @@ export const translations = {
       loginPromptBtn: 'Go to sign in',
       recordSoundsHintText: 'Record short sounds that tell your child whether their answer was right or wrong.\n\nFor example:\n— "Great job, Tim!"\n— "You\'re amazing, Sam!"\n— "Try again, Mike!"\n\nTip: Keep the sounds as short as possible so they don\'t annoy your child.',
       recordSoundsHintOk: 'Got it!',
+      difficulty: 'Difficulty',
+      difficultyLabel: (n) => `Show ${n} cards`,
     },
     themeNames: {
       animals: 'Animals',
@@ -191,6 +193,17 @@ export const translations = {
       loginPromptBtn: 'Перейти ко входу',
       recordSoundsHintText: 'Запишите короткие звуки, указывающие на то, что ответ Вашего ребёнка был правильным или неправильным.\n\nНапример:\n— «Правильно, Дима!»\n— «Ты молодец, Ваня!»\n— «Попробуй ещё раз, Петя!»\n\nСовет: По возможности, ответы должны быть максимально короткими, чтобы не раздражать ребёнка.',
       recordSoundsHintOk: 'Понятно!',
+      difficulty: 'Уровень сложности',
+      difficultyLabel: (n) => {
+        const rem = n % 10
+        const rem100 = n % 100
+        let word
+        if (rem100 >= 11 && rem100 <= 14) word = 'карточек'
+        else if (rem === 1) word = 'карточку'
+        else if (rem >= 2 && rem <= 4) word = 'карточки'
+        else word = 'карточек'
+        return `Показывать по ${n} ${word}`
+      },
     },
     themeNames: {
       animals: 'Животные',

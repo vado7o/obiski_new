@@ -1,6 +1,7 @@
 import { useState, useEffect, useLayoutEffect, useCallback, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { shuffleArray, BATCH_SIZE } from '../data/themes.js'
+import { shuffleArray } from '../data/themes.js'
+import { useDifficulty } from '../contexts/DifficultyContext.jsx'
 import { speak, speakWordObject } from '../hooks/useSpeech.js'
 import { useLang } from '../contexts/LanguageContext.jsx'
 import { useContent } from '../contexts/ContentContext.jsx'
@@ -77,6 +78,7 @@ function computeOptimalLayout(W, H, n) {
 export default function GameScreen({ selectedThemes, onComplete, onMenu }) {
   const { t, lang } = useLang()
   const { themes } = useContent()
+  const { difficulty } = useDifficulty()
   const [wordList, setWordList] = useState([])
   const [batchState, setBatchState] = useState({ words: [], displayOrder: [], questionOrder: [] })
   const [questionIndex, setQuestionIndex] = useState(0)
@@ -100,7 +102,7 @@ export default function GameScreen({ selectedThemes, onComplete, onMenu }) {
       const H = el.clientHeight
       if (W > 0 && H > 0) {
         setGridLayout(prev => {
-          const next = computeOptimalLayout(W, H, BATCH_SIZE)
+          const next = computeOptimalLayout(W, H, difficulty)
           if (prev.cols === next.cols && prev.rows === next.rows &&
               prev.gridW === next.gridW && prev.gridH === next.gridH) return prev
           return next
@@ -115,18 +117,18 @@ export default function GameScreen({ selectedThemes, onComplete, onMenu }) {
     const ro = new ResizeObserver(debouncedUpdate)
     ro.observe(el)
     return () => { ro.disconnect(); clearTimeout(debounceRef.current) }
-  }, [])
+  }, [difficulty])
 
   useEffect(() => {
     const list = buildWordList(selectedThemes, themes)
     setWordList(list)
-    const batch = list.slice(0, BATCH_SIZE)
+    const batch = list.slice(0, difficulty)
     setBatchState(makeBatchState(batch))
     setQuestionIndex(0)
     setBatchOffset(0)
     setProgress(0)
     setAnsweredIds(new Set())
-  }, [selectedThemes])
+  }, [selectedThemes, difficulty])
 
   useEffect(() => {
     let active = true
@@ -212,11 +214,11 @@ export default function GameScreen({ selectedThemes, onComplete, onMenu }) {
 
         if (nextQIndex >= batchState.words.length) {
           // Batch finished
-          const nextOffset = batchOffset + BATCH_SIZE
+          const nextOffset = batchOffset + difficulty
           if (nextOffset >= wordList.length) {
             onComplete()
           } else {
-            const nextBatch = wordList.slice(nextOffset, nextOffset + BATCH_SIZE)
+            const nextBatch = wordList.slice(nextOffset, nextOffset + difficulty)
             const nextState = makeBatchState(nextBatch)
             suppressAutoSpeakRef.current = true
             setBatchState(nextState)
@@ -253,7 +255,7 @@ export default function GameScreen({ selectedThemes, onComplete, onMenu }) {
         speak(t.tryAgain, afterFeedback)
       }
     }
-  }, [isLocked, currentTarget, questionIndex, batchState, batchOffset, wordList, answeredIds, feedbackSounds, onComplete, speakCurrent, t])
+  }, [isLocked, currentTarget, questionIndex, batchState, batchOffset, wordList, answeredIds, feedbackSounds, onComplete, speakCurrent, t, difficulty])
 
   const handleRepeat = () => {
     if (currentTarget) speakCurrent(currentTarget)
