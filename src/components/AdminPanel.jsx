@@ -8,6 +8,7 @@ import {
   uploadWordPhoto, uploadWordAudio, deleteWordAudio,
 } from '../api.js'
 import FeedbackSoundsSection from './FeedbackSoundsSection.jsx'
+import StatsPanel from './StatsPanel.jsx'
 import './AdminPanel.css'
 
 const DEFAULT_THEME = { name: '', icon: '📚', color: '#6C63FF', bgColor: '#EDEBFF' }
@@ -113,11 +114,21 @@ export default function AdminPanel({ onClose }) {
           >
             🔊 {t.admin.tabFeedback}
           </button>
+          <button
+            className={`admin-tab ${activeTab === 'stats' ? 'active' : ''}`}
+            onClick={() => setActiveTab('stats')}
+          >
+            📊 {t.admin.tabStats}
+          </button>
         </div>
 
         {error && <p className="admin-error admin-error-bar">{error}</p>}
 
-        {activeTab === 'sounds' ? (
+        {activeTab === 'stats' ? (
+          <div className="admin-feedback-wrap">
+            <StatsPanel />
+          </div>
+        ) : activeTab === 'sounds' ? (
           <div className="admin-feedback-wrap">
             <FeedbackSoundsSection />
           </div>

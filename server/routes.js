@@ -10,6 +10,7 @@ import {
   downloadObject,
   ObjectNotFoundError,
 } from './storage.js'
+import { registerAnalyticsRoutes } from './analyticsRoutes.js'
 
 const upload = multer({
   storage: multer.memoryStorage(),
@@ -58,6 +59,7 @@ const VALID_LANGS = new Set(['en', 'ru', 'es', 'fr', 'de', 'zh'])
 
 export function registerRoutes(app) {
   registerAuthRoutes(app)
+  registerAnalyticsRoutes(app)
 
   // ---- Per-user personal settings ("personal folder") ----
   app.get('/api/me/settings', isAuthenticated, async (req, res) => {

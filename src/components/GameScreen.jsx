@@ -92,6 +92,7 @@ export default function GameScreen({ selectedThemes, onComplete, onMenu }) {
   const suppressAutoSpeakRef = useRef(false)
   const wrapRef = useRef(null)
   const debounceRef = useRef(null)
+  const correctCountRef = useRef(0)
   const [gridLayout, setGridLayout] = useState({ cols: 4, rows: 2, gridW: null, gridH: null })
 
   useLayoutEffect(() => {
@@ -122,6 +123,7 @@ export default function GameScreen({ selectedThemes, onComplete, onMenu }) {
   useEffect(() => {
     const list = buildWordList(selectedThemes, themes)
     setWordList(list)
+    correctCountRef.current = 0
     const batch = list.slice(0, difficulty)
     setBatchState(makeBatchState(batch))
     setQuestionIndex(0)
@@ -198,6 +200,7 @@ export default function GameScreen({ selectedThemes, onComplete, onMenu }) {
 
     if (word.id === currentTarget.id) {
       // ── CORRECT ──────────────────────────────────────────────
+      correctCountRef.current += 1
       setFeedback({ id: word.id, type: 'correct' })
       setProgress(batchOffset + questionIndex + 1)
 
@@ -216,7 +219,7 @@ export default function GameScreen({ selectedThemes, onComplete, onMenu }) {
           // Batch finished
           const nextOffset = batchOffset + difficulty
           if (nextOffset >= wordList.length) {
-            onComplete()
+            onComplete({ themes: selectedThemes, difficulty, cardsTotal: wordList.length, cardsCorrect: correctCountRef.current })
           } else {
             const nextBatch = wordList.slice(nextOffset, nextOffset + difficulty)
             const nextState = makeBatchState(nextBatch)

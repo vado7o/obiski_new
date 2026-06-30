@@ -1,10 +1,12 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { LanguageProvider } from './contexts/LanguageContext.jsx'
 import { ContentProvider } from './contexts/ContentContext.jsx'
 import { AuthProvider } from './contexts/AuthContext.jsx'
 import { useAuth } from './contexts/AuthContext.jsx'
 import { DifficultyProvider } from './contexts/DifficultyContext.jsx'
+import { useLang } from './contexts/LanguageContext.jsx'
+import { useAnalytics } from './hooks/useAnalytics.js'
 import ThemeSelector from './components/ThemeSelector.jsx'
 import GameScreen from './components/GameScreen.jsx'
 import VictoryScreen from './components/VictoryScreen.jsx'
@@ -25,10 +27,21 @@ const pageVariants = {
 
 function AppInner() {
   const { user, ready } = useAuth()
+  const { lang } = useLang()
+  const { trackVisit, trackRound } = useAnalytics()
   const [screen, setScreen] = useState(SCREEN.SELECT)
   const [selectedThemes, setSelectedThemes] = useState([])
   const [adminOpen, setAdminOpen] = useState(false)
   const [userSoundsOpen, setUserSoundsOpen] = useState(false)
+  const roundStartedAtRef = useRef(null)
+  const visitTrackedRef = useRef(false)
+
+  useEffect(() => {
+    if (!visitTrackedRef.current) {
+      visitTrackedRef.current = true
+      trackVisit(lang)
+    }
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     if (!ready || !user) return
@@ -45,8 +58,18 @@ function AppInner() {
     )
   }
 
-  const startGame = () => setScreen(SCREEN.GAME)
-  const handleComplete = () => setScreen(SCREEN.VICTORY)
+  const startGame = () => {
+    roundStartedAtRef.current = Date.now()
+    setScreen(SCREEN.GAME)
+  }
+
+  const handleComplete = (stats) => {
+    if (stats) {
+      trackRound({ ...stats, startedAt: roundStartedAtRef.current })
+    }
+    setScreen(SCREEN.VICTORY)
+  }
+
   const handlePlayAgain = () => {
     setSelectedThemes([])
     setScreen(SCREEN.SELECT)

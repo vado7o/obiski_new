@@ -68,6 +68,37 @@ export async function ensureSchema() {
     );
   `)
 
+  // Anonymous + registered visit tracking
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS app_visits (
+      id         BIGSERIAL PRIMARY KEY,
+      anon_id    TEXT NOT NULL,
+      user_id    TEXT REFERENCES users(id) ON DELETE SET NULL,
+      visited_at TIMESTAMPTZ DEFAULT NOW(),
+      device     TEXT,
+      lang       TEXT
+    );
+  `)
+  await pool.query('CREATE INDEX IF NOT EXISTS idx_app_visits_anon ON app_visits(anon_id);')
+  await pool.query('CREATE INDEX IF NOT EXISTS idx_app_visits_at  ON app_visits(visited_at);')
+
+  // Game-round results
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS game_rounds (
+      id            BIGSERIAL PRIMARY KEY,
+      anon_id       TEXT NOT NULL,
+      user_id       TEXT REFERENCES users(id) ON DELETE SET NULL,
+      themes        TEXT[],
+      difficulty    INTEGER,
+      cards_total   INTEGER,
+      cards_correct INTEGER,
+      started_at    TIMESTAMPTZ,
+      ended_at      TIMESTAMPTZ DEFAULT NOW()
+    );
+  `)
+  await pool.query('CREATE INDEX IF NOT EXISTS idx_game_rounds_anon ON game_rounds(anon_id);')
+  await pool.query('CREATE INDEX IF NOT EXISTS idx_game_rounds_at  ON game_rounds(ended_at);')
+
   // Feedback sounds: up to 5 per language per type (correct / incorrect)
   await pool.query(`
     CREATE TABLE IF NOT EXISTS feedback_sounds (
