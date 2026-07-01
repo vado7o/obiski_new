@@ -1,0 +1,33 @@
+{
+  "expo": {
+    "name": "Obiski",
+    "slug": "obiski",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "splash": {
+      "image": "./assets/splash-icon.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#f0eeff"
+    },
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.obiski.app"
+    },
+    "android": {
+      "package": "com.obiski.app",
+      "adaptiveIcon": {
+        "backgroundColor": "#f0eeff",
+        "foregroundImage": "./assets/android-icon-foreground.png",
+        "backgroundImage": "./assets/android-icon-background.png",
+        "monochromeImage": "./assets/android-icon-monochrome.png"
+      },
+      "permissions": ["INTERNET", "ACCESS_NETWORK_STATE"]
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "plugins": []
+  }
+}
