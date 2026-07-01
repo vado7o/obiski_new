@@ -16,7 +16,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 14px 4px 14px;
+  padding: calc(14px + env(safe-area-inset-top)) 4px 14px;
   margin-bottom: 8px;
   background: rgba(237, 231, 255, 0.88);
   backdrop-filter: blur(14px);
@@ -272,7 +272,7 @@
   bottom: 0;
   left: 0;
   right: 0;
-  padding: 16px 24px 24px;
+  padding: 16px 24px calc(24px + env(safe-area-inset-bottom));
   background: rgba(255,255,255,0.92);
   backdrop-filter: blur(16px);
   border-top: 1px solid rgba(124, 77, 255, 0.12);
