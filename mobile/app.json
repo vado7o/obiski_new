@@ -25,7 +25,10 @@
         "backgroundColor": "#f0eeff",
         "foregroundImage": "./assets/android-icon-foreground.png"
       },
-      "permissions": ["INTERNET", "ACCESS_NETWORK_STATE"]
+      "permissions": [
+        "INTERNET",
+        "ACCESS_NETWORK_STATE"
+      ]
     },
     "web": {
       "favicon": "./assets/favicon.png"
@@ -33,8 +36,9 @@
     "plugins": [],
     "extra": {
       "eas": {
-        "projectId": ""
+        "projectId": "36403dce-1374-4640-a66b-50173b6015c7"
       }
-    }
+    },
+    "owner": "vado7os-team"
   }
 }
