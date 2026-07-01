@@ -3,7 +3,7 @@ import { StyleSheet, View, ActivityIndicator, Text, TouchableOpacity } from 'rea
 import { WebView } from 'react-native-webview'
 import { useRef, useState } from 'react'
 
-const APP_URL = `https://${process.env.EXPO_PUBLIC_APP_HOST || 'd57e0317-8f00-4dec-a51c-ccefc15fb819-00-myejbr14dnko.pike.replit.dev'}`
+const APP_URL = 'https://obiski.replit.app'
 
 export default function App() {
   const webViewRef = useRef(null)
