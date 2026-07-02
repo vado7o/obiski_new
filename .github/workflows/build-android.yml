@@ -21,12 +21,14 @@ jobs:
         with:
           node-version: '22'
 
-      - name: Update npm
-        run: npm install -g npm@latest
+      - name: Enable Corepack and setup Yarn
+        run: |
+          corepack enable
+          yarn --version
 
       - name: Install dependencies
         working-directory: mobile
-        run: npm install --legacy-peer-deps
+        run: yarn install --ignore-engines
 
       - name: Setup EAS
         uses: expo/expo-github-action@v8
