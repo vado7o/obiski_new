@@ -21,6 +21,9 @@ jobs:
         with:
           node-version: '22'
 
+      - name: Update npm
+        run: npm install -g npm@latest
+
       - name: Install dependencies
         working-directory: mobile
         run: npm install --legacy-peer-deps
