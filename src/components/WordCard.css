@@ -15,9 +15,13 @@
   padding: 0;
 }
 
-.word-card:hover:not(.answered) {
+.word-card:hover:not(.answered):not(.locked) {
   border-color: var(--theme-color, #7C4DFF);
   box-shadow: 0 8px 28px rgba(0,0,0,0.18);
+}
+
+.word-card.locked {
+  cursor: default;
 }
 
 .word-card.answered {

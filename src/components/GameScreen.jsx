@@ -339,6 +339,7 @@ export default function GameScreen({ selectedThemes, onComplete, onMenu }) {
                   index={i}
                   feedback={fb}
                   isAnswered={isAnswered}
+                  isLocked={isLocked}
                   onClick={() => handleCardClick(word)}
                 />
               )

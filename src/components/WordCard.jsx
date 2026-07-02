@@ -2,17 +2,18 @@ import { useState } from 'react'
 import { motion } from 'framer-motion'
 import './WordCard.css'
 
-export default function WordCard({ word, index, feedback, isAnswered, onClick }) {
+export default function WordCard({ word, index, feedback, isAnswered, isLocked, onClick }) {
   const [imgError, setImgError] = useState(false)
   const isCorrect = feedback === 'correct'
   const isWrong = feedback === 'wrong'
+  const inactive = isAnswered || isLocked
 
   return (
     <motion.button
-      className={`word-card ${isCorrect ? 'correct' : ''} ${isWrong ? 'wrong' : ''} ${isAnswered ? 'answered' : ''}`}
+      className={`word-card ${isCorrect ? 'correct' : ''} ${isWrong ? 'wrong' : ''} ${isAnswered ? 'answered' : ''} ${isLocked && !isAnswered ? 'locked' : ''}`}
       style={{ '--theme-color': word.themeColor }}
-      onClick={isAnswered ? undefined : onClick}
-      disabled={isAnswered}
+      onClick={inactive ? undefined : onClick}
+      disabled={inactive}
       initial={{ opacity: 0, scale: 0.7 }}
       animate={{ opacity: 1, scale: 1 }}
       transition={{
@@ -22,8 +23,8 @@ export default function WordCard({ word, index, feedback, isAnswered, onClick })
         stiffness: 260,
         damping: 20,
       }}
-      whileHover={!isAnswered ? { scale: 1.04, y: -3 } : {}}
-      whileTap={!isAnswered ? { scale: 0.96 } : {}}
+      whileHover={!inactive ? { scale: 1.04, y: -3 } : {}}
+      whileTap={!inactive ? { scale: 0.96 } : {}}
     >
       <div className="word-img-wrap">
         {word.imageUrl && !imgError ? (
