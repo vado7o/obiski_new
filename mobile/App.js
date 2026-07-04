@@ -1,14 +1,33 @@
 import { StatusBar } from 'expo-status-bar'
-import { StyleSheet, View, ActivityIndicator, Text, TouchableOpacity } from 'react-native'
+import { StyleSheet, View, ActivityIndicator, Text, TouchableOpacity, PermissionsAndroid, Platform } from 'react-native'
 import { WebView } from 'react-native-webview'
-import { useRef, useState } from 'react'
+import { useRef, useState, useEffect } from 'react'
 
 const APP_URL = 'https://obiski.replit.app'
+
+async function requestMicPermission() {
+  if (Platform.OS !== 'android') return
+  try {
+    await PermissionsAndroid.request(
+      PermissionsAndroid.PERMISSIONS.RECORD_AUDIO,
+      {
+        title: 'Доступ к микрофону',
+        message: 'Obiski нужен микрофон для записи ваших звуков',
+        buttonPositive: 'Разрешить',
+        buttonNegative: 'Отклонить',
+      }
+    )
+  } catch {}
+}
 
 export default function App() {
   const webViewRef = useRef(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(false)
+
+  useEffect(() => {
+    requestMicPermission()
+  }, [])
 
   function handleReload() {
     setError(false)
@@ -46,6 +65,8 @@ export default function App() {
         allowsInlineMediaPlayback={true}
         startInLoadingState={false}
         userAgent="ObishkiApp/1.0 (Android; Mobile)"
+        onPermissionRequest={(request) => request.grant(request.resources)}
+        mediaCapturePermissionGrantType="grant"
       />
 
       {loading && !error && (
