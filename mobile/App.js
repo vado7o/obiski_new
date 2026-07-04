@@ -1,7 +1,7 @@
 import { StatusBar } from 'expo-status-bar'
 import { StyleSheet, View, ActivityIndicator, Text, TouchableOpacity, PermissionsAndroid, Platform } from 'react-native'
 import { WebView } from 'react-native-webview'
-import { useRef, useState } from 'react'
+import { useRef, useState, useEffect } from 'react'
 
 const APP_URL = 'https://obiski.replit.app'
 
@@ -31,6 +31,10 @@ export default function App() {
   const webViewRef = useRef(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(false)
+
+  useEffect(() => {
+    ensureMicPermission()
+  }, [])
 
   function handleReload() {
     setError(false)
@@ -68,15 +72,8 @@ export default function App() {
         allowsInlineMediaPlayback={true}
         startInLoadingState={false}
         userAgent="ObishkiApp/1.0 (Android; Mobile)"
-        onPermissionRequest={async (request) => {
-          const granted = await ensureMicPermission()
-          if (granted) {
-            request.grant(request.resources)
-          } else {
-            request.deny()
-          }
-        }}
-        mediaCapturePermissionGrantType="grantIfSameHostElseDeny"
+        onPermissionRequest={(request) => request.grant(request.resources)}
+        mediaCapturePermissionGrantType="grant"
       />
 
       {loading && !error && (
