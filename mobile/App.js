@@ -1,14 +1,18 @@
 import { StatusBar } from 'expo-status-bar'
 import { StyleSheet, View, ActivityIndicator, Text, TouchableOpacity, PermissionsAndroid, Platform } from 'react-native'
 import { WebView } from 'react-native-webview'
-import { useRef, useState, useEffect } from 'react'
+import { useRef, useState } from 'react'
 
 const APP_URL = 'https://obiski.replit.app'
 
-async function requestMicPermission() {
-  if (Platform.OS !== 'android') return
+async function ensureMicPermission() {
+  if (Platform.OS !== 'android') return true
   try {
-    await PermissionsAndroid.request(
+    const already = await PermissionsAndroid.check(
+      PermissionsAndroid.PERMISSIONS.RECORD_AUDIO
+    )
+    if (already) return true
+    const result = await PermissionsAndroid.request(
       PermissionsAndroid.PERMISSIONS.RECORD_AUDIO,
       {
         title: 'Доступ к микрофону',
@@ -17,17 +21,16 @@ async function requestMicPermission() {
         buttonNegative: 'Отклонить',
       }
     )
-  } catch {}
+    return result === PermissionsAndroid.RESULTS.GRANTED
+  } catch {
+    return false
+  }
 }
 
 export default function App() {
   const webViewRef = useRef(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(false)
-
-  useEffect(() => {
-    requestMicPermission()
-  }, [])
 
   function handleReload() {
     setError(false)
@@ -65,8 +68,15 @@ export default function App() {
         allowsInlineMediaPlayback={true}
         startInLoadingState={false}
         userAgent="ObishkiApp/1.0 (Android; Mobile)"
-        onPermissionRequest={(request) => request.grant(request.resources)}
-        mediaCapturePermissionGrantType="grant"
+        onPermissionRequest={async (request) => {
+          const granted = await ensureMicPermission()
+          if (granted) {
+            request.grant(request.resources)
+          } else {
+            request.deny()
+          }
+        }}
+        mediaCapturePermissionGrantType="grantIfSameHostElseDeny"
       />
 
       {loading && !error && (
