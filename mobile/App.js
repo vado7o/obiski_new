@@ -1,12 +1,12 @@
 import { StatusBar } from 'expo-status-bar'
-import { StyleSheet, View, ActivityIndicator, Text, TouchableOpacity, PermissionsAndroid, Platform } from 'react-native'
+import { StyleSheet, View, ActivityIndicator, Text, TouchableOpacity, PermissionsAndroid, Platform, Linking } from 'react-native'
 import { WebView } from 'react-native-webview'
 import { useRef, useState } from 'react'
 
 const APP_URL = 'https://obiski.replit.app'
 
-async function ensureMicPermission() {
-  if (Platform.OS !== 'android') return true
+async function requestMicPermission() {
+  if (Platform.OS !== 'android') return 'granted'
   try {
     const result = await PermissionsAndroid.request(
       PermissionsAndroid.PERMISSIONS.RECORD_AUDIO,
@@ -17,9 +17,11 @@ async function ensureMicPermission() {
         buttonNegative: 'Отклонить',
       }
     )
-    return result === PermissionsAndroid.RESULTS.GRANTED
+    if (result === PermissionsAndroid.RESULTS.GRANTED) return 'granted'
+    if (result === PermissionsAndroid.RESULTS.NEVER_ASK_AGAIN) return 'never_ask_again'
+    return 'denied'
   } catch {
-    return false
+    return 'denied'
   }
 }
 
@@ -31,14 +33,23 @@ export default function App() {
   async function handleWebViewMessage(event) {
     try {
       const data = JSON.parse(event.nativeEvent.data)
+
       if (data.type === 'REQUEST_MIC_PERMISSION') {
-        const granted = await ensureMicPermission()
+        const status = await requestMicPermission()
         webViewRef.current?.injectJavaScript(`
           window.dispatchEvent(new MessageEvent('message', {
-            data: JSON.stringify({ type: 'MIC_PERMISSION_RESULT', granted: ${granted} })
+            data: JSON.stringify({
+              type: 'MIC_PERMISSION_RESULT',
+              granted: ${status === 'granted'},
+              neverAskAgain: ${status === 'never_ask_again'}
+            })
           }));
           true;
         `)
+      }
+
+      if (data.type === 'OPEN_APP_SETTINGS') {
+        Linking.openSettings()
       }
     } catch {}
   }

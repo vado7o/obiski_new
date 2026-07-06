@@ -94,6 +94,19 @@
   color: #c0392b;
 }
 
+.mic-settings-prompt {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.btn-mini-settings {
+  background: #fff3e0;
+  color: #e65100;
+}
+.btn-mini-settings:hover { background: #ffe0b2; }
+
 @media (max-width: 600px) {
   .usersounds-modal { border-radius: 18px; }
   .feedback-slot { flex-wrap: wrap; }

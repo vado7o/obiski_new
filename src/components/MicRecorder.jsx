@@ -7,7 +7,7 @@ function requestMicFromNative() {
         const data = JSON.parse(event.data)
         if (data.type === 'MIC_PERMISSION_RESULT') {
           window.removeEventListener('message', handler)
-          resolve(data.granted)
+          resolve({ granted: data.granted, neverAskAgain: data.neverAskAgain })
         }
       } catch {}
     }
@@ -18,20 +18,32 @@ function requestMicFromNative() {
   })
 }
 
+function openNativeSettings() {
+  window.ReactNativeWebView.postMessage(
+    JSON.stringify({ type: 'OPEN_APP_SETTINGS' })
+  )
+}
+
 export default function MicRecorder({ onRecorded, disabled, labelRecord, labelStop, labelError }) {
   const [state, setState] = useState('idle')
   const [errMsg, setErrMsg] = useState('')
+  const [showSettings, setShowSettings] = useState(false)
   const recorderRef = useRef(null)
   const chunksRef = useRef([])
 
   async function startRecording() {
+    setShowSettings(false)
     try {
       if (window.ReactNativeWebView) {
-        const granted = await requestMicFromNative()
+        const { granted, neverAskAgain } = await requestMicFromNative()
         if (!granted) {
-          setErrMsg(labelError || 'Нет доступа к микрофону')
-          setState('error')
-          setTimeout(() => setState('idle'), 3000)
+          if (neverAskAgain) {
+            setShowSettings(true)
+          } else {
+            setErrMsg(labelError || 'Нет доступа к микрофону')
+            setState('error')
+            setTimeout(() => setState('idle'), 3000)
+          }
           return
         }
       }
@@ -64,6 +76,20 @@ export default function MicRecorder({ onRecorded, disabled, labelRecord, labelSt
       recorderRef.current.stop()
       recorderRef.current = null
     }
+  }
+
+  if (showSettings) {
+    return (
+      <span className="mic-settings-prompt">
+        <span className="mic-error">Разрешите микрофон в настройках</span>
+        <button
+          className="btn-mini btn-mini-settings"
+          onClick={() => { openNativeSettings(); setShowSettings(false) }}
+        >
+          ⚙️ Настройки
+        </button>
+      </span>
+    )
   }
 
   if (state === 'error') {
