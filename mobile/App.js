@@ -1,17 +1,13 @@
 import { StatusBar } from 'expo-status-bar'
 import { StyleSheet, View, ActivityIndicator, Text, TouchableOpacity, PermissionsAndroid, Platform } from 'react-native'
 import { WebView } from 'react-native-webview'
-import { useRef, useState, useEffect } from 'react'
+import { useRef, useState } from 'react'
 
 const APP_URL = 'https://obiski.replit.app'
 
 async function ensureMicPermission() {
   if (Platform.OS !== 'android') return true
   try {
-    const already = await PermissionsAndroid.check(
-      PermissionsAndroid.PERMISSIONS.RECORD_AUDIO
-    )
-    if (already) return true
     const result = await PermissionsAndroid.request(
       PermissionsAndroid.PERMISSIONS.RECORD_AUDIO,
       {
@@ -32,9 +28,20 @@ export default function App() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(false)
 
-  useEffect(() => {
-    ensureMicPermission()
-  }, [])
+  async function handleWebViewMessage(event) {
+    try {
+      const data = JSON.parse(event.nativeEvent.data)
+      if (data.type === 'REQUEST_MIC_PERMISSION') {
+        const granted = await ensureMicPermission()
+        webViewRef.current?.injectJavaScript(`
+          window.dispatchEvent(new MessageEvent('message', {
+            data: JSON.stringify({ type: 'MIC_PERMISSION_RESULT', granted: ${granted} })
+          }));
+          true;
+        `)
+      }
+    } catch {}
+  }
 
   function handleReload() {
     setError(false)
@@ -65,6 +72,7 @@ export default function App() {
         onLoadEnd={() => setLoading(false)}
         onError={() => { setLoading(false); setError(true) }}
         onHttpError={(e) => { if (e.nativeEvent.statusCode >= 500) { setLoading(false); setError(true) } }}
+        onMessage={handleWebViewMessage}
         javaScriptEnabled={true}
         domStorageEnabled={true}
         allowsBackForwardNavigationGestures={true}

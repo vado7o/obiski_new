@@ -1,5 +1,23 @@
 import { useState, useRef } from 'react'
 
+function requestMicFromNative() {
+  return new Promise((resolve) => {
+    const handler = (event) => {
+      try {
+        const data = JSON.parse(event.data)
+        if (data.type === 'MIC_PERMISSION_RESULT') {
+          window.removeEventListener('message', handler)
+          resolve(data.granted)
+        }
+      } catch {}
+    }
+    window.addEventListener('message', handler)
+    window.ReactNativeWebView.postMessage(
+      JSON.stringify({ type: 'REQUEST_MIC_PERMISSION' })
+    )
+  })
+}
+
 export default function MicRecorder({ onRecorded, disabled, labelRecord, labelStop, labelError }) {
   const [state, setState] = useState('idle')
   const [errMsg, setErrMsg] = useState('')
@@ -8,6 +26,16 @@ export default function MicRecorder({ onRecorded, disabled, labelRecord, labelSt
 
   async function startRecording() {
     try {
+      if (window.ReactNativeWebView) {
+        const granted = await requestMicFromNative()
+        if (!granted) {
+          setErrMsg(labelError || 'Нет доступа к микрофону')
+          setState('error')
+          setTimeout(() => setState('idle'), 3000)
+          return
+        }
+      }
+
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
       const mimeType = MediaRecorder.isTypeSupported('audio/webm') ? 'audio/webm' : 'audio/ogg'
       const recorder = new MediaRecorder(stream, { mimeType })
