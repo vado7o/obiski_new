@@ -5,6 +5,7 @@ import { useContent } from '../contexts/ContentContext.jsx'
 import { useAuth } from '../contexts/AuthContext.jsx'
 import { LANGUAGES } from '../i18n/translations.js'
 import { useDifficulty } from '../contexts/DifficultyContext.jsx'
+import { useShowTranslation } from '../contexts/ShowTranslationContext.jsx'
 import { getTitleSound } from '../api.js'
 import './ThemeSelector.css'
 
@@ -13,6 +14,7 @@ export default function ThemeSelector({ selected, onToggle, onStart, onOpenAdmin
   const { themes, loading } = useContent()
   const { user, isAdmin, login, logout } = useAuth()
   const { difficulty, setDifficulty, DIFFICULTY_OPTIONS } = useDifficulty()
+  const { showTranslation, setShowTranslation } = useShowTranslation()
   const canStart = selected.length > 0
   const [menuOpen, setMenuOpen] = useState(false)
   const [langView, setLangView] = useState(false)
@@ -136,6 +138,14 @@ export default function ThemeSelector({ selected, onToggle, onStart, onOpenAdmin
                     >
                       <span className="lang-label">{t.admin.difficulty}</span>
                       <span className="lang-chevron">›</span>
+                    </button>
+
+                    <button
+                      className="lang-option"
+                      onClick={() => setShowTranslation(!showTranslation)}
+                    >
+                      <span className="lang-label">{t.admin.showTranslation}</span>
+                      {showTranslation && <span className="lang-check">✓</span>}
                     </button>
 
                     <button

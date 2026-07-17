@@ -2,6 +2,7 @@ import { useState, useEffect, useLayoutEffect, useCallback, useRef } from 'react
 import { motion, AnimatePresence } from 'framer-motion'
 import { shuffleArray } from '../data/themes.js'
 import { useDifficulty } from '../contexts/DifficultyContext.jsx'
+import { useShowTranslation } from '../contexts/ShowTranslationContext.jsx'
 import { speak, speakWordObject } from '../hooks/useSpeech.js'
 import { useLang } from '../contexts/LanguageContext.jsx'
 import { useContent } from '../contexts/ContentContext.jsx'
@@ -93,6 +94,7 @@ export default function GameScreen({ selectedThemes, onComplete, onMenu }) {
   const { t, lang } = useLang()
   const { themes } = useContent()
   const { difficulty } = useDifficulty()
+  const { showTranslation } = useShowTranslation()
   const [wordList, setWordList] = useState([])
   const [batchState, setBatchState] = useState({ words: [], displayOrder: [], questionOrder: [] })
   const [questionIndex, setQuestionIndex] = useState(0)
@@ -302,6 +304,9 @@ export default function GameScreen({ selectedThemes, onComplete, onMenu }) {
         <div className="game-stats">
           <span className="stat">{t.wordsProgress(progress, totalWords)}</span>
         </div>
+        {showTranslation && currentTarget && (
+          <div className="word-translation">{currentTarget.name}</div>
+        )}
       </div>
 
       <div className="prompt-area">
