@@ -49,6 +49,13 @@ export default function ThemeSelector({ selected, onToggle, onStart, onOpenAdmin
     return () => document.removeEventListener('mousedown', handleClick)
   }, [menuOpen])
 
+  useEffect(() => {
+    if (!menuOpen) return
+    function handleScroll() { closeMenu() }
+    window.addEventListener('scroll', handleScroll, { passive: true })
+    return () => window.removeEventListener('scroll', handleScroll)
+  }, [menuOpen])
+
   const currentLang = LANGUAGES.find(l => l.code === lang)
 
   return (
