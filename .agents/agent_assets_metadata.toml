@@ -192,3 +192,21 @@ id = "6xXB_iztsmjyrPZFdU43I"
 uri = "file://attached_assets/generated_images/card_vehicles_truck.png"
 type = "image"
 title = "truck flashcard"
+
+[[generated]]
+id = "RD2uEzeR36Vd-B_TyT2Es"
+uri = "file://attached_assets/icon_v1.png"
+type = "image"
+title = "icon variant 1 silhouette gradient"
+
+[[generated]]
+id = "gbAiNzV9AkIjhEsQo_4DW"
+uri = "file://attached_assets/icon_v2.png"
+type = "image"
+title = "icon variant 2 orange child purple bg"
+
+[[generated]]
+id = "YheNfOMqKDcMbbNnYurgw"
+uri = "file://attached_assets/icon_v3.png"
+type = "image"
+title = "icon variant 3 dark silhouette gradient bg"
