@@ -29,7 +29,7 @@ export default function FeedbackSoundsSection() {
     try {
       const [feedbackData, titleData] = await Promise.all([
         getAdminFeedbackSounds(),
-        getAdminTitleSound(),
+        getAdminTitleSound(lang),
       ])
       setSounds(feedbackData.sounds)
       setTitleSound(titleData.sound)
@@ -38,7 +38,7 @@ export default function FeedbackSoundsSection() {
     }
   }
 
-  useEffect(() => { load() }, [])
+  useEffect(() => { load() }, [lang])
 
   function getSlot(type, slot) {
     return sounds.find((s) => s.lang === lang && s.type === type && s.slot === slot) || null
@@ -73,7 +73,7 @@ export default function FeedbackSoundsSection() {
     if (!file) return
     setTitleBusy(true); setError(null)
     try {
-      await uploadTitleSound(file)
+      await uploadTitleSound(lang, file)
       await load()
     } catch (err) {
       setError(err.message || a.errorGeneric)
@@ -85,7 +85,7 @@ export default function FeedbackSoundsSection() {
   async function handleTitleDelete() {
     setTitleBusy(true); setError(null)
     try {
-      await deleteTitleSound()
+      await deleteTitleSound(lang)
       await load()
     } catch (err) {
       setError(err.message || a.errorGeneric)

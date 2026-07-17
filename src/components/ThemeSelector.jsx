@@ -22,13 +22,13 @@ export default function ThemeSelector({ selected, onToggle, onStart, onOpenAdmin
 
   useEffect(() => {
     let cancelled = false
-    getTitleSound().then(({ url }) => {
+    getTitleSound(lang).then(({ url }) => {
       if (cancelled || !url) return
       const audio = new Audio(url)
       audio.play().catch(() => {})
     }).catch(() => {})
     return () => { cancelled = true }
-  }, [])
+  }, [lang])
 
   const userName =
     user && (([user.firstName, user.lastName].filter(Boolean).join(' ')) || user.email)

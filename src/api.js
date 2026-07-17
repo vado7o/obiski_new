@@ -83,20 +83,23 @@ export function deleteWordAudio(id) {
   return jsonRequest(`/api/admin/words/${id}/audio`, { method: 'DELETE' })
 }
 
-export function getTitleSound() {
-  return jsonRequest('/api/title-sound')
+export function getTitleSound(lang) {
+  return jsonRequest(`/api/title-sound?lang=${encodeURIComponent(lang || 'ru')}`)
 }
 
-export function getAdminTitleSound() {
-  return jsonRequest('/api/admin/title-sound')
+export function getAdminTitleSound(lang) {
+  return jsonRequest(`/api/admin/title-sound?lang=${encodeURIComponent(lang || 'ru')}`)
 }
 
-export function uploadTitleSound(file) {
-  return uploadFile('/api/admin/title-sound', file)
+export function uploadTitleSound(lang, file) {
+  const fd = new FormData()
+  fd.append('lang', lang || 'ru')
+  fd.append('file', file)
+  return fetch('/api/admin/title-sound', { method: 'POST', body: fd }).then(r => r.json())
 }
 
-export function deleteTitleSound() {
-  return jsonRequest('/api/admin/title-sound', { method: 'DELETE' })
+export function deleteTitleSound(lang) {
+  return jsonRequest(`/api/admin/title-sound?lang=${encodeURIComponent(lang || 'ru')}`, { method: 'DELETE' })
 }
 
 export function getFeedbackSounds(lang) {

@@ -111,13 +111,25 @@ export async function ensureSchema() {
     );
   `)
 
-  // Title sound: single global sound played on the main screen
+  // Title sound: one per language, played on the main screen
+  // Migration: drop old single-row schema (id=1) if it exists
+  await pool.query(`
+    DO $$
+    BEGIN
+      IF EXISTS (
+        SELECT 1 FROM information_schema.columns
+        WHERE table_name = 'title_sound' AND column_name = 'id'
+      ) THEN
+        DROP TABLE title_sound;
+      END IF;
+    END;
+    $$;
+  `)
   await pool.query(`
     CREATE TABLE IF NOT EXISTS title_sound (
-      id INTEGER PRIMARY KEY DEFAULT 1,
+      lang TEXT PRIMARY KEY,
       object_path TEXT NOT NULL,
-      updated_at TIMESTAMPTZ DEFAULT NOW(),
-      CHECK (id = 1)
+      updated_at TIMESTAMPTZ DEFAULT NOW()
     );
   `)
 }

@@ -396,7 +396,8 @@ export function registerRoutes(app) {
   // ---- Public: title sound ----
   app.get('/api/title-sound', async (req, res) => {
     try {
-      const row = await query('SELECT object_path FROM title_sound WHERE id = 1')
+      const lang = req.query.lang || 'ru'
+      const row = await query('SELECT object_path FROM title_sound WHERE lang = $1', [lang])
       if (row.rowCount === 0) return res.json({ url: null })
       res.json({ url: row.rows[0].object_path })
     } catch (err) {
@@ -408,7 +409,8 @@ export function registerRoutes(app) {
   // ---- Admin: title sound ----
   app.get('/api/admin/title-sound', requireOwner, async (req, res) => {
     try {
-      const row = await query('SELECT object_path FROM title_sound WHERE id = 1')
+      const lang = req.query.lang || 'ru'
+      const row = await query('SELECT object_path FROM title_sound WHERE lang = $1', [lang])
       res.json({ sound: row.rowCount > 0 ? row.rows[0] : null })
     } catch (err) {
       console.error('GET /api/admin/title-sound failed:', err)
@@ -421,13 +423,14 @@ export function registerRoutes(app) {
       if (!req.file) return res.status(400).json({ error: 'file_required' })
       if (!req.file.mimetype.startsWith('audio/'))
         return res.status(400).json({ error: 'invalid_file_type' })
-      const existing = await query('SELECT object_path FROM title_sound WHERE id = 1')
+      const lang = req.body.lang || 'ru'
+      const existing = await query('SELECT object_path FROM title_sound WHERE lang = $1', [lang])
       const objectPath = await uploadObject(req.file.buffer, req.file.mimetype)
       await query(
-        `INSERT INTO title_sound (id, object_path, updated_at)
-         VALUES (1, $1, NOW())
-         ON CONFLICT (id) DO UPDATE SET object_path = EXCLUDED.object_path, updated_at = NOW()`,
-        [objectPath]
+        `INSERT INTO title_sound (lang, object_path, updated_at)
+         VALUES ($1, $2, NOW())
+         ON CONFLICT (lang) DO UPDATE SET object_path = EXCLUDED.object_path, updated_at = NOW()`,
+        [lang, objectPath]
       )
       if (existing.rowCount > 0) await deleteObject(existing.rows[0].object_path)
       res.json({ objectPath })
@@ -439,9 +442,10 @@ export function registerRoutes(app) {
 
   app.delete('/api/admin/title-sound', requireOwner, async (req, res) => {
     try {
-      const existing = await query('SELECT object_path FROM title_sound WHERE id = 1')
+      const lang = req.query.lang || 'ru'
+      const existing = await query('SELECT object_path FROM title_sound WHERE lang = $1', [lang])
       if (existing.rowCount === 0) return res.status(404).json({ error: 'not_found' })
-      await query('DELETE FROM title_sound WHERE id = 1')
+      await query('DELETE FROM title_sound WHERE lang = $1', [lang])
       await deleteObject(existing.rows[0].object_path)
       res.json({ ok: true })
     } catch (err) {
