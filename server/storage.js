@@ -77,7 +77,7 @@ export async function downloadObject(file, res) {
   res.set({
     'Content-Type': metadata.contentType || 'application/octet-stream',
     'Content-Length': metadata.size,
-    'Cache-Control': 'public, max-age=86400',
+    'Cache-Control': 'public, max-age=31536000, immutable',
   })
   const stream = file.createReadStream()
   stream.on('error', () => {
