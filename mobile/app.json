@@ -22,8 +22,8 @@
       "targetSdkVersion": 35,
       "minSdkVersion": 24,
       "adaptiveIcon": {
-        "backgroundColor": "#f0eeff",
-        "foregroundImage": "./assets/android-icon-foreground.png"
+        "backgroundColor": "#3D1A5E",
+        "foregroundImage": "./assets/icon.png"
       },
       "permissions": [
         "INTERNET",
