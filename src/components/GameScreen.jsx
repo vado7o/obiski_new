@@ -10,6 +10,20 @@ import { getAllBlobsForLang } from '../db/userSoundsDB.js'
 import WordCard from './WordCard.jsx'
 import './GameScreen.css'
 
+function AnimatedSpeaker() {
+  return (
+    <div className="speaker-playing-wrap">
+      <div className="speaker-playing-glow" />
+      <svg className="speaker-playing-svg" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M10 24 L10 40 L20 40 L33 52 L33 12 L20 24 Z" fill="#7C4DFF" />
+        <path className="speaker-wave speaker-wave-1" d="M38 29 Q43 32 38 35" stroke="#7C4DFF" strokeWidth="2.8" strokeLinecap="round" />
+        <path className="speaker-wave speaker-wave-2" d="M42 23 Q52 32 42 41" stroke="#7C4DFF" strokeWidth="2.8" strokeLinecap="round" />
+        <path className="speaker-wave speaker-wave-3" d="M47 17 Q62 32 47 47" stroke="#7C4DFF" strokeWidth="2.8" strokeLinecap="round" />
+      </svg>
+    </div>
+  )
+}
+
 function playRandom(urls, onEnd) {
   if (!urls || urls.length === 0) return false
   const url = urls[Math.floor(Math.random() * urls.length)]
@@ -291,17 +305,20 @@ export default function GameScreen({ selectedThemes, onComplete, onMenu }) {
       </div>
 
       <div className="prompt-area">
-        <motion.button
-          className="speaker-btn"
-          onClick={handleRepeat}
-          whileHover={{ scale: 1.08 }}
-          whileTap={{ scale: 0.93 }}
-        >
-          <span className="speaker-icon">🔊</span>
-          {currentTarget && (
-            <span className="speaker-hint">{t.tapToHear}</span>
-          )}
-        </motion.button>
+        {isLocked ? (
+          <AnimatedSpeaker />
+        ) : (
+          <motion.button
+            className="speaker-btn"
+            onClick={handleRepeat}
+            whileHover={{ scale: 1.08 }}
+            whileTap={{ scale: 0.93 }}
+          >
+            {currentTarget && (
+              <span className="speaker-hint">{t.tapToHear}</span>
+            )}
+          </motion.button>
+        )}
       </div>
 
       <div className="cards-grid-wrap" ref={wrapRef}>
