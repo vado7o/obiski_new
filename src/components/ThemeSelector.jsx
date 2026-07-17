@@ -5,6 +5,7 @@ import { useContent } from '../contexts/ContentContext.jsx'
 import { useAuth } from '../contexts/AuthContext.jsx'
 import { LANGUAGES } from '../i18n/translations.js'
 import { useDifficulty } from '../contexts/DifficultyContext.jsx'
+import { getTitleSound } from '../api.js'
 import './ThemeSelector.css'
 
 export default function ThemeSelector({ selected, onToggle, onStart, onOpenAdmin, onOpenUserSounds }) {
@@ -18,6 +19,16 @@ export default function ThemeSelector({ selected, onToggle, onStart, onOpenAdmin
   const [difficultyView, setDifficultyView] = useState(false)
   const [loginPromptOpen, setLoginPromptOpen] = useState(false)
   const menuRef = useRef(null)
+
+  useEffect(() => {
+    let cancelled = false
+    getTitleSound().then(({ url }) => {
+      if (cancelled || !url) return
+      const audio = new Audio(url)
+      audio.play().catch(() => {})
+    }).catch(() => {})
+    return () => { cancelled = true }
+  }, [])
 
   const userName =
     user && (([user.firstName, user.lastName].filter(Boolean).join(' ')) || user.email)

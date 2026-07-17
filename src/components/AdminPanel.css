@@ -309,6 +309,16 @@
   max-width: 700px;
 }
 
+.title-sound-block {
+  margin-bottom: 8px;
+}
+
+.title-sound-divider {
+  border: none;
+  border-top: 2px dashed #e0ddf5;
+  margin: 24px 0;
+}
+
 .feedback-lang-badge {
   display: inline-block;
   background: #ece9ff;

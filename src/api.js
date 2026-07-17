@@ -83,6 +83,22 @@ export function deleteWordAudio(id) {
   return jsonRequest(`/api/admin/words/${id}/audio`, { method: 'DELETE' })
 }
 
+export function getTitleSound() {
+  return jsonRequest('/api/title-sound')
+}
+
+export function getAdminTitleSound() {
+  return jsonRequest('/api/admin/title-sound')
+}
+
+export function uploadTitleSound(file) {
+  return uploadFile('/api/admin/title-sound', file)
+}
+
+export function deleteTitleSound() {
+  return jsonRequest('/api/admin/title-sound', { method: 'DELETE' })
+}
+
 export function getFeedbackSounds(lang) {
   return jsonRequest(`/api/feedback-sounds/${encodeURIComponent(lang)}`)
 }

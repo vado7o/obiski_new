@@ -110,4 +110,14 @@ export async function ensureSchema() {
       PRIMARY KEY (lang, type, slot)
     );
   `)
+
+  // Title sound: single global sound played on the main screen
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS title_sound (
+      id INTEGER PRIMARY KEY DEFAULT 1,
+      object_path TEXT NOT NULL,
+      updated_at TIMESTAMPTZ DEFAULT NOW(),
+      CHECK (id = 1)
+    );
+  `)
 }
