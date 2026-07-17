@@ -2,7 +2,7 @@ import { createContext, useContext, useState } from 'react'
 
 const DIFFICULTY_OPTIONS = [3, 4, 8, 10]
 const STORAGE_KEY = 'obiski_difficulty'
-const DEFAULT_DIFFICULTY = 4
+const DEFAULT_DIFFICULTY = 8
 
 const DifficultyContext = createContext(null)
 
