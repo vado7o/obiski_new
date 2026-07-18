@@ -287,11 +287,18 @@ export default function GameScreen({ selectedThemes, onComplete, onMenu }) {
 
   return (
     <div className="game-screen">
-      <div className="game-nav">
-        <span className="app-title">Obiski</span>
-        <button className="menu-btn" onClick={onMenu}>
-          {t.backBtn}
-        </button>
+      <div className="game-top">
+        {showTranslation && currentTarget && (
+          <div className="word-translation">
+            {currentTarget.translations?.[lang] || currentTarget.name}
+          </div>
+        )}
+        <div className="game-nav">
+          <span className="app-title">Obiski</span>
+          <button className="menu-btn" onClick={onMenu}>
+            {t.backBtn}
+          </button>
+        </div>
       </div>
       <div className="game-header">
         <div className="progress-bar-wrap">
@@ -304,11 +311,6 @@ export default function GameScreen({ selectedThemes, onComplete, onMenu }) {
         <div className="game-stats">
           <span className="stat">{t.wordsProgress(progress, totalWords)}</span>
         </div>
-        {showTranslation && currentTarget && (
-          <div className="word-translation">
-            {currentTarget.translations?.[lang] || currentTarget.name}
-          </div>
-        )}
       </div>
 
       <div className="prompt-area">
