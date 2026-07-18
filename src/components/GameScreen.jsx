@@ -288,13 +288,13 @@ export default function GameScreen({ selectedThemes, onComplete, onMenu }) {
   return (
     <div className="game-screen">
       <div className="game-top">
-        {showTranslation && currentTarget && (
-          <div className="word-translation">
-            {currentTarget.translations?.[lang] || currentTarget.name}
-          </div>
-        )}
         <div className="game-nav">
           <span className="app-title">Obiski</span>
+          {showTranslation && currentTarget && (
+            <div className="word-translation">
+              {currentTarget.translations?.[lang] || currentTarget.name}
+            </div>
+          )}
           <button className="menu-btn" onClick={onMenu}>
             {t.backBtn}
           </button>
