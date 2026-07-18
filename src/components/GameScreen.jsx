@@ -305,7 +305,9 @@ export default function GameScreen({ selectedThemes, onComplete, onMenu }) {
           <span className="stat">{t.wordsProgress(progress, totalWords)}</span>
         </div>
         {showTranslation && currentTarget && (
-          <div className="word-translation">{currentTarget.name}</div>
+          <div className="word-translation">
+            {currentTarget.translations?.[lang] || currentTarget.name}
+          </div>
         )}
       </div>
 

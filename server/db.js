@@ -35,6 +35,7 @@ export async function ensureSchema() {
     );
   `)
   await pool.query('CREATE INDEX IF NOT EXISTS idx_words_theme ON words(theme_id);')
+  await pool.query(`ALTER TABLE words ADD COLUMN IF NOT EXISTS translations JSONB DEFAULT '{}';`)
 
   // Session store for Replit Auth (connect-pg-simple)
   await pool.query(`

@@ -25,6 +25,7 @@
     "memoizee": "^0.4.17",
     "multer": "^2.2.0",
     "nanoid": "^5.1.16",
+    "openai": "^6.48.0",
     "openid-client": "^6.8.4",
     "passport": "^0.7.0",
     "pg": "^8.22.0",

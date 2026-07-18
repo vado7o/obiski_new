@@ -30,6 +30,7 @@ function mapWord(row) {
   return {
     id: row.id,
     name: row.name,
+    translations: row.translations || {},
     emoji: row.emoji || '',
     imageUrl: row.image_path || null,
     audioUrl: row.audio_path || null,
