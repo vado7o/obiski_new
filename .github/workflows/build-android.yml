@@ -1,41 +1,45 @@
-name: Build Android APK
-
+name: Android Build
 on:
-  push:
-    branches:
-      - main
-    paths:
-      - 'mobile/**'
   workflow_dispatch:
 
 jobs:
   build:
-    name: Build APK (EAS)
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Setup Java JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '22'
+          node-version: '20'
 
-      - name: Enable Corepack and setup Yarn
+      - name: Install Dependencies
         run: |
-          corepack enable
-          yarn --version
+          cd mobile
+          npm install
 
-      - name: Install dependencies
-        working-directory: mobile
-        run: yarn install --ignore-engines
+      - name: Generate Local Android Folder
+        run: |
+          cd mobile
+          # npx expo prebuild создаст локальную папку /android БЕЗ отправки в облако Expo Dev
+          npx expo prebuild --platform android --no-install
 
-      - name: Setup EAS
-        uses: expo/expo-github-action@v8
+      - name: Build APK with Gradle
+        run: |
+          cd mobile/android
+          chmod +x gradlew
+          ./gradlew assembleDebug
+
+      - name: Upload APK Artifact
+        uses: actions/upload-artifact@v4
         with:
-          eas-version: latest
-          token: ${{ secrets.EXPO_TOKEN }}
+          name: app-debug-apk
+          path: mobile/android/app/build/outputs/apk/debug/app-debug.apk
 
-      - name: Build APK (starts in background, prints link)
-        working-directory: mobile
-        run: eas build --platform android --profile preview --non-interactive --no-wait
