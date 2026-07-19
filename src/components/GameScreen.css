@@ -7,16 +7,36 @@
   position: absolute;
   left: 50%;
   transform: translateX(-50%);
-  text-align: center;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  max-width: 55%;
+  pointer-events: none;
+}
+
+.word-en {
   font-size: 1.05rem;
   font-weight: 800;
   color: #7C4DFF;
-  letter-spacing: 0.01em;
   white-space: nowrap;
-  max-width: 45%;
   overflow: hidden;
   text-overflow: ellipsis;
-  pointer-events: none;
+}
+
+.word-sep {
+  font-size: 0.9rem;
+  font-weight: 400;
+  color: #C4B8F0;
+  flex-shrink: 0;
+}
+
+.word-lang {
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: #FF6D00;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .game-screen {

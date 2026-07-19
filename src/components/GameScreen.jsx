@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { shuffleArray } from '../data/themes.js'
 import { useDifficulty } from '../contexts/DifficultyContext.jsx'
 import { useShowTranslation } from '../contexts/ShowTranslationContext.jsx'
+import { useShowText } from '../contexts/ShowTextContext.jsx'
 import { speak, speakWordObject } from '../hooks/useSpeech.js'
 import { useLang } from '../contexts/LanguageContext.jsx'
 import { useContent } from '../contexts/ContentContext.jsx'
@@ -95,6 +96,7 @@ export default function GameScreen({ selectedThemes, onComplete, onMenu }) {
   const { themes } = useContent()
   const { difficulty } = useDifficulty()
   const { showTranslation } = useShowTranslation()
+  const { showText } = useShowText()
   const [wordList, setWordList] = useState([])
   const [batchState, setBatchState] = useState({ words: [], displayOrder: [], questionOrder: [] })
   const [questionIndex, setQuestionIndex] = useState(0)
@@ -290,9 +292,22 @@ export default function GameScreen({ selectedThemes, onComplete, onMenu }) {
       <div className="game-top">
         <div className="game-nav">
           <span className="app-title">Obiski</span>
-          {showTranslation && currentTarget && (
+          {(showText || showTranslation) && currentTarget && (
             <div className="word-translation">
-              {currentTarget.translations?.[lang] || currentTarget.name}
+              {showText && (
+                <span className="word-en">{currentTarget.name}</span>
+              )}
+              {showText && showTranslation && lang !== 'en' && (
+                <span className="word-sep">·</span>
+              )}
+              {showTranslation && lang !== 'en' && (
+                <span className="word-lang">
+                  {currentTarget.translations?.[lang] || currentTarget.name}
+                </span>
+              )}
+              {showTranslation && !showText && lang === 'en' && (
+                <span className="word-en">{currentTarget.name}</span>
+              )}
             </div>
           )}
           <button className="menu-btn" onClick={onMenu}>

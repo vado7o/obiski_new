@@ -97,6 +97,7 @@ export const translations = {
       recordSoundsHintOk: 'Got it!',
       difficulty: 'Difficulty',
       difficultyLabel: (n) => `Show ${n} cards`,
+      showText: 'Show text',
       showTranslation: 'Show translation',
       tabStats: 'Statistics',
       statsLoading: 'Loading…',
@@ -218,6 +219,7 @@ export const translations = {
       recordSoundsHintText: 'Запишите своим голосом короткие звуки, указывающие на то, что ответ Вашего ребёнка был правильным или неправильным.\n\nНапример, для правильных ответов:\n— «Правильно, Дима!»\n— «Ты молодец, Света!»\nА для неправильных ответов:\n— «Неправильно, Саша.»\n— «Попробуй ещё раз, Наташа!»\n\nСовет: По возможности, ответы должны быть максимально короткими, чтобы не надоедать Вашему ребёнку.',
       recordSoundsHintOk: 'Понятно!',
       difficulty: 'Уровень сложности',
+      showText: 'Показывать текст',
       showTranslation: 'Показывать перевод',
       difficultyLabel: (n) => {
         const rem = n % 10

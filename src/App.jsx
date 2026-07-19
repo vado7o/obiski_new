@@ -6,6 +6,7 @@ import { AuthProvider } from './contexts/AuthContext.jsx'
 import { useAuth } from './contexts/AuthContext.jsx'
 import { DifficultyProvider } from './contexts/DifficultyContext.jsx'
 import { ShowTranslationProvider } from './contexts/ShowTranslationContext.jsx'
+import { ShowTextProvider } from './contexts/ShowTextContext.jsx'
 import { useLang } from './contexts/LanguageContext.jsx'
 import { useAnalytics } from './hooks/useAnalytics.js'
 import ThemeSelector from './components/ThemeSelector.jsx'
@@ -111,11 +112,13 @@ export default function App() {
     <LanguageProvider>
       <DifficultyProvider>
         <ShowTranslationProvider>
+        <ShowTextProvider>
         <AuthProvider>
           <ContentProvider>
             <AppInner />
           </ContentProvider>
         </AuthProvider>
+        </ShowTextProvider>
         </ShowTranslationProvider>
       </DifficultyProvider>
     </LanguageProvider>
