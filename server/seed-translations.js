@@ -1,11 +1,10 @@
 /**
- * Seed word translations directly (no API key needed).
- * Run: node server/seed-translations.js
+ * Word translations data.
+ * Importable by db.js for automatic seeding on server start.
+ * Also runnable standalone: node server/seed-translations.js
  */
 
 import pg from 'pg'
-const { Pool } = pg
-const pool = new Pool({ connectionString: process.env.DATABASE_URL })
 
 // { wordId: { ru, es, fr, de, zh } }
 const TRANSLATIONS = {
@@ -252,30 +251,38 @@ const TRANSLATIONS = {
   twenty:    { en:'twenty',    ru:'двадцать',       es:'veinte',     fr:'vingt',     de:'zwanzig',    zh:'二十' },
 }
 
-async function run() {
+/**
+ * Seed translations into the given pg pool.
+ * Only updates words that have empty translations ({}).
+ * Safe to call on every server start.
+ */
+export async function seedTranslations(dbPool) {
   const ids = Object.keys(TRANSLATIONS)
   let updated = 0
-  let skipped = 0
-
   for (const id of ids) {
-    const t = TRANSLATIONS[id]
-    const result = await pool.query(
-      `UPDATE words SET translations = $1 WHERE id = $2`,
-      [JSON.stringify(t), id]
+    const result = await dbPool.query(
+      `UPDATE words SET translations = $1
+       WHERE id = $2 AND (translations IS NULL OR translations = '{}')`,
+      [JSON.stringify(TRANSLATIONS[id]), id]
     )
-    if (result.rowCount > 0) {
-      updated++
-    } else {
-      skipped++
-      console.warn(`Word not found in DB: "${id}"`)
-    }
+    if (result.rowCount > 0) updated++
   }
+  if (updated > 0) console.log(`[seed] Populated translations for ${updated} words.`)
+}
 
+// ── Standalone runner ──────────────────────────────────────────────────────
+if (process.argv[1].endsWith('seed-translations.js')) {
+  const { Pool } = pg
+  const pool = new Pool({ connectionString: process.env.DATABASE_URL })
+  const ids = Object.keys(TRANSLATIONS)
+  let updated = 0, skipped = 0
+  for (const id of ids) {
+    const r = await pool.query(
+      `UPDATE words SET translations = $1 WHERE id = $2`,
+      [JSON.stringify(TRANSLATIONS[id]), id]
+    )
+    r.rowCount > 0 ? updated++ : (skipped++, console.warn(`Not found: "${id}"`))
+  }
   console.log(`Done: ${updated} updated, ${skipped} not found.`)
   await pool.end()
 }
-
-run().catch(err => {
-  console.error('Fatal error:', err)
-  process.exit(1)
-})

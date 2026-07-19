@@ -1,4 +1,5 @@
 import pg from 'pg'
+import { seedTranslations } from './seed-translations.js'
 
 const { Pool } = pg
 
@@ -111,6 +112,9 @@ export async function ensureSchema() {
       PRIMARY KEY (lang, type, slot)
     );
   `)
+
+  // Seed word translations if any are missing (safe to run on every start)
+  await seedTranslations(pool)
 
   // Title sound: one per language, played on the main screen
   // Migration: drop old single-row schema (id=1) if it exists
