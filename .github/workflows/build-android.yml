@@ -23,12 +23,14 @@ jobs:
       - name: Install Dependencies
         run: |
           cd mobile
-          npm install
+          # --legacy-peer-deps спасет от падения npm, если модули старые
+          npm install --legacy-peer-deps
 
       - name: Generate Local Android Folder
         run: |
           cd mobile
-          # npx expo prebuild создаст локальную папку /android БЕЗ отправки в облако Expo Dev
+          # На всякий случай явно доставляем expo в виртуальную машину
+          npm install expo --legacy-peer-deps
           npx expo prebuild --platform android --no-install
 
       - name: Build APK with Gradle
