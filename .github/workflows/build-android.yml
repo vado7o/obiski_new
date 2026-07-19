@@ -23,17 +23,14 @@ jobs:
       - name: Clean and Install Dependencies
         run: |
           cd mobile
-          # Принудительно очищаем кэш и используем жесткий режим без peer-конфликтов
           npm cache clean --force
           npm install --legacy-peer-deps --no-audit --no-fund
 
       - name: Generate Local Android Folder
         run: |
           cd mobile
-          # Устанавливаем сам expo глобально и локально напролом
-          npm install -g expo-cli
-          npm install expo --legacy-peer-deps
-          npx expo prebuild --platform android --no-install
+          # Используем только локальный npx expo prebuild без глобального CLI
+          npx expo prebuild --platform android --no-install --clear
 
       - name: Build APK with Gradle
         run: |
