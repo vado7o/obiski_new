@@ -1,4 +1,3 @@
-Записи
 name: Android Build
 on:
   workflow_dispatch:
