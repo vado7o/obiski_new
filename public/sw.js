@@ -1,4 +1,4 @@
-const CONTENT_CACHE = 'obiski-content-v2'
+const CONTENT_CACHE = 'obiski-content-v3'
 const MEDIA_CACHE = 'obiski-media-v1'
 const ALL_CACHES = [CONTENT_CACHE, MEDIA_CACHE]
 
