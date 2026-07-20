@@ -13,7 +13,7 @@ import './ThemeSelector.css'
 export default function ThemeSelector({ selected, onToggle, onStart, onOpenAdmin, onOpenUserSounds }) {
   const { t, lang, setLang } = useLang()
   const { themes, loading } = useContent()
-  const { user, isAdmin, login, logout } = useAuth()
+  const { isAdmin, adminLogin, adminLogout } = useAuth()
   const { difficulty, setDifficulty, DIFFICULTY_OPTIONS } = useDifficulty()
   const { showTranslation, setShowTranslation } = useShowTranslation()
   const { showText, setShowText } = useShowText()
@@ -21,8 +21,13 @@ export default function ThemeSelector({ selected, onToggle, onStart, onOpenAdmin
   const [menuOpen, setMenuOpen] = useState(false)
   const [langView, setLangView] = useState(false)
   const [difficultyView, setDifficultyView] = useState(false)
-  const [loginPromptOpen, setLoginPromptOpen] = useState(false)
+  const [adminPwOpen, setAdminPwOpen] = useState(false)
+  const [adminPw, setAdminPw] = useState('')
+  const [adminPwError, setAdminPwError] = useState(false)
+  const [adminPwLoading, setAdminPwLoading] = useState(false)
   const menuRef = useRef(null)
+  const tapCountRef = useRef(0)
+  const lastTapRef = useRef(0)
 
   useEffect(() => {
     let cancelled = false
@@ -34,8 +39,35 @@ export default function ThemeSelector({ selected, onToggle, onStart, onOpenAdmin
     return () => { cancelled = true }
   }, [lang])
 
-  const userName =
-    user && (([user.firstName, user.lastName].filter(Boolean).join(' ')) || user.email)
+  function handleLogoTap() {
+    const now = Date.now()
+    if (now - lastTapRef.current < 600) {
+      tapCountRef.current += 1
+    } else {
+      tapCountRef.current = 1
+    }
+    lastTapRef.current = now
+    if (tapCountRef.current >= 5) {
+      tapCountRef.current = 0
+      setAdminPw('')
+      setAdminPwError(false)
+      setAdminPwOpen(true)
+    }
+  }
+
+  async function handleAdminLogin(e) {
+    e.preventDefault()
+    setAdminPwLoading(true)
+    setAdminPwError(false)
+    const ok = await adminLogin(adminPw)
+    setAdminPwLoading(false)
+    if (ok) {
+      setAdminPwOpen(false)
+      setAdminPw('')
+    } else {
+      setAdminPwError(true)
+    }
+  }
 
   function closeMenu() {
     setMenuOpen(false)
@@ -71,7 +103,7 @@ export default function ThemeSelector({ selected, onToggle, onStart, onOpenAdmin
         transition={{ duration: 0.4 }}
       >
         <div className="app-nav-left">
-          <span className="app-title">Obiski</span>
+          <span className="app-title" onClick={handleLogoTap}>Obiski</span>
           <p className="tagline">{t.tagline}</p>
         </div>
 
@@ -160,14 +192,7 @@ export default function ThemeSelector({ selected, onToggle, onStart, onOpenAdmin
 
                     <button
                       className="lang-option"
-                      onClick={() => {
-                        closeMenu()
-                        if (user) {
-                          onOpenUserSounds()
-                        } else {
-                          setLoginPromptOpen(true)
-                        }
-                      }}
+                      onClick={() => { closeMenu(); onOpenUserSounds() }}
                     >
                       <span className="lang-label">{t.admin.recordSounds}</span>
                     </button>
@@ -181,34 +206,22 @@ export default function ThemeSelector({ selected, onToggle, onStart, onOpenAdmin
                       <span className="lang-chevron">›</span>
                     </button>
 
-                    <div className="menu-divider" />
-                    {user ? (
+                    {isAdmin && (
                       <>
-                        {userName && (
-                          <div className="menu-user">{userName}</div>
-                        )}
-                        {isAdmin && (
-                          <button
-                            className="lang-option"
-                            onClick={() => { closeMenu(); onOpenAdmin() }}
-                          >
-                            <span className="lang-label">{t.admin.menuManage}</span>
-                          </button>
-                        )}
+                        <div className="menu-divider" />
                         <button
                           className="lang-option"
-                          onClick={() => { closeMenu(); logout() }}
+                          onClick={() => { closeMenu(); onOpenAdmin() }}
+                        >
+                          <span className="lang-label">{t.admin.menuManage}</span>
+                        </button>
+                        <button
+                          className="lang-option"
+                          onClick={() => { closeMenu(); adminLogout() }}
                         >
                           <span className="lang-label">{t.admin.menuLogout}</span>
                         </button>
                       </>
-                    ) : (
-                      <button
-                        className="lang-option"
-                        onClick={() => { closeMenu(); login() }}
-                      >
-                        <span className="lang-label">{t.admin.menuLogin}</span>
-                      </button>
                     )}
                   </>
                 )}
@@ -281,13 +294,13 @@ export default function ThemeSelector({ selected, onToggle, onStart, onOpenAdmin
       </motion.div>
 
       <AnimatePresence>
-        {loginPromptOpen && (
+        {adminPwOpen && (
           <motion.div
             className="login-prompt-overlay"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            onClick={() => setLoginPromptOpen(false)}
+            onClick={() => setAdminPwOpen(false)}
           >
             <motion.div
               className="login-prompt-modal"
@@ -297,26 +310,38 @@ export default function ThemeSelector({ selected, onToggle, onStart, onOpenAdmin
               transition={{ type: 'spring', stiffness: 340, damping: 28 }}
               onClick={e => e.stopPropagation()}
             >
-              <div className="login-prompt-icon">🎤</div>
-              <p className="login-prompt-text">{t.admin.loginPrompt}</p>
-              <div className="login-prompt-btns">
-                <button
-                  className="login-prompt-cancel"
-                  onClick={() => setLoginPromptOpen(false)}
-                >
-                  {t.admin.cancel}
-                </button>
-                <button
-                  className="login-prompt-confirm"
-                  onClick={() => {
-                    setLoginPromptOpen(false)
-                    sessionStorage.setItem('loginIntent', 'recordSounds')
-                    login()
-                  }}
-                >
-                  {t.admin.loginPromptBtn}
-                </button>
-              </div>
+              <div className="login-prompt-icon">🔑</div>
+              <form onSubmit={handleAdminLogin} style={{ width: '100%' }}>
+                <input
+                  className="admin-pw-input"
+                  type="password"
+                  placeholder={t.admin.passwordPlaceholder}
+                  value={adminPw}
+                  onChange={e => { setAdminPw(e.target.value); setAdminPwError(false) }}
+                  autoFocus
+                  disabled={adminPwLoading}
+                />
+                {adminPwError && (
+                  <p className="admin-pw-error">{t.admin.loginError}</p>
+                )}
+                <div className="login-prompt-btns">
+                  <button
+                    type="button"
+                    className="login-prompt-cancel"
+                    onClick={() => setAdminPwOpen(false)}
+                    disabled={adminPwLoading}
+                  >
+                    {t.admin.cancel}
+                  </button>
+                  <button
+                    type="submit"
+                    className="login-prompt-confirm"
+                    disabled={adminPwLoading || !adminPw}
+                  >
+                    {adminPwLoading ? '…' : t.admin.loginBtn}
+                  </button>
+                </div>
+              </form>
             </motion.div>
           </motion.div>
         )}

@@ -2,7 +2,6 @@ import multer from 'multer'
 import { nanoid } from 'nanoid'
 import { query } from './db.js'
 import { requireOwner, registerAuthRoutes } from './auth.js'
-import { isAuthenticated } from './replitAuth.js'
 import {
   uploadObject,
   deleteObject,
@@ -62,35 +61,6 @@ export function registerRoutes(app) {
   registerAuthRoutes(app)
   registerAnalyticsRoutes(app)
 
-  // ---- Per-user personal settings ("personal folder") ----
-  app.get('/api/me/settings', isAuthenticated, async (req, res) => {
-    try {
-      const id = req.user.claims.sub
-      const r = await query('SELECT data FROM user_settings WHERE user_id = $1', [id])
-      res.json({ settings: r.rows[0]?.data || {} })
-    } catch (err) {
-      console.error('GET /api/me/settings failed:', err)
-      res.status(500).json({ error: 'failed_to_load_settings' })
-    }
-  })
-
-  app.put('/api/me/settings', isAuthenticated, async (req, res) => {
-    try {
-      const id = req.user.claims.sub
-      const data = req.body && typeof req.body === 'object' && !Array.isArray(req.body) ? req.body : {}
-      const r = await query(
-        `INSERT INTO user_settings (user_id, data, updated_at)
-         VALUES ($1, $2::jsonb, NOW())
-         ON CONFLICT (user_id) DO UPDATE SET data = EXCLUDED.data, updated_at = NOW()
-         RETURNING data`,
-        [id, JSON.stringify(data)]
-      )
-      res.json({ settings: r.rows[0].data })
-    } catch (err) {
-      console.error('PUT /api/me/settings failed:', err)
-      res.status(500).json({ error: 'failed_to_save_settings' })
-    }
-  })
 
   // ---- Public: feedback sounds for current language ----
   app.get('/api/feedback-sounds/:lang', async (req, res) => {

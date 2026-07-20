@@ -1,38 +1,44 @@
 import { createContext, useContext, useState, useEffect, useCallback } from 'react'
-import { getMe } from '../api.js'
 
 const AuthContext = createContext(null)
 
 export function AuthProvider({ children }) {
-  const [user, setUser] = useState(null)
-  const [isOwner, setIsOwner] = useState(false)
+  const [isAdmin, setIsAdmin] = useState(false)
   const [ready, setReady] = useState(false)
 
   useEffect(() => {
-    getMe()
-      .then((d) => {
-        setUser(d && d.authenticated ? d.user : null)
-        setIsOwner(!!(d && d.isOwner))
-      })
-      .catch(() => {
-        setUser(null)
-        setIsOwner(false)
-      })
+    fetch('/api/auth/user', { credentials: 'same-origin' })
+      .then((r) => r.json())
+      .then((d) => setIsAdmin(!!(d && d.isAdmin)))
+      .catch(() => setIsAdmin(false))
       .finally(() => setReady(true))
   }, [])
 
-  const login = useCallback(() => {
-    window.location.href = '/api/login'
+  const adminLogin = useCallback(async (password) => {
+    try {
+      const res = await fetch('/api/admin/login', {
+        method: 'POST',
+        credentials: 'same-origin',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ password }),
+      })
+      if (res.ok) {
+        setIsAdmin(true)
+        return true
+      }
+      return false
+    } catch {
+      return false
+    }
   }, [])
 
-  const logout = useCallback(() => {
-    window.location.href = '/api/logout'
+  const adminLogout = useCallback(async () => {
+    await fetch('/api/admin/logout', { method: 'POST', credentials: 'same-origin' }).catch(() => {})
+    setIsAdmin(false)
   }, [])
 
   return (
-    <AuthContext.Provider
-      value={{ user, isOwner, isAdmin: isOwner, ready, login, logout }}
-    >
+    <AuthContext.Provider value={{ isAdmin, isOwner: isAdmin, ready, adminLogin, adminLogout }}>
       {children}
     </AuthContext.Provider>
   )
