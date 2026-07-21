@@ -76,14 +76,17 @@ export function registerAnalyticsRoutes(app) {
           LIMIT 10
         `),
         query(`
-          SELECT u.id, u.email, u.first_name, u.last_name, u.created_at,
-            COUNT(DISTINCT v.id)::int AS visit_count,
-            MAX(v.visited_at)        AS last_seen,
-            COUNT(DISTINCT r.id)::int AS rounds_count
-          FROM users u
-          LEFT JOIN app_visits  v ON v.user_id = u.id
-          LEFT JOIN game_rounds r ON r.user_id = u.id
-          GROUP BY u.id
+          SELECT
+            v.anon_id,
+            COUNT(DISTINCT v.id)::int  AS visit_count,
+            MAX(v.visited_at)          AS last_seen,
+            COUNT(DISTINCT r.id)::int  AS rounds_count,
+            (SELECT av2.lang FROM app_visits av2
+               WHERE av2.anon_id = v.anon_id AND av2.lang IS NOT NULL
+               ORDER BY av2.visited_at DESC LIMIT 1) AS lang
+          FROM app_visits v
+          LEFT JOIN game_rounds r ON r.anon_id = v.anon_id
+          GROUP BY v.anon_id
           ORDER BY last_seen DESC NULLS LAST
           LIMIT 100
         `),

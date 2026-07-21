@@ -216,6 +216,18 @@
   background: #faf9ff;
 }
 
+.stats-device-id {
+  font-family: monospace;
+  font-size: 13px;
+  color: #7C4DFF;
+  letter-spacing: 0.03em;
+}
+
+.stats-lang {
+  text-align: center;
+  font-size: 18px;
+}
+
 .stats-email {
   color: #666;
   font-size: 12px;

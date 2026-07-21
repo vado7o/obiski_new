@@ -83,32 +83,35 @@ function TopThemes({ rows, t }) {
   )
 }
 
+const LANG_FLAGS = { ru: '🇷🇺', en: '🇬🇧', es: '🇪🇸', fr: '🇫🇷', de: '🇩🇪', zh: '🇨🇳' }
+
+function shortId(anon_id) {
+  return '#' + String(anon_id || '').replace(/-/g, '').slice(0, 8)
+}
+
 function UsersTable({ users, t }) {
   return (
     <div className="stats-users-wrap">
       <table className="stats-users">
         <thead>
           <tr>
-            <th>{t.admin.statsUserName}</th>
-            <th>{t.admin.statsUserEmail}</th>
+            <th>{t.admin.statsUserDevice}</th>
+            <th>{t.admin.statsUserLang}</th>
             <th>{t.admin.statsUserVisits}</th>
             <th>{t.admin.statsUserRounds}</th>
             <th>{t.admin.statsUserLastSeen}</th>
           </tr>
         </thead>
         <tbody>
-          {users.map(u => {
-            const name = [u.first_name, u.last_name].filter(Boolean).join(' ') || '—'
-            return (
-              <tr key={u.id}>
-                <td>{name}</td>
-                <td className="stats-email">{u.email || '—'}</td>
-                <td className="stats-num">{u.visit_count}</td>
-                <td className="stats-num">{u.rounds_count}</td>
-                <td className="stats-date">{fmtDateTime(u.last_seen)}</td>
-              </tr>
-            )
-          })}
+          {users.map(u => (
+            <tr key={u.anon_id}>
+              <td className="stats-device-id">{shortId(u.anon_id)}</td>
+              <td className="stats-lang">{LANG_FLAGS[u.lang] || u.lang || '—'}</td>
+              <td className="stats-num">{u.visit_count}</td>
+              <td className="stats-num">{u.rounds_count}</td>
+              <td className="stats-date">{fmtDateTime(u.last_seen)}</td>
+            </tr>
+          ))}
         </tbody>
       </table>
     </div>
@@ -168,7 +171,7 @@ export default function StatsPanel() {
       )}
 
       <div className="stats-section">
-        <div className="stats-section-head">{t.admin.statsUsers}</div>
+        <div className="stats-section-head">{t.admin.statsVisitors}</div>
         {recentUsers.length === 0 ? (
           <p className="stats-empty">{t.admin.statsNoData}</p>
         ) : (
