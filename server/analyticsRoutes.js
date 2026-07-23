@@ -69,10 +69,14 @@ export function registerAnalyticsRoutes(app) {
           ORDER BY 1
         `),
         query(`
-          SELECT unnest(themes) AS theme_id, COUNT(*)::int AS plays
-          FROM game_rounds
-          GROUP BY theme_id
-          ORDER BY plays DESC
+          SELECT gr.theme_id, COALESCE(t.name, gr.theme_id) AS theme_name, gr.plays
+          FROM (
+            SELECT unnest(themes) AS theme_id, COUNT(*)::int AS plays
+            FROM game_rounds
+            GROUP BY theme_id
+          ) gr
+          LEFT JOIN themes t ON t.id = gr.theme_id
+          ORDER BY gr.plays DESC
           LIMIT 10
         `),
         query(`

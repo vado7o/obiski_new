@@ -251,14 +251,99 @@ const TRANSLATIONS = {
   twenty:    { en:'twenty',    ru:'двадцать',       es:'veinte',     fr:'vingt',     de:'zwanzig',    zh:'二十' },
 }
 
+// Translations for words added via admin panel (matched by name, not ID)
+const TRANSLATIONS_BY_NAME = {
+  'Candies':     { en:'candies',     ru:'конфеты',        es:'caramelos',           fr:'bonbons',              de:'Süßigkeiten',   zh:'糖果' },
+  'autumn':      { en:'autumn',      ru:'осень',          es:'otoño',               fr:'automne',              de:'Herbst',        zh:'秋天' },
+  'baby':        { en:'baby',        ru:'малыш',          es:'bebé',                fr:'bébé',                 de:'Baby',          zh:'婴儿' },
+  'beans':       { en:'beans',       ru:'фасоль',         es:'judías',              fr:'haricots',             de:'Bohnen',        zh:'豆子' },
+  'bear':        { en:'bear',        ru:'медведь',        es:'oso',                 fr:'ours',                 de:'Bär',           zh:'熊' },
+  'boy':         { en:'boy',         ru:'мальчик',        es:'niño',                fr:'garçon',               de:'Junge',         zh:'男孩' },
+  'broccoli':    { en:'broccoli',    ru:'брокколи',       es:'brócoli',             fr:'brocoli',              de:'Brokkoli',      zh:'西兰花' },
+  'cabbage':     { en:'cabbage',     ru:'капуста',        es:'repollo',             fr:'chou',                 de:'Kohl',          zh:'卷心菜' },
+  'carrot':      { en:'carrot',      ru:'морковь',        es:'zanahoria',           fr:'carotte',              de:'Karotte',       zh:'胡萝卜' },
+  'celery':      { en:'celery',      ru:'сельдерей',      es:'apio',                fr:'céleri',               de:'Sellerie',      zh:'芹菜' },
+  'children':    { en:'children',    ru:'дети',           es:'niños',               fr:'enfants',              de:'Kinder',        zh:'孩子们' },
+  'corn':        { en:'corn',        ru:'кукуруза',       es:'maíz',                fr:'maïs',                 de:'Mais',          zh:'玉米' },
+  'crawl':       { en:'crawl',       ru:'ползти',         es:'gatear',              fr:'ramper',               de:'krabbeln',      zh:'爬行' },
+  'crocodile':   { en:'crocodile',   ru:'крокодил',       es:'cocodrilo',           fr:'crocodile',            de:'Krokodil',      zh:'鳄鱼' },
+  'cry':         { en:'cry',         ru:'плакать',        es:'llorar',              fr:'pleurer',              de:'weinen',        zh:'哭' },
+  'deer':        { en:'deer',        ru:'олень',          es:'ciervo',              fr:'cerf',                 de:'Reh',           zh:'鹿' },
+  'draw':        { en:'draw',        ru:'рисовать',       es:'dibujar',             fr:'dessiner',             de:'zeichnen',      zh:'画画' },
+  'drink':       { en:'drink',       ru:'пить',           es:'beber',               fr:'boire',                de:'trinken',       zh:'喝' },
+  'eat':         { en:'eat',         ru:'есть',           es:'comer',               fr:'manger',               de:'essen',         zh:'吃' },
+  'eggplant':    { en:'eggplant',    ru:'баклажан',       es:'berenjena',           fr:'aubergine',            de:'Aubergine',     zh:'茄子' },
+  'elephant':    { en:'elephant',    ru:'слон',           es:'elefante',            fr:'éléphant',             de:'Elefant',       zh:'大象' },
+  'father':      { en:'father',      ru:'папа',           es:'padre',               fr:'père',                 de:'Vater',         zh:'爸爸' },
+  'fish':        { en:'fish',        ru:'рыба',           es:'pez',                 fr:'poisson',              de:'Fisch',         zh:'鱼' },
+  'fog':         { en:'fog',         ru:'туман',          es:'niebla',              fr:'brouillard',           de:'Nebel',         zh:'雾' },
+  'fox':         { en:'fox',         ru:'лиса',           es:'zorro',               fr:'renard',               de:'Fuchs',         zh:'狐狸' },
+  'frog':        { en:'frog',        ru:'лягушка',        es:'rana',                fr:'grenouille',           de:'Frosch',        zh:'青蛙' },
+  'fur coat':    { en:'fur coat',    ru:'шуба',           es:'abrigo de piel',      fr:'manteau de fourrure',  de:'Pelzmantel',    zh:'皮草大衣' },
+  'garlic':      { en:'garlic',      ru:'чеснок',         es:'ajo',                 fr:'ail',                  de:'Knoblauch',     zh:'大蒜' },
+  'girl':        { en:'girl',        ru:'девочка',        es:'niña',                fr:'fille',                de:'Mädchen',       zh:'女孩' },
+  'go':          { en:'go',          ru:'идти',           es:'ir',                  fr:'aller',                de:'gehen',         zh:'走' },
+  'grandfather': { en:'grandfather', ru:'дедушка',        es:'abuelo',              fr:'grand-père',           de:'Großvater',     zh:'爷爷' },
+  'grandmother': { en:'grandmother', ru:'бабушка',        es:'abuela',              fr:'grand-mère',           de:'Großmutter',    zh:'奶奶' },
+  'hedgehog':    { en:'hedgehog',    ru:'ёжик',           es:'erizo',               fr:'hérisson',             de:'Igel',          zh:'刺猬' },
+  'ice':         { en:'ice',         ru:'лёд',            es:'hielo',               fr:'glace',                de:'Eis',           zh:'冰' },
+  'juice':       { en:'juice',       ru:'сок',            es:'jugo',                fr:'jus',                  de:'Saft',          zh:'果汁' },
+  'lion':        { en:'lion',        ru:'лев',            es:'león',                fr:'lion',                 de:'Löwe',          zh:'狮子' },
+  'meat':        { en:'meat',        ru:'мясо',           es:'carne',               fr:'viande',               de:'Fleisch',       zh:'肉' },
+  'milk':        { en:'milk',        ru:'молоко',         es:'leche',               fr:'lait',                 de:'Milch',         zh:'牛奶' },
+  'monkey':      { en:'monkey',      ru:'обезьяна',       es:'mono',                fr:'singe',                de:'Affe',          zh:'猴子' },
+  'mother':      { en:'mother',      ru:'мама',           es:'madre',               fr:'mère',                 de:'Mutter',        zh:'妈妈' },
+  'olives':      { en:'olives',      ru:'оливки',         es:'aceitunas',           fr:'olives',               de:'Oliven',        zh:'橄榄' },
+  'onion':       { en:'onion',       ru:'лук',            es:'cebolla',             fr:'oignon',               de:'Zwiebel',       zh:'洋葱' },
+  'overall':     { en:'overall',     ru:'комбинезон',     es:'mono',                fr:'combinaison',          de:'Overall',       zh:'工装裤' },
+  'paddle':      { en:'paddle',      ru:'весло',          es:'remo',                fr:'pagaie',               de:'Paddel',        zh:'桨' },
+  'peas':        { en:'peas',        ru:'горох',          es:'guisantes',           fr:'petits pois',          de:'Erbsen',        zh:'豌豆' },
+  'pepper':      { en:'pepper',      ru:'перец',          es:'pimiento',            fr:'poivron',              de:'Paprika',       zh:'辣椒' },
+  'pie':         { en:'pie',         ru:'пирог',          es:'pastel',              fr:'tarte',                de:'Kuchen',        zh:'馅饼' },
+  'play':        { en:'play',        ru:'играть',         es:'jugar',               fr:'jouer',                de:'spielen',       zh:'玩' },
+  'potato':      { en:'potato',      ru:'картошка',       es:'patata',              fr:'pomme de terre',       de:'Kartoffel',     zh:'土豆' },
+  'pumpkin':     { en:'pumpkin',     ru:'тыква',          es:'calabaza',            fr:'citrouille',           de:'Kürbis',        zh:'南瓜' },
+  'radish':      { en:'radish',      ru:'редиска',        es:'rábano',              fr:'radis',                de:'Radieschen',    zh:'萝卜' },
+  'read':        { en:'read',        ru:'читать',         es:'leer',                fr:'lire',                 de:'lesen',         zh:'读' },
+  'rhino':       { en:'rhino',       ru:'носорог',        es:'rinoceronte',         fr:'rhinocéros',           de:'Nashorn',       zh:'犀牛' },
+  'run':         { en:'run',         ru:'бежать',         es:'correr',              fr:'courir',               de:'rennen',        zh:'跑' },
+  'sand':        { en:'sand',        ru:'песок',          es:'arena',               fr:'sable',                de:'Sand',          zh:'沙子' },
+  'sandals':     { en:'sandals',     ru:'сандалии',       es:'sandalias',           fr:'sandales',             de:'Sandalen',      zh:'凉鞋' },
+  'sausage':     { en:'sausage',     ru:'сосиска',        es:'salchicha',           fr:'saucisse',             de:'Wurst',         zh:'香肠' },
+  'say':         { en:'say',         ru:'говорить',       es:'decir',               fr:'dire',                 de:'sagen',         zh:'说' },
+  'scream':      { en:'scream',      ru:'кричать',        es:'gritar',              fr:'crier',                de:'schreien',      zh:'尖叫' },
+  'seat':        { en:'seat',        ru:'сиденье',        es:'asiento',             fr:'siège',                de:'Sitz',          zh:'座位' },
+  'shorts':      { en:'shorts',      ru:'шорты',          es:'pantalones cortos',   fr:'short',                de:'Shorts',        zh:'短裤' },
+  'skirt':       { en:'skirt',       ru:'юбка',           es:'falda',               fr:'jupe',                 de:'Rock',          zh:'裙子' },
+  'sleep':       { en:'sleep',       ru:'спать',          es:'dormir',              fr:'dormir',               de:'schlafen',      zh:'睡觉' },
+  'slippers':    { en:'slippers',    ru:'тапочки',        es:'zapatillas',          fr:'chaussons',            de:'Hausschuhe',    zh:'拖鞋' },
+  'smile':       { en:'smile',       ru:'улыбаться',      es:'sonreír',             fr:'sourire',              de:'lächeln',       zh:'微笑' },
+  'snake':       { en:'snake',       ru:'змея',           es:'serpiente',           fr:'serpent',              de:'Schlange',      zh:'蛇' },
+  'sneakers':    { en:'sneakers',    ru:'кроссовки',      es:'zapatillas',          fr:'baskets',              de:'Turnschuhe',    zh:'运动鞋' },
+  'soil':        { en:'soil',        ru:'земля',          es:'tierra',              fr:'sol',                  de:'Erde',          zh:'土壤' },
+  'squirrel':    { en:'squirrel',    ru:'белка',          es:'ardilla',             fr:'écureuil',             de:'Eichhörnchen',  zh:'松鼠' },
+  'stay':        { en:'stay',        ru:'стоять',         es:'quedarse',            fr:'rester',               de:'bleiben',       zh:'留下' },
+  'stone':       { en:'stone',       ru:'камень',         es:'piedra',              fr:'pierre',               de:'Stein',         zh:'石头' },
+  'suit':        { en:'suit',        ru:'костюм',         es:'traje',               fr:'costume',              de:'Anzug',         zh:'西装' },
+  'swim':        { en:'swim',        ru:'плавать',        es:'nadar',               fr:'nager',                de:'schwimmen',     zh:'游泳' },
+  'tea':         { en:'tea',         ru:'чай',            es:'té',                  fr:'thé',                  de:'Tee',           zh:'茶' },
+  'tiger':       { en:'tiger',       ru:'тигр',           es:'tigre',               fr:'tigre',                de:'Tiger',         zh:'老虎' },
+  'tomato':      { en:'tomato',      ru:'помидор',        es:'tomate',              fr:'tomate',               de:'Tomate',        zh:'番茄' },
+  'wolf':        { en:'wolf',        ru:'волк',           es:'lobo',                fr:'loup',                 de:'Wolf',          zh:'狼' },
+  'zebra':       { en:'zebra',       ru:'зебра',          es:'cebra',               fr:'zèbre',                de:'Zebra',         zh:'斑马' },
+  'zucchini':    { en:'zucchini',    ru:'кабачок',        es:'calabacín',           fr:'courgette',            de:'Zucchini',      zh:'西葫芦' },
+}
+
 /**
  * Seed translations into the given pg pool.
  * Only updates words that have empty translations ({}).
  * Safe to call on every server start.
  */
 export async function seedTranslations(dbPool) {
-  const ids = Object.keys(TRANSLATIONS)
   let updated = 0
+
+  // Pass 1: match by ID (original seeded words)
+  const ids = Object.keys(TRANSLATIONS)
   for (const id of ids) {
     const result = await dbPool.query(
       `UPDATE words SET translations = $1
@@ -267,6 +352,18 @@ export async function seedTranslations(dbPool) {
     )
     if (result.rowCount > 0) updated++
   }
+
+  // Pass 2: match by name (words added via admin panel that have random ID suffixes)
+  const names = Object.keys(TRANSLATIONS_BY_NAME)
+  for (const name of names) {
+    const result = await dbPool.query(
+      `UPDATE words SET translations = $1
+       WHERE LOWER(name) = LOWER($2) AND (translations IS NULL OR translations = '{}')`,
+      [JSON.stringify(TRANSLATIONS_BY_NAME[name]), name]
+    )
+    if (result.rowCount > 0) updated++
+  }
+
   if (updated > 0) console.log(`[seed] Populated translations for ${updated} words.`)
 }
 

@@ -69,7 +69,7 @@ function TopThemes({ rows, t }) {
     <div className="top-themes">
       {rows.map(r => (
         <div key={r.theme_id} className="top-theme-row">
-          <div className="top-theme-name">{t.themeNames[r.theme_id] || r.theme_id}</div>
+          <div className="top-theme-name">{r.theme_name || t.themeNames?.[r.theme_id] || r.theme_id}</div>
           <div className="top-theme-bar-wrap">
             <div
               className="top-theme-bar"
