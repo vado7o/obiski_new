@@ -207,11 +207,14 @@ export function registerRoutes(app) {
         const theme = await query('SELECT 1 FROM themes WHERE id = $1', [themeId])
         if (theme.rowCount === 0) return res.status(400).json({ error: 'theme_not_found' })
       }
+      // If the name is being changed, clear translations so they get re-seeded correctly
+      const clearTranslations = name != null
       const result = await query(
         `UPDATE words SET
            name = COALESCE($2, name),
            emoji = COALESCE($3, emoji),
            theme_id = COALESCE($4, theme_id)
+           ${clearTranslations ? ", translations = '{}'" : ''}
          WHERE id = $1 RETURNING *`,
         [req.params.id, name ?? null, emoji ?? null, themeId ?? null]
       )

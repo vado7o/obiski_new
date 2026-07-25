@@ -251,6 +251,48 @@ const TRANSLATIONS = {
   twenty:    { en:'twenty',    ru:'двадцать',       es:'veinte',     fr:'vingt',     de:'zwanzig',    zh:'二十' },
 }
 
+// Words that were renamed via admin panel: old ID → { expectedName, translations }
+// Pass 3 checks both id AND current name, so dev DB (name still matches ID) is unaffected.
+const TRANSLATIONS_RENAMED = [
+  { id: 'penguin',    name: 'donkey',      t: { en:'donkey',       ru:'осёл',                  es:'burro',              fr:'âne',                   de:'Esel',               zh:'驴' } },
+  { id: 'brain',      name: 'eyebrow',     t: { en:'eyebrow',      ru:'бровь',                 es:'ceja',               fr:'sourcil',               de:'Augenbraue',         zh:'眉毛' } },
+  { id: 'balloon',    name: 'airship',     t: { en:'airship',      ru:'дирижабль',             es:'dirigible',          fr:'dirigeable',            de:'Luftschiff',         zh:'飞艇' } },
+  { id: 'fig',        name: 'avocado',     t: { en:'avocado',      ru:'авокадо',               es:'aguacate',           fr:'avocat',                de:'Avocado',            zh:'牛油果' } },
+  { id: 'boot',       name: 'boots',       t: { en:'boots',        ru:'сапоги',                es:'botas',              fr:'bottes',                de:'Stiefel',            zh:'靴子' } },
+  { id: 'monkey',     name: 'chicken',     t: { en:'chicken',      ru:'курица',                es:'pollo',              fr:'poulet',                de:'Huhn',               zh:'鸡' } },
+  { id: 'tiger',      name: 'cock',        t: { en:'cock',         ru:'петух',                 es:'gallo',              fr:'coq',                   de:'Hahn',               zh:'公鸡' } },
+  { id: 'heart',      name: 'finger',      t: { en:'finger',       ru:'палец',                 es:'dedo',               fr:'doigt',                 de:'Finger',             zh:'手指' } },
+  { id: 'glove',      name: 'gloves',      t: { en:'gloves',       ru:'перчатки',              es:'guantes',            fr:'gants',                 de:'Handschuhe',         zh:'手套' } },
+  { id: 'elephant',   name: 'goat',        t: { en:'goat',         ru:'коза',                  es:'cabra',              fr:'chèvre',                de:'Ziege',              zh:'山羊' } },
+  { id: 'bird',       name: 'goose',       t: { en:'goose',        ru:'гусь',                  es:'ganso',              fr:'oie',                   de:'Gans',               zh:'鹅' } },
+  { id: 'bone',       name: 'hair',        t: { en:'hair',         ru:'волосы',                es:'cabello',            fr:'cheveux',               de:'Haare',              zh:'头发' } },
+  { id: 'lion',       name: 'hamster',     t: { en:'hamster',      ru:'хомяк',                 es:'hámster',            fr:'hamster',               de:'Hamster',            zh:'仓鼠' } },
+  { id: 'spaceship',  name: 'harvester',   t: { en:'harvester',    ru:'комбайн',               es:'cosechadora',        fr:'moissonneuse',          de:'Mähdrescher',        zh:'收割机' } },
+  { id: 'foot',       name: 'legs',        t: { en:'legs',         ru:'ноги',                  es:'piernas',            fr:'jambes',                de:'Beine',              zh:'腿' } },
+  { id: 'mouth',      name: 'lips',        t: { en:'lips',         ru:'губы',                  es:'labios',             fr:'lèvres',                de:'Lippen',             zh:'嘴唇' } },
+  { id: 'muscle',     name: 'moustache',   t: { en:'moustache',    ru:'усы',                   es:'bigote',             fr:'moustache',             de:'Schnurrbart',        zh:'胡须' } },
+  { id: 'hotdog',     name: 'mushroom',    t: { en:'mushroom',     ru:'гриб',                  es:'seta',               fr:'champignon',            de:'Pilz',               zh:'蘑菇' } },
+  { id: 'turquoise',  name: 'light-blue',  t: { en:'light blue',   ru:'голубой',               es:'azul claro',         fr:'bleu clair',            de:'hellblau',           zh:'浅蓝色' } },
+  { id: 'frog',       name: 'parrot',      t: { en:'parrot',       ru:'попугай',               es:'loro',               fr:'perroquet',             de:'Papagei',            zh:'鹦鹉' } },
+  { id: 'canoe',      name: 'police car',  t: { en:'police car',   ru:'полицейская машина',    es:'coche de policía',   fr:'voiture de police',     de:'Polizeiauto',        zh:'警车' } },
+  { id: 'taco',       name: 'porridge',    t: { en:'porridge',     ru:'каша',                  es:'gachas',             fr:'bouillie',              de:'Brei',               zh:'粥' } },
+  { id: 'glacier',    name: 'rain',        t: { en:'rain',         ru:'дождь',                 es:'lluvia',             fr:'pluie',                 de:'Regen',              zh:'雨' } },
+  { id: 'wave',       name: 'sea',         t: { en:'sea',          ru:'море',                  es:'mar',                fr:'mer',                   de:'Meer',               zh:'海' } },
+  { id: 'rocket',     name: 'ship',        t: { en:'ship',         ru:'корабль',               es:'barco',              fr:'navire',                de:'Schiff',             zh:'船' } },
+  { id: 'shoe',       name: 'shoes',       t: { en:'shoes',        ru:'туфли',                 es:'zapatos',            fr:'chaussures',            de:'Schuhe',             zh:'鞋子' } },
+  { id: 'snowflake',  name: 'snow',        t: { en:'snow',         ru:'снег',                  es:'nieve',              fr:'neige',                 de:'Schnee',             zh:'雪' } },
+  { id: 'sock',       name: 'socks',       t: { en:'socks',        ru:'носки',                 es:'calcetines',         fr:'chaussettes',           de:'Socken',             zh:'袜子' } },
+  { id: 'shirt',      name: 't-shirt',     t: { en:'t-shirt',      ru:'футболка',              es:'camiseta',           fr:'t-shirt',               de:'T-Shirt',            zh:'T恤' } },
+  { id: 'crown',      name: 'tights',      t: { en:'tights',       ru:'колготки',              es:'medias',             fr:'collants',              de:'Strumpfhose',        zh:'连裤袜' } },
+  { id: 'submarine',  name: 'trailer',     t: { en:'trailer',      ru:'прицеп',                es:'remolque',           fr:'remorque',              de:'Anhänger',           zh:'拖车' } },
+  { id: 'skateboard', name: 'trolleybus',  t: { en:'trolleybus',   ru:'троллейбус',            es:'trolebús',           fr:'trolleybus',            de:'Oberleitungsbus',    zh:'无轨电车' } },
+  { id: 'fish',       name: 'turkey',      t: { en:'turkey',       ru:'индейка',               es:'pavo',               fr:'dinde',                 de:'Truthahn',           zh:'火鸡' } },
+  { id: 'swimsuit',   name: 'turtleneck',  t: { en:'turtleneck',   ru:'водолазка',             es:'cuello alto',        fr:'col roulé',             de:'Rollkragenpullover', zh:'высокий воротник' } },
+  { id: 'indigo',     name: 'violet',      t: { en:'violet',       ru:'фиолетовый',            es:'violeta',            fr:'violet',                de:'violett',            zh:'紫色' } },
+  { id: 'donut',      name: 'water',       t: { en:'water',        ru:'вода',                  es:'agua',               fr:'eau',                   de:'Wasser',             zh:'水' } },
+  { id: 'wasp',       name: 'worm',        t: { en:'worm',         ru:'червяк',                es:'gusano',             fr:'ver',                   de:'Wurm',               zh:'蚯蚓' } },
+]
+
 // Translations for words added via admin panel (matched by name, not ID)
 const TRANSLATIONS_BY_NAME = {
   'Candies':     { en:'candies',     ru:'конфеты',        es:'caramelos',           fr:'bonbons',              de:'Süßigkeiten',   zh:'糖果' },
@@ -360,6 +402,18 @@ export async function seedTranslations(dbPool) {
       `UPDATE words SET translations = $1
        WHERE LOWER(name) = LOWER($2) AND (translations IS NULL OR translations = '{}')`,
       [JSON.stringify(TRANSLATIONS_BY_NAME[name]), name]
+    )
+    if (result.rowCount > 0) updated++
+  }
+
+  // Pass 3: fix renamed words — matched by BOTH id AND current name
+  // This safely targets only production rows where the admin renamed the word,
+  // leaving dev DB rows untouched (their name still matches the original ID).
+  for (const entry of TRANSLATIONS_RENAMED) {
+    const result = await dbPool.query(
+      `UPDATE words SET translations = $1
+       WHERE id = $2 AND LOWER(name) = LOWER($3)`,
+      [JSON.stringify(entry.t), entry.id, entry.name]
     )
     if (result.rowCount > 0) updated++
   }
