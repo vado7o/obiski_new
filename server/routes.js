@@ -55,6 +55,13 @@ async function uniqueThemeId(base) {
   return id
 }
 
+async function uniqueWordId(base) {
+  let id = slugify(base) || `word-${nanoid(6)}`
+  const exists = await query('SELECT 1 FROM words WHERE id = $1', [id])
+  if (exists.rowCount > 0) id = `${id}-${nanoid(4)}`
+  return id
+}
+
 const VALID_LANGS = new Set(['en', 'ru', 'es', 'fr', 'de', 'zh'])
 
 export function registerRoutes(app) {
@@ -207,16 +214,29 @@ export function registerRoutes(app) {
         const theme = await query('SELECT 1 FROM themes WHERE id = $1', [themeId])
         if (theme.rowCount === 0) return res.status(400).json({ error: 'theme_not_found' })
       }
-      // If the name is being changed, clear translations so they get re-seeded correctly
-      const clearTranslations = name != null
+      // When name changes: generate a new ID matching the new name and clear translations
+      if (name != null) {
+        const newId = await uniqueWordId(name)
+        const result = await query(
+          `UPDATE words SET
+             id = $2,
+             name = $3,
+             emoji = COALESCE($4, emoji),
+             theme_id = COALESCE($5, theme_id),
+             translations = '{}'
+           WHERE id = $1 RETURNING *`,
+          [req.params.id, newId, String(name).trim(), emoji ?? null, themeId ?? null]
+        )
+        if (result.rowCount === 0) return res.status(404).json({ error: 'not_found' })
+        return res.json(mapWord(result.rows[0]))
+      }
+      // Only emoji or themeId changed — no ID/translation update needed
       const result = await query(
         `UPDATE words SET
-           name = COALESCE($2, name),
-           emoji = COALESCE($3, emoji),
-           theme_id = COALESCE($4, theme_id)
-           ${clearTranslations ? ", translations = '{}'" : ''}
+           emoji = COALESCE($2, emoji),
+           theme_id = COALESCE($3, theme_id)
          WHERE id = $1 RETURNING *`,
-        [req.params.id, name ?? null, emoji ?? null, themeId ?? null]
+        [req.params.id, emoji ?? null, themeId ?? null]
       )
       if (result.rowCount === 0) return res.status(404).json({ error: 'not_found' })
       res.json(mapWord(result.rows[0]))
