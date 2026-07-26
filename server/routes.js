@@ -471,4 +471,60 @@ export function registerRoutes(app) {
       res.status(500).json({ error: 'delete_failed' })
     }
   })
+
+  // ---- Public: win sound ----
+  app.get('/api/win-sound', async (req, res) => {
+    try {
+      const row = await query('SELECT object_path FROM win_sound WHERE id = 1')
+      res.json({ url: row.rowCount > 0 ? row.rows[0].object_path : null })
+    } catch (err) {
+      console.error('GET /api/win-sound failed:', err)
+      res.status(500).json({ error: 'failed_to_load' })
+    }
+  })
+
+  // ---- Admin: win sound ----
+  app.get('/api/admin/win-sound', requireOwner, async (req, res) => {
+    try {
+      const row = await query('SELECT object_path FROM win_sound WHERE id = 1')
+      res.json({ sound: row.rowCount > 0 ? row.rows[0] : null })
+    } catch (err) {
+      console.error('GET /api/admin/win-sound failed:', err)
+      res.status(500).json({ error: 'failed_to_load' })
+    }
+  })
+
+  app.post('/api/admin/win-sound', requireOwner, upload.single('file'), async (req, res) => {
+    try {
+      if (!req.file) return res.status(400).json({ error: 'file_required' })
+      if (!req.file.mimetype.startsWith('audio/'))
+        return res.status(400).json({ error: 'invalid_file_type' })
+      const existing = await query('SELECT object_path FROM win_sound WHERE id = 1')
+      const objectPath = await uploadObject(req.file.buffer, req.file.mimetype)
+      await query(
+        `INSERT INTO win_sound (id, object_path, updated_at)
+         VALUES (1, $1, NOW())
+         ON CONFLICT (id) DO UPDATE SET object_path = EXCLUDED.object_path, updated_at = NOW()`,
+        [objectPath]
+      )
+      if (existing.rowCount > 0) await deleteObject(existing.rows[0].object_path)
+      res.json({ objectPath })
+    } catch (err) {
+      console.error('POST /api/admin/win-sound failed:', err)
+      res.status(500).json({ error: 'upload_failed' })
+    }
+  })
+
+  app.delete('/api/admin/win-sound', requireOwner, async (req, res) => {
+    try {
+      const existing = await query('SELECT object_path FROM win_sound WHERE id = 1')
+      if (existing.rowCount === 0) return res.status(404).json({ error: 'not_found' })
+      await query('DELETE FROM win_sound WHERE id = 1')
+      await deleteObject(existing.rows[0].object_path)
+      res.json({ ok: true })
+    } catch (err) {
+      console.error('DELETE /api/admin/win-sound failed:', err)
+      res.status(500).json({ error: 'delete_failed' })
+    }
+  })
 }

@@ -1,15 +1,27 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { motion } from 'framer-motion'
 import confetti from 'canvas-confetti'
 import { speak } from '../hooks/useSpeech.js'
 import { useLang } from '../contexts/LanguageContext.jsx'
+import { getWinSound } from '../api.js'
 import './VictoryScreen.css'
 
 export default function VictoryScreen({ onPlayAgain }) {
   const { t } = useLang()
   const hasSpoken = useRef(false)
+  const [winSoundUrl, setWinSoundUrl] = useState(undefined) // undefined = not yet fetched
+
+  // Fetch win sound URL once on mount
+  useEffect(() => {
+    getWinSound()
+      .then(data => setWinSoundUrl(data.url || null))
+      .catch(() => setWinSoundUrl(null))
+  }, [])
 
   useEffect(() => {
+    // Wait until we know whether a custom win sound exists
+    if (winSoundUrl === undefined) return
+
     const fire = () => {
       confetti({
         particleCount: 120,
@@ -37,11 +49,20 @@ export default function VictoryScreen({ onPlayAgain }) {
 
     if (!hasSpoken.current) {
       hasSpoken.current = true
-      setTimeout(() => speak(t.congrats), 500)
+      setTimeout(() => {
+        if (winSoundUrl) {
+          // Custom uploaded sound — plays on all devices including mobile
+          const audio = new Audio(winSoundUrl)
+          audio.play().catch(() => {})
+        } else {
+          // Fallback: browser Web Speech API (works in browser, not in mobile WebView)
+          speak(t.congrats)
+        }
+      }, 500)
     }
 
     return () => clearInterval(interval)
-  }, [t])
+  }, [winSoundUrl, t])
 
   return (
     <div className="victory-screen">

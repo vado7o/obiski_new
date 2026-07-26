@@ -141,4 +141,13 @@ export async function ensureSchema() {
       updated_at TIMESTAMPTZ DEFAULT NOW()
     );
   `)
+
+  // Win sound: one global sound played on the victory screen
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS win_sound (
+      id INTEGER PRIMARY KEY DEFAULT 1,
+      object_path TEXT NOT NULL,
+      updated_at TIMESTAMPTZ DEFAULT NOW()
+    );
+  `)
 }

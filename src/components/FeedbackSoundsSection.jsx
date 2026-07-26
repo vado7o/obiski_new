@@ -8,6 +8,9 @@ import {
   getAdminTitleSound,
   uploadTitleSound,
   deleteTitleSound,
+  getAdminWinSound,
+  uploadWinSound,
+  deleteWinSound,
 } from '../api.js'
 import MicRecorder from './MicRecorder.jsx'
 
@@ -18,21 +21,26 @@ export default function FeedbackSoundsSection() {
   const a = t.admin
   const [sounds, setSounds] = useState([])
   const [titleSound, setTitleSound] = useState(null)
+  const [winSound, setWinSound] = useState(null)
   const [busy, setBusy] = useState(false)
   const [titleBusy, setTitleBusy] = useState(false)
+  const [winBusy, setWinBusy] = useState(false)
   const [error, setError] = useState(null)
   const titleFileRef = useRef(null)
+  const winFileRef = useRef(null)
 
   const langLabel = LANGUAGES.find((l) => l.code === lang)
 
   async function load() {
     try {
-      const [feedbackData, titleData] = await Promise.all([
+      const [feedbackData, titleData, winData] = await Promise.all([
         getAdminFeedbackSounds(),
         getAdminTitleSound(lang),
+        getAdminWinSound(),
       ])
       setSounds(feedbackData.sounds)
       setTitleSound(titleData.sound)
+      setWinSound(winData.sound)
     } catch {
       setError(a.errorGeneric)
     }
@@ -69,6 +77,31 @@ export default function FeedbackSoundsSection() {
     }
   }
 
+  async function handleWinUpload(file) {
+    if (!file) return
+    setWinBusy(true); setError(null)
+    try {
+      await uploadWinSound(file)
+      await load()
+    } catch (err) {
+      setError(err.message || a.errorGeneric)
+    } finally {
+      setWinBusy(false)
+    }
+  }
+
+  async function handleWinDelete() {
+    setWinBusy(true); setError(null)
+    try {
+      await deleteWinSound()
+      await load()
+    } catch (err) {
+      setError(err.message || a.errorGeneric)
+    } finally {
+      setWinBusy(false)
+    }
+  }
+
   async function handleTitleUpload(file) {
     if (!file) return
     setTitleBusy(true); setError(null)
@@ -97,6 +130,69 @@ export default function FeedbackSoundsSection() {
   return (
     <div className="feedback-sounds-section">
       {error && <p className="admin-error admin-error-bar">{error}</p>}
+
+      {/* ── Win sound ── */}
+      <div className="title-sound-block">
+        <div className="feedback-group-label">{a.winSound}</div>
+        <p className="feedback-hint">{a.winSoundHint}</p>
+        <div className="feedback-slot" style={{ maxWidth: 460 }}>
+          {winSound ? (
+            <div className="feedback-slot-controls">
+              <audio
+                key={winSound.object_path}
+                src={winSound.object_path}
+                controls
+                preload="none"
+                className="feedback-audio"
+              />
+              <button className="btn-mini" disabled={winBusy} onClick={() => winFileRef.current.click()}>
+                {a.replaceSound}
+              </button>
+              <MicRecorder
+                disabled={winBusy}
+                labelRecord={a.recordMic}
+                labelStop={a.stopRec}
+                labelError={a.micError}
+                onRecorded={(blob) =>
+                  handleWinUpload(new File([blob], 'recording.webm', { type: blob.type }))
+                }
+              />
+              <button className="btn-mini btn-mini-danger" disabled={winBusy} onClick={handleWinDelete}>
+                {a.deleteSound}
+              </button>
+            </div>
+          ) : (
+            <div className="feedback-slot-controls">
+              <span className="feedback-empty-label">{a.winSoundEmpty}</span>
+              <button className="btn-mini" disabled={winBusy} onClick={() => winFileRef.current.click()}>
+                {a.uploadSound}
+              </button>
+              <MicRecorder
+                disabled={winBusy}
+                labelRecord={a.recordMic}
+                labelStop={a.stopRec}
+                labelError={a.micError}
+                onRecorded={(blob) =>
+                  handleWinUpload(new File([blob], 'recording.webm', { type: blob.type }))
+                }
+              />
+            </div>
+          )}
+          <input
+            ref={winFileRef}
+            type="file"
+            accept="audio/*"
+            hidden
+            onChange={(e) => {
+              const file = e.target.files[0]
+              e.target.value = ''
+              if (file) handleWinUpload(file)
+            }}
+          />
+        </div>
+      </div>
+
+      <div className="title-sound-divider" />
 
       {/* ── Title sound ── */}
       <div className="title-sound-block">
