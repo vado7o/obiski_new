@@ -1,5 +1,6 @@
 import pg from 'pg'
 import { seedTranslations } from './seed-translations.js'
+import { autoTranslateMissing } from './auto-translate.js'
 
 const { Pool } = pg
 
@@ -115,6 +116,9 @@ export async function ensureSchema() {
 
   // Seed word translations if any are missing (safe to run on every start)
   await seedTranslations(pool)
+
+  // Auto-translate any words whose translations are still empty (fire-and-forget)
+  autoTranslateMissing(pool).catch(err => console.error('[auto-translate]', err.message))
 
   // Title sound: one per language, played on the main screen
   // Migration: drop old single-row schema (id=1) if it exists
