@@ -246,6 +246,30 @@ export function registerRoutes(app) {
     }
   })
 
+  app.put('/api/admin/words/:id/translations', requireOwner, async (req, res) => {
+    try {
+      const { translations } = req.body || {}
+      if (!translations || typeof translations !== 'object' || Array.isArray(translations)) {
+        return res.status(400).json({ error: 'translations_required' })
+      }
+      // Only allow known language keys, string values
+      const ALLOWED = ['en', 'ru', 'es', 'fr', 'de', 'zh']
+      const clean = {}
+      for (const lang of ALLOWED) {
+        if (typeof translations[lang] === 'string') clean[lang] = translations[lang].trim()
+      }
+      const result = await query(
+        `UPDATE words SET translations = $1 WHERE id = $2 RETURNING *`,
+        [JSON.stringify(clean), req.params.id]
+      )
+      if (result.rowCount === 0) return res.status(404).json({ error: 'not_found' })
+      res.json(mapWord(result.rows[0]))
+    } catch (err) {
+      console.error('update translations failed:', err)
+      res.status(500).json({ error: 'update_failed' })
+    }
+  })
+
   app.delete('/api/admin/words/:id', requireOwner, async (req, res) => {
     try {
       const existing = await query(

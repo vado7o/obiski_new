@@ -6,7 +6,17 @@ import {
   createTheme, updateTheme, deleteTheme,
   createWord, updateWord, deleteWord,
   uploadWordPhoto, uploadWordAudio, deleteWordAudio,
+  updateWordTranslations,
 } from '../api.js'
+
+const LANG_LABELS = {
+  en: { label: 'English',  flag: '🇬🇧' },
+  ru: { label: 'Русский',  flag: '🇷🇺' },
+  es: { label: 'Español',  flag: '🇪🇸' },
+  fr: { label: 'Français', flag: '🇫🇷' },
+  de: { label: 'Deutsch',  flag: '🇩🇪' },
+  zh: { label: '中文',     flag: '🇨🇳' },
+}
 import FeedbackSoundsSection from './FeedbackSoundsSection.jsx'
 import StatsPanel from './StatsPanel.jsx'
 import './AdminPanel.css'
@@ -23,6 +33,7 @@ export default function AdminPanel({ onClose }) {
   const [activeTab, setActiveTab] = useState('cards')
   const [themeForm, setThemeForm] = useState(null) // {mode, data}
   const [wordForm, setWordForm] = useState(null)
+  const [translationModal, setTranslationModal] = useState(null) // {word, draft}
 
   useEffect(() => {
     if (!selectedThemeId && themes.length) setSelectedThemeId(themes[0].id)
@@ -82,6 +93,20 @@ export default function AdminPanel({ onClose }) {
   const onPhoto = (wordId, file) => file && run(() => uploadWordPhoto(wordId, file))
   const onAudio = (wordId, file) => file && run(() => uploadWordAudio(wordId, file))
   const onRemoveAudio = (wordId) => run(() => deleteWordAudio(wordId))
+
+  const openTranslationModal = (word) => {
+    const draft = {}
+    for (const lang of Object.keys(LANG_LABELS)) {
+      draft[lang] = (word.translations && word.translations[lang]) || ''
+    }
+    setTranslationModal({ word, draft })
+  }
+
+  const saveTranslations = () =>
+    run(async () => {
+      await updateWordTranslations(translationModal.word.id, translationModal.draft)
+      setTranslationModal(null)
+    })
 
   return (
     <motion.div
@@ -186,6 +211,7 @@ export default function AdminPanel({ onClose }) {
                       onPhoto={(f) => onPhoto(w.id, f)}
                       onAudio={(f) => onAudio(w.id, f)}
                       onRemoveAudio={() => onRemoveAudio(w.id)}
+                      onTranslation={() => openTranslationModal(w)}
                     />
                   ))}
                 </div>
@@ -216,13 +242,26 @@ export default function AdminPanel({ onClose }) {
           onSave={saveWord}
         />
       )}
+      {translationModal && (
+        <TranslationModal
+          word={translationModal.word}
+          draft={translationModal.draft}
+          busy={busy}
+          onChange={(lang, val) =>
+            setTranslationModal((m) => ({ ...m, draft: { ...m.draft, [lang]: val } }))
+          }
+          onCancel={() => setTranslationModal(null)}
+          onSave={saveTranslations}
+        />
+      )}
     </motion.div>
   )
 }
 
-function WordRow({ word, t, busy, onEdit, onDelete, onPhoto, onAudio, onRemoveAudio }) {
+function WordRow({ word, t, busy, onEdit, onDelete, onPhoto, onAudio, onRemoveAudio, onTranslation }) {
   const photoRef = useRef(null)
   const audioRef = useRef(null)
+  const hasTranslations = word.translations && Object.keys(word.translations).length > 0
   return (
     <div className="admin-word">
       <div className="admin-word-media">
@@ -241,6 +280,9 @@ function WordRow({ word, t, busy, onEdit, onDelete, onPhoto, onAudio, onRemoveAu
         <span className={`admin-tag ${word.audioUrl ? 'ok' : 'warn'}`}>
           {word.audioUrl ? t.admin.hasAudio : t.admin.usesTts}
         </span>
+        <span className={`admin-tag ${hasTranslations ? 'ok' : 'warn'}`}>
+          {hasTranslations ? '🌐 ' + Object.keys(word.translations).length : '🌐 —'}
+        </span>
       </div>
       <div className="admin-word-buttons">
         <input ref={photoRef} type="file" accept="image/*" hidden onChange={(e) => { onPhoto(e.target.files[0]); e.target.value = '' }} />
@@ -248,8 +290,41 @@ function WordRow({ word, t, busy, onEdit, onDelete, onPhoto, onAudio, onRemoveAu
         <button className="btn-mini" disabled={busy} onClick={() => photoRef.current.click()}>{t.admin.choosePhoto}</button>
         <button className="btn-mini" disabled={busy} onClick={() => audioRef.current.click()}>{t.admin.chooseAudio}</button>
         {word.audioUrl && <button className="btn-mini" disabled={busy} onClick={onRemoveAudio}>{t.admin.removeAudio}</button>}
+        <button className="btn-mini btn-mini-translate" disabled={busy} onClick={onTranslation}>🌐 {t.admin.translations || 'Перевод'}</button>
         <button className="icon-btn" onClick={onEdit}>✏️</button>
         <button className="icon-btn" onClick={onDelete}>🗑️</button>
+      </div>
+    </div>
+  )
+}
+
+function TranslationModal({ word, draft, busy, onChange, onCancel, onSave }) {
+  return (
+    <div className="modal-overlay" onMouseDown={onCancel}>
+      <div className="modal-card translation-modal" onMouseDown={(e) => e.stopPropagation()}>
+        <h2 className="modal-title">🌐 {word.name}</h2>
+        <div className="translation-rows">
+          {Object.entries(LANG_LABELS).map(([lang, { flag, label }]) => (
+            <label key={lang} className="translation-row">
+              <span className="translation-lang">
+                <span className="translation-flag">{flag}</span>
+                <span className="translation-lang-name">{label}</span>
+              </span>
+              <input
+                className="admin-input translation-input"
+                value={draft[lang] || ''}
+                placeholder="—"
+                onChange={(e) => onChange(lang, e.target.value)}
+              />
+            </label>
+          ))}
+        </div>
+        <div className="modal-actions">
+          <button type="button" className="btn-ghost" onClick={onCancel}>Отмена</button>
+          <button type="button" className="btn-primary" disabled={busy} onClick={onSave}>
+            {busy ? 'Сохранение…' : 'Сохранить'}
+          </button>
+        </div>
       </div>
     </div>
   )

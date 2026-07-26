@@ -402,3 +402,53 @@
   color: #c0392b;
 }
 .btn-mini-danger:hover:not(:disabled) { background: #fbd5d2; }
+
+.btn-mini-translate {
+  background: #edf4ff;
+  color: #3a6fdc;
+}
+.btn-mini-translate:hover:not(:disabled) { background: #dae8ff; }
+
+/* ---- Translation modal ---- */
+.translation-modal {
+  width: 100%;
+  max-width: 440px;
+}
+
+.translation-rows {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 4px 0 20px;
+}
+
+.translation-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.translation-lang {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 110px;
+  flex-shrink: 0;
+}
+
+.translation-flag {
+  font-size: 1.2rem;
+  line-height: 1;
+}
+
+.translation-lang-name {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #5a5675;
+}
+
+.translation-input {
+  flex: 1;
+  padding: 8px 12px;
+  font-size: 0.95rem;
+}

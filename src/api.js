@@ -57,6 +57,13 @@ export function deleteWord(id) {
   return jsonRequest(`/api/admin/words/${id}`, { method: 'DELETE' })
 }
 
+export function updateWordTranslations(id, translations) {
+  return jsonRequest(`/api/admin/words/${id}/translations`, {
+    method: 'PUT',
+    body: JSON.stringify({ translations }),
+  })
+}
+
 async function uploadFile(url, file) {
   const form = new FormData()
   form.append('file', file)
