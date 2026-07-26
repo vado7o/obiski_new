@@ -109,22 +109,22 @@ export function deleteTitleSound(lang) {
   return jsonRequest(`/api/admin/title-sound?lang=${encodeURIComponent(lang || 'ru')}`, { method: 'DELETE' })
 }
 
-export function getWinSound() {
-  return jsonRequest('/api/win-sound')
+export function getWinSound(lang) {
+  return jsonRequest(`/api/win-sound?lang=${encodeURIComponent(lang || 'en')}`)
 }
 
-export function getAdminWinSound() {
-  return jsonRequest('/api/admin/win-sound')
+export function getAdminWinSound(lang) {
+  return jsonRequest(`/api/admin/win-sound?lang=${encodeURIComponent(lang || 'en')}`)
 }
 
-export function uploadWinSound(file) {
+export function uploadWinSound(lang, file) {
   const fd = new FormData()
   fd.append('file', file)
-  return fetch('/api/admin/win-sound', { method: 'POST', body: fd }).then(r => r.json())
+  return fetch(`/api/admin/win-sound?lang=${encodeURIComponent(lang || 'en')}`, { method: 'POST', body: fd }).then(r => r.json())
 }
 
-export function deleteWinSound() {
-  return jsonRequest('/api/admin/win-sound', { method: 'DELETE' })
+export function deleteWinSound(lang) {
+  return jsonRequest(`/api/admin/win-sound?lang=${encodeURIComponent(lang || 'en')}`, { method: 'DELETE' })
 }
 
 export function getFeedbackSounds(lang) {

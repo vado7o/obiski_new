@@ -7,16 +7,16 @@ import { getWinSound } from '../api.js'
 import './VictoryScreen.css'
 
 export default function VictoryScreen({ onPlayAgain }) {
-  const { t } = useLang()
+  const { t, lang } = useLang()
   const hasSpoken = useRef(false)
   const [winSoundUrl, setWinSoundUrl] = useState(undefined) // undefined = not yet fetched
 
-  // Fetch win sound URL once on mount
+  // Fetch win sound URL for the current language on mount
   useEffect(() => {
-    getWinSound()
+    getWinSound(lang)
       .then(data => setWinSoundUrl(data.url || null))
       .catch(() => setWinSoundUrl(null))
-  }, [])
+  }, [lang])
 
   useEffect(() => {
     // Wait until we know whether a custom win sound exists

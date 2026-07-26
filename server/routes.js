@@ -472,10 +472,11 @@ export function registerRoutes(app) {
     }
   })
 
-  // ---- Public: win sound ----
+  // ---- Public: win sound (per-language) ----
   app.get('/api/win-sound', async (req, res) => {
+    const lang = req.query.lang || 'en'
     try {
-      const row = await query('SELECT object_path FROM win_sound WHERE id = 1')
+      const row = await query('SELECT object_path FROM win_sound WHERE lang = $1', [lang])
       res.json({ url: row.rowCount > 0 ? row.rows[0].object_path : null })
     } catch (err) {
       console.error('GET /api/win-sound failed:', err)
@@ -483,10 +484,11 @@ export function registerRoutes(app) {
     }
   })
 
-  // ---- Admin: win sound ----
+  // ---- Admin: win sound (per-language) ----
   app.get('/api/admin/win-sound', requireOwner, async (req, res) => {
+    const lang = req.query.lang || 'en'
     try {
-      const row = await query('SELECT object_path FROM win_sound WHERE id = 1')
+      const row = await query('SELECT object_path FROM win_sound WHERE lang = $1', [lang])
       res.json({ sound: row.rowCount > 0 ? row.rows[0] : null })
     } catch (err) {
       console.error('GET /api/admin/win-sound failed:', err)
@@ -495,17 +497,18 @@ export function registerRoutes(app) {
   })
 
   app.post('/api/admin/win-sound', requireOwner, upload.single('file'), async (req, res) => {
+    const lang = req.query.lang || 'en'
     try {
       if (!req.file) return res.status(400).json({ error: 'file_required' })
       if (!req.file.mimetype.startsWith('audio/'))
         return res.status(400).json({ error: 'invalid_file_type' })
-      const existing = await query('SELECT object_path FROM win_sound WHERE id = 1')
+      const existing = await query('SELECT object_path FROM win_sound WHERE lang = $1', [lang])
       const objectPath = await uploadObject(req.file.buffer, req.file.mimetype)
       await query(
-        `INSERT INTO win_sound (id, object_path, updated_at)
-         VALUES (1, $1, NOW())
-         ON CONFLICT (id) DO UPDATE SET object_path = EXCLUDED.object_path, updated_at = NOW()`,
-        [objectPath]
+        `INSERT INTO win_sound (lang, object_path, updated_at)
+         VALUES ($1, $2, NOW())
+         ON CONFLICT (lang) DO UPDATE SET object_path = EXCLUDED.object_path, updated_at = NOW()`,
+        [lang, objectPath]
       )
       if (existing.rowCount > 0) await deleteObject(existing.rows[0].object_path)
       res.json({ objectPath })
@@ -516,10 +519,11 @@ export function registerRoutes(app) {
   })
 
   app.delete('/api/admin/win-sound', requireOwner, async (req, res) => {
+    const lang = req.query.lang || 'en'
     try {
-      const existing = await query('SELECT object_path FROM win_sound WHERE id = 1')
+      const existing = await query('SELECT object_path FROM win_sound WHERE lang = $1', [lang])
       if (existing.rowCount === 0) return res.status(404).json({ error: 'not_found' })
-      await query('DELETE FROM win_sound WHERE id = 1')
+      await query('DELETE FROM win_sound WHERE lang = $1', [lang])
       await deleteObject(existing.rows[0].object_path)
       res.json({ ok: true })
     } catch (err) {

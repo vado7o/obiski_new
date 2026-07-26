@@ -36,7 +36,7 @@ export default function FeedbackSoundsSection() {
       const [feedbackData, titleData, winData] = await Promise.all([
         getAdminFeedbackSounds(),
         getAdminTitleSound(lang),
-        getAdminWinSound(),
+        getAdminWinSound(lang),
       ])
       setSounds(feedbackData.sounds)
       setTitleSound(titleData.sound)
@@ -81,7 +81,7 @@ export default function FeedbackSoundsSection() {
     if (!file) return
     setWinBusy(true); setError(null)
     try {
-      await uploadWinSound(file)
+      await uploadWinSound(lang, file)
       await load()
     } catch (err) {
       setError(err.message || a.errorGeneric)
@@ -93,7 +93,7 @@ export default function FeedbackSoundsSection() {
   async function handleWinDelete() {
     setWinBusy(true); setError(null)
     try {
-      await deleteWinSound()
+      await deleteWinSound(lang)
       await load()
     } catch (err) {
       setError(err.message || a.errorGeneric)

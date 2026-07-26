@@ -142,10 +142,22 @@ export async function ensureSchema() {
     );
   `)
 
-  // Win sound: one global sound played on the victory screen
+  // Win sound: per-language, same pattern as title_sound
+  await pool.query(`
+    DO $$
+    BEGIN
+      IF EXISTS (
+        SELECT 1 FROM information_schema.columns
+        WHERE table_name = 'win_sound' AND column_name = 'id'
+      ) THEN
+        DROP TABLE win_sound;
+      END IF;
+    END;
+    $$;
+  `)
   await pool.query(`
     CREATE TABLE IF NOT EXISTS win_sound (
-      id INTEGER PRIMARY KEY DEFAULT 1,
+      lang TEXT PRIMARY KEY,
       object_path TEXT NOT NULL,
       updated_at TIMESTAMPTZ DEFAULT NOW()
     );
