@@ -142,11 +142,15 @@ export async function ensureSchema() {
     );
   `)
 
-  // Win sound: per-language, same pattern as title_sound
+  // Win sound: id kept as PK (Replit migration compat), lang as UNIQUE lookup column
+  // Step 1: If dev has the old lang-PK schema (no id column) — drop and recreate fresh
   await pool.query(`
     DO $$
     BEGIN
       IF EXISTS (
+        SELECT 1 FROM information_schema.tables
+        WHERE table_name = 'win_sound'
+      ) AND NOT EXISTS (
         SELECT 1 FROM information_schema.columns
         WHERE table_name = 'win_sound' AND column_name = 'id'
       ) THEN
@@ -155,11 +159,31 @@ export async function ensureSchema() {
     END;
     $$;
   `)
+  // Step 2: Create table if not exists (fresh or post-drop)
   await pool.query(`
     CREATE TABLE IF NOT EXISTS win_sound (
-      lang TEXT PRIMARY KEY,
+      id INTEGER PRIMARY KEY DEFAULT 1,
+      lang TEXT NOT NULL DEFAULT 'ru',
       object_path TEXT NOT NULL,
       updated_at TIMESTAMPTZ DEFAULT NOW()
     );
+  `)
+  // Step 3: Add lang column to prod if it doesn't have it yet
+  await pool.query(`
+    ALTER TABLE win_sound ADD COLUMN IF NOT EXISTS lang TEXT NOT NULL DEFAULT 'ru';
+  `)
+  // Step 4: Add unique constraint on lang if missing
+  await pool.query(`
+    DO $$
+    BEGIN
+      IF NOT EXISTS (
+        SELECT 1 FROM pg_constraint
+        WHERE conname = 'win_sound_lang_key'
+          AND conrelid = 'win_sound'::regclass
+      ) THEN
+        ALTER TABLE win_sound ADD CONSTRAINT win_sound_lang_key UNIQUE (lang);
+      END IF;
+    END;
+    $$;
   `)
 }
