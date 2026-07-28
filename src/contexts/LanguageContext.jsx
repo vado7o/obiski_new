@@ -1,13 +1,14 @@
-import { createContext, useContext, useState } from 'react'
+import { createContext, useContext } from 'react'
 import { translations } from '../i18n/translations.js'
 
 const LanguageContext = createContext(null)
 
+const lang = 'ru'
+const t = translations.ru
+
 export function LanguageProvider({ children }) {
-  const [lang, setLang] = useState('ru')
-  const t = translations[lang] || translations.en
   return (
-    <LanguageContext.Provider value={{ lang, setLang, t }}>
+    <LanguageContext.Provider value={{ lang, t }}>
       {children}
     </LanguageContext.Provider>
   )

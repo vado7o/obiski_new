@@ -10,12 +10,7 @@ import {
 } from '../api.js'
 
 const LANG_LABELS = {
-  en: { label: 'English',  flag: '🇬🇧' },
-  ru: { label: 'Русский',  flag: '🇷🇺' },
-  es: { label: 'Español',  flag: '🇪🇸' },
-  fr: { label: 'Français', flag: '🇫🇷' },
-  de: { label: 'Deutsch',  flag: '🇩🇪' },
-  zh: { label: '中文',     flag: '🇨🇳' },
+  ru: { label: 'Русский', flag: '🇷🇺' },
 }
 import FeedbackSoundsSection from './FeedbackSoundsSection.jsx'
 import StatsPanel from './StatsPanel.jsx'

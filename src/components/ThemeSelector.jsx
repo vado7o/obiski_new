@@ -3,7 +3,6 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { useLang } from '../contexts/LanguageContext.jsx'
 import { useContent } from '../contexts/ContentContext.jsx'
 import { useAuth } from '../contexts/AuthContext.jsx'
-import { LANGUAGES } from '../i18n/translations.js'
 import { useDifficulty } from '../contexts/DifficultyContext.jsx'
 import { useShowTranslation } from '../contexts/ShowTranslationContext.jsx'
 import { useShowText } from '../contexts/ShowTextContext.jsx'
@@ -11,7 +10,7 @@ import { getTitleSound } from '../api.js'
 import './ThemeSelector.css'
 
 export default function ThemeSelector({ selected, onToggle, onStart, onOpenAdmin, onOpenUserSounds }) {
-  const { t, lang, setLang } = useLang()
+  const { t, lang } = useLang()
   const { themes, loading } = useContent()
   const { isAdmin, adminLogin, adminLogout } = useAuth()
   const { difficulty, setDifficulty, DIFFICULTY_OPTIONS } = useDifficulty()
@@ -19,7 +18,6 @@ export default function ThemeSelector({ selected, onToggle, onStart, onOpenAdmin
   const { showText, setShowText } = useShowText()
   const canStart = selected.length > 0
   const [menuOpen, setMenuOpen] = useState(false)
-  const [langView, setLangView] = useState(false)
   const [difficultyView, setDifficultyView] = useState(false)
   const [adminPwOpen, setAdminPwOpen] = useState(false)
   const [adminPw, setAdminPw] = useState('')
@@ -71,7 +69,6 @@ export default function ThemeSelector({ selected, onToggle, onStart, onOpenAdmin
 
   function closeMenu() {
     setMenuOpen(false)
-    setLangView(false)
     setDifficultyView(false)
   }
 
@@ -91,8 +88,6 @@ export default function ThemeSelector({ selected, onToggle, onStart, onOpenAdmin
     window.addEventListener('scroll', handleScroll, { passive: true })
     return () => window.removeEventListener('scroll', handleScroll)
   }, [menuOpen])
-
-  const currentLang = LANGUAGES.find(l => l.code === lang)
 
   return (
     <div className="theme-selector">
@@ -121,29 +116,7 @@ export default function ThemeSelector({ selected, onToggle, onStart, onOpenAdmin
                 exit={{ opacity: 0, y: -8, scale: 0.96 }}
                 transition={{ duration: 0.18 }}
               >
-                {langView ? (
-                  <>
-                    <button
-                      className="lang-option lang-back"
-                      onClick={() => setLangView(false)}
-                    >
-                      <span className="lang-flag">‹</span>
-                      <span className="lang-label">{t.admin.back}</span>
-                    </button>
-                    <div className="menu-divider" />
-                    {LANGUAGES.map(l => (
-                      <button
-                        key={l.code}
-                        className={`lang-option ${lang === l.code ? 'active' : ''}`}
-                        onClick={() => { setLang(l.code); closeMenu() }}
-                      >
-                        <span className="lang-flag">{l.flag}</span>
-                        <span className="lang-label">{l.label}</span>
-                        {lang === l.code && <span className="lang-check">✓</span>}
-                      </button>
-                    ))}
-                  </>
-                ) : difficultyView ? (
+                {difficultyView ? (
                   <>
                     <button
                       className="lang-option lang-back"
@@ -195,15 +168,6 @@ export default function ThemeSelector({ selected, onToggle, onStart, onOpenAdmin
                       onClick={() => { closeMenu(); onOpenUserSounds() }}
                     >
                       <span className="lang-label">{t.admin.recordSounds}</span>
-                    </button>
-
-                    <button
-                      className="lang-option"
-                      onClick={() => setLangView(true)}
-                    >
-                      {currentLang && <span className="lang-flag">{currentLang.flag}</span>}
-                      <span className="lang-label">{t.language}</span>
-                      <span className="lang-chevron">›</span>
                     </button>
 
                     {isAdmin && (

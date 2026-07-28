@@ -5,7 +5,7 @@
  * only processes words whose translations are null, {}, or all-empty strings.
  */
 
-const TARGET_LANGS = ['ru', 'es', 'fr', 'de', 'zh']
+const TARGET_LANGS = ['ru']
 
 // Multiple public Lingva instances — tried in order until one succeeds
 const LINGVA_INSTANCES = [
