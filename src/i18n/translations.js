@@ -97,6 +97,7 @@ export const translations = {
       difficultyLabel: (n) => `Show ${n} cards`,
       showText: 'Show text',
       showTranslation: 'Show translation',
+      playFeedbackSounds: 'Play correct/wrong sounds',
       tabStats: 'Statistics',
       statsLoading: 'Loading…',
       statsRefresh: 'Refresh',
@@ -222,6 +223,7 @@ export const translations = {
       difficulty: 'Уровень сложности',
       showText: 'Показывать текст',
       showTranslation: 'Показывать перевод',
+      playFeedbackSounds: 'Проигрывать звуки «правильно/неправильно»',
       difficultyLabel: (n) => {
         const rem = n % 10
         const rem100 = n % 100

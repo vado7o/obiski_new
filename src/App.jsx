@@ -7,6 +7,7 @@ import { useAuth } from './contexts/AuthContext.jsx'
 import { DifficultyProvider } from './contexts/DifficultyContext.jsx'
 import { ShowTranslationProvider } from './contexts/ShowTranslationContext.jsx'
 import { ShowTextProvider } from './contexts/ShowTextContext.jsx'
+import { PlayFeedbackSoundsProvider } from './contexts/PlayFeedbackSoundsContext.jsx'
 import { useLang } from './contexts/LanguageContext.jsx'
 import { useAnalytics } from './hooks/useAnalytics.js'
 import ThemeSelector from './components/ThemeSelector.jsx'
@@ -113,11 +114,13 @@ export default function App() {
       <DifficultyProvider>
         <ShowTranslationProvider>
         <ShowTextProvider>
+        <PlayFeedbackSoundsProvider>
         <AuthProvider>
           <ContentProvider>
             <AppInner />
           </ContentProvider>
         </AuthProvider>
+        </PlayFeedbackSoundsProvider>
         </ShowTextProvider>
         </ShowTranslationProvider>
       </DifficultyProvider>

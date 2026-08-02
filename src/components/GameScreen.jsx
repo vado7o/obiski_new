@@ -4,6 +4,7 @@ import { shuffleArray } from '../data/themes.js'
 import { useDifficulty } from '../contexts/DifficultyContext.jsx'
 import { useShowTranslation } from '../contexts/ShowTranslationContext.jsx'
 import { useShowText } from '../contexts/ShowTextContext.jsx'
+import { usePlayFeedbackSounds } from '../contexts/PlayFeedbackSoundsContext.jsx'
 import { speak, speakWordObject } from '../hooks/useSpeech.js'
 import { useLang } from '../contexts/LanguageContext.jsx'
 import { useContent } from '../contexts/ContentContext.jsx'
@@ -97,6 +98,7 @@ export default function GameScreen({ selectedThemes, onComplete, onMenu }) {
   const { difficulty } = useDifficulty()
   const { showTranslation } = useShowTranslation()
   const { showText } = useShowText()
+  const { playFeedbackSounds } = usePlayFeedbackSounds()
   const [wordList, setWordList] = useState([])
   const [batchState, setBatchState] = useState({ words: [], displayOrder: [], questionOrder: [] })
   const [questionIndex, setQuestionIndex] = useState(0)
@@ -258,8 +260,12 @@ export default function GameScreen({ selectedThemes, onComplete, onMenu }) {
         }
       }
 
-      if (!playRandom(feedbackSounds.correct, afterFeedback)) {
-        speak(t.correct, afterFeedback)
+      if (playFeedbackSounds) {
+        if (!playRandom(feedbackSounds.correct, afterFeedback)) {
+          speak(t.correct, afterFeedback)
+        }
+      } else {
+        setTimeout(afterFeedback, 600)
       }
 
     } else {
@@ -272,11 +278,15 @@ export default function GameScreen({ selectedThemes, onComplete, onMenu }) {
         speakCurrent(currentTarget, () => setIsLocked(false))
       }
 
-      if (!playRandom(feedbackSounds.incorrect, afterFeedback)) {
-        speak(t.tryAgain, afterFeedback)
+      if (playFeedbackSounds) {
+        if (!playRandom(feedbackSounds.incorrect, afterFeedback)) {
+          speak(t.tryAgain, afterFeedback)
+        }
+      } else {
+        setTimeout(afterFeedback, 600)
       }
     }
-  }, [isLocked, currentTarget, questionIndex, batchState, batchOffset, wordList, answeredIds, feedbackSounds, onComplete, speakCurrent, t, difficulty])
+  }, [isLocked, currentTarget, questionIndex, batchState, batchOffset, wordList, answeredIds, feedbackSounds, playFeedbackSounds, onComplete, speakCurrent, t, difficulty])
 
   const handleRepeat = () => {
     if (currentTarget) speakCurrent(currentTarget)
