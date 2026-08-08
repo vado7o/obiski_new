@@ -11,15 +11,15 @@ const ROOMS = [
   { id: 'garage',   icon: '🔧', color: '#FF5722' },
 ]
 
-const PARTICLES = Array.from({ length: 16 }, (_, i) => ({
+const PARTICLES = Array.from({ length: 20 }, (_, i) => ({
   id: i,
-  angle: (i / 16) * 360,
-  distance: 90 + Math.random() * 60,
-  color: ['#FFD700','#FF6B6B','#4ECDC4','#45B7D1','#FFA07A','#98D8C8'][i % 6],
+  angle: (i / 20) * 360,
+  distance: 100 + (i % 3) * 40,
+  color: ['#FFD700','#FF6B6B','#4ECDC4','#45B7D1','#FFA07A','#98D8C8','#FF69B4','#7CFC00'][i % 8],
 }))
 
 // phase: locked → shaking → open → choosing → done
-export default function ChestScreen({ word, onRoomChosen, onOpenStickerbook, onSkip }) {
+export default function ChestScreen({ word, onOpenStickerbook, onSkip }) {
   const { t } = useLang()
   const { unlockSticker } = useStickers()
   const [phase, setPhase] = useState('locked')
@@ -37,9 +37,15 @@ export default function ChestScreen({ word, onRoomChosen, onOpenStickerbook, onS
   const handleRoomChosen = (roomId) => {
     if (chosenRoom) return
     setChosenRoom(roomId)
-    unlockSticker(word.name, roomId)
+    if (word) unlockSticker(word.name, roomId)
     setPhase('done')
+    // Auto-open stickerbook to chosen room after brief celebration
+    setTimeout(() => {
+      onOpenStickerbook(roomId)
+    }, 1500)
   }
+
+  const isOpen = phase === 'open' || phase === 'choosing' || phase === 'done'
 
   if (!word) return null
 
@@ -49,7 +55,7 @@ export default function ChestScreen({ word, onRoomChosen, onOpenStickerbook, onS
 
       {/* Particles */}
       <AnimatePresence>
-        {(phase === 'open' || phase === 'choosing' || phase === 'done') && PARTICLES.map(p => (
+        {isOpen && PARTICLES.map(p => (
           <motion.div
             key={p.id}
             className="chest-particle"
@@ -57,81 +63,76 @@ export default function ChestScreen({ word, onRoomChosen, onOpenStickerbook, onS
             initial={{ x: 0, y: 0, opacity: 1, scale: 1 }}
             animate={{
               x: Math.cos((p.angle * Math.PI) / 180) * p.distance,
-              y: Math.sin((p.angle * Math.PI) / 180) * p.distance - 80,
+              y: Math.sin((p.angle * Math.PI) / 180) * p.distance - 100,
               opacity: 0,
               scale: 0.3,
             }}
-            transition={{ duration: 1.2, ease: 'easeOut' }}
+            transition={{ duration: 1.4, ease: 'easeOut' }}
           />
         ))}
       </AnimatePresence>
 
       <div className="chest-center">
-        {/* Chest visual */}
+        {/* 3D Chest image */}
         <motion.div
           className="chest-wrap"
-          animate={phase === 'shaking' ? {
-            x: [-8, 8, -8, 8, -5, 5, 0],
-            rotate: [-3, 3, -3, 3, -2, 2, 0],
-          } : {}}
-          transition={{ duration: 0.5 }}
+          /* Idle wiggle when locked */
+          animate={
+            phase === 'locked'
+              ? { rotate: [-2, 2, -2, 2, -1.5, 1.5, -1, 1, 0], y: [0, -4, 0, -3, 0] }
+              : phase === 'shaking'
+              ? { x: [-10, 10, -10, 10, -6, 6, 0], rotate: [-4, 4, -4, 4, -2, 2, 0] }
+              : {}
+          }
+          transition={
+            phase === 'locked'
+              ? { duration: 3.5, repeat: Infinity, repeatDelay: 1.5, ease: 'easeInOut' }
+              : { duration: 0.5 }
+          }
           onClick={handleChestTap}
           style={{ cursor: phase === 'locked' ? 'pointer' : 'default' }}
         >
-          {/* Lid */}
-          <motion.div
-            className="chest-lid"
-            animate={phase === 'open' || phase === 'choosing' || phase === 'done'
-              ? { rotateX: -130, y: -10 }
-              : { rotateX: 0, y: 0 }}
-            transition={{ type: 'spring', stiffness: 200, damping: 18 }}
-            style={{ transformOrigin: 'bottom center', transformStyle: 'preserve-3d' }}
-          >
-            <div className="chest-lid-inner" />
-          </motion.div>
-          {/* Body */}
-          <div className="chest-body">
-            <div className="chest-lock">
-              <div className="chest-lock-shackle" />
-              <div className="chest-lock-body" />
-            </div>
-            {/* Inner glow when open */}
-            <AnimatePresence>
-              {(phase === 'open' || phase === 'choosing' || phase === 'done') && (
-                <motion.div
-                  className="chest-glow"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                />
-              )}
-            </AnimatePresence>
-          </div>
+          <motion.img
+            src="/chest-closed.png"
+            alt="chest"
+            className="chest-img"
+            draggable={false}
+            animate={{ opacity: isOpen ? 0 : 1, scale: isOpen ? 0.85 : 1 }}
+            transition={{ duration: 0.35 }}
+          />
+          <motion.img
+            src="/chest-open.png"
+            alt="chest open"
+            className="chest-img chest-img-open"
+            draggable={false}
+            initial={{ opacity: 0, scale: 0.85 }}
+            animate={{ opacity: isOpen ? 1 : 0, scale: isOpen ? 1 : 0.85 }}
+            transition={{ duration: 0.35 }}
+          />
         </motion.div>
 
-        {/* Tap hint */}
-        <AnimatePresence>
-          {phase === 'locked' && (
-            <motion.p
-              className="chest-hint"
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: [0.6, 1, 0.6], y: [0, -4, 0] }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 1.8, repeat: Infinity }}
-            >
-              {t.chest}
-            </motion.p>
-          )}
-        </AnimatePresence>
+        {/* Tap hint — only visible when locked */}
+        <motion.p
+          className="chest-hint"
+          animate={{ opacity: phase === 'locked' ? 1 : 0, y: phase === 'locked' ? [0, -5, 0] : 0 }}
+          transition={
+            phase === 'locked'
+              ? { duration: 1.8, repeat: Infinity, repeatType: 'loop' }
+              : { duration: 0.25 }
+          }
+          style={{ pointerEvents: 'none' }}
+        >
+          {t.chest}
+        </motion.p>
 
         {/* Sticker flying out */}
         <AnimatePresence>
-          {(phase === 'open' || phase === 'choosing' || phase === 'done') && (
+          {isOpen && (
             <motion.div
               className="chest-sticker-fly"
               initial={{ y: 60, scale: 0, opacity: 0 }}
-              animate={{ y: -160, scale: 1.1, opacity: 1 }}
-              transition={{ type: 'spring', stiffness: 260, damping: 20, delay: 0.2 }}
+              animate={{ y: -180, scale: 1.1, opacity: 1 }}
+              transition={{ type: 'spring', stiffness: 260, damping: 20, delay: 0.25 }}
             >
               <img
                 src={`/stickers/${slug}.png`}
@@ -140,7 +141,8 @@ export default function ChestScreen({ word, onRoomChosen, onOpenStickerbook, onS
                 draggable={false}
                 onError={e => {
                   e.target.style.display = 'none'
-                  e.target.nextSibling && (e.target.nextSibling.style.display = 'block')
+                  const fb = e.target.nextElementSibling
+                  if (fb) fb.style.display = 'block'
                 }}
               />
               <span className="chest-sticker-emoji" style={{ display: 'none' }}>
@@ -185,7 +187,22 @@ export default function ChestScreen({ word, onRoomChosen, onOpenStickerbook, onS
         )}
       </AnimatePresence>
 
-      {/* Bottom actions */}
+      {/* Done — brief auto-navigate message */}
+      <AnimatePresence>
+        {phase === 'done' && chosenRoom && (
+          <motion.div
+            className="chest-done-message"
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ delay: 0.2 }}
+          >
+            ✨ {t.chestOpening || 'Открываем стикербук…'}
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Skip button — only before chest opens */}
       <AnimatePresence>
         {phase === 'locked' && (
           <motion.button
@@ -198,29 +215,6 @@ export default function ChestScreen({ word, onRoomChosen, onOpenStickerbook, onS
           >
             {t.chestSkip}
           </motion.button>
-        )}
-        {phase === 'done' && chosenRoom && (
-          <motion.div
-            className="chest-done-actions"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.4 }}
-          >
-            <motion.button
-              className="chest-open-book-btn"
-              onClick={onOpenStickerbook}
-              whileTap={{ scale: 0.95 }}
-            >
-              📚 {t.chestOpenStickerbook}
-            </motion.button>
-            <motion.button
-              className="chest-continue-btn"
-              onClick={onRoomChosen}
-              whileTap={{ scale: 0.95 }}
-            >
-              {t.playAgain}
-            </motion.button>
-          </motion.div>
         )}
       </AnimatePresence>
     </div>

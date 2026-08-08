@@ -60,6 +60,7 @@ function AppInner() {
   const [screen, setScreen] = useState(SCREEN.SELECT)
   const [selectedThemes, setSelectedThemes] = useState([])
   const [rewardWord, setRewardWord] = useState(null)
+  const [stickerInitialRoom, setStickerInitialRoom] = useState('island')
   const [adminOpen, setAdminOpen] = useState(false)
   const [userSoundsOpen, setUserSoundsOpen] = useState(false)
   const roundStartedAtRef = useRef(null)
@@ -96,15 +97,33 @@ function AppInner() {
     if (stats) {
       trackRound({ ...stats, startedAt: roundStartedAtRef.current })
     }
-    // Pick a reward word from the played themes
+    // Pick a reward word — always show chest after any win
     const allWords = themes.flatMap(t => t.words)
+    const makeSlug = w => w.name.trim().toLowerCase().replace(/ /g, '_')
+
+    // First try: words from the played themes that have stickers
     const themeWords = allWords.filter(w => selectedThemes.includes(w.themeId))
     const stickerThemeWords = themeWords.filter(w => THEME_TO_ROOM[w.themeId])
-    const available = stickerThemeWords.filter(w => !unlocked.includes(w.name.trim().toLowerCase().replace(/ /g, '_')))
-    const pool = available.length > 0 ? available : stickerThemeWords
+    const availableFromTheme = stickerThemeWords.filter(w => !unlocked.includes(makeSlug(w)))
+    let pool = availableFromTheme.length > 0 ? availableFromTheme : stickerThemeWords
+
+    // Fallback: if the played theme has no sticker-eligible words (e.g. colors, numbers),
+    // pick from ANY theme that has stickers
+    if (pool.length === 0) {
+      const allStickerWords = allWords.filter(w => THEME_TO_ROOM[w.themeId])
+      const allAvailable = allStickerWords.filter(w => !unlocked.includes(makeSlug(w)))
+      pool = allAvailable.length > 0 ? allAvailable : allStickerWords
+    }
+
     const word = pool.length > 0 ? pool[Math.floor(Math.random() * pool.length)] : null
     setRewardWord(word)
-    setScreen(word ? SCREEN.CHEST : SCREEN.VICTORY)
+    // Always go to chest (even if somehow word is null we still show it)
+    setScreen(SCREEN.CHEST)
+  }
+
+  const handleOpenStickerbook = (roomId) => {
+    if (roomId) setStickerInitialRoom(roomId)
+    setScreen(SCREEN.STICKERBOOK)
   }
 
   const handlePlayAgain = () => {
@@ -123,7 +142,7 @@ function AppInner() {
               onStart={startGame}
               onOpenAdmin={() => setAdminOpen(true)}
               onOpenUserSounds={() => setUserSoundsOpen(true)}
-              onOpenStickerbook={() => setScreen(SCREEN.STICKERBOOK)}
+              onOpenStickerbook={() => handleOpenStickerbook('island')}
             />
           </motion.div>
         )}
@@ -141,12 +160,11 @@ function AppInner() {
 
       {/* Chest screen — full-screen overlay, shown after game completes */}
       <AnimatePresence>
-        {screen === SCREEN.CHEST && rewardWord && (
+        {screen === SCREEN.CHEST && (
           <ChestScreen
             word={rewardWord}
-            onRoomChosen={() => setScreen(SCREEN.VICTORY)}
-            onOpenStickerbook={() => setScreen(SCREEN.STICKERBOOK)}
-            onSkip={() => setScreen(SCREEN.VICTORY)}
+            onOpenStickerbook={handleOpenStickerbook}
+            onSkip={handlePlayAgain}
           />
         )}
       </AnimatePresence>
@@ -162,7 +180,10 @@ function AppInner() {
             transition={{ duration: 0.25 }}
             style={{ position: 'fixed', inset: 0, zIndex: 180 }}
           >
-            <StickerBook onClose={handlePlayAgain} />
+            <StickerBook
+              initialRoom={stickerInitialRoom}
+              onClose={handlePlayAgain}
+            />
           </motion.div>
         )}
       </AnimatePresence>

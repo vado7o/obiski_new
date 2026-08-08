@@ -96,8 +96,12 @@ function RoomCanvas({ roomId, stickersInRoom, allWords, onPositionChange, onTap 
   return (
     <div className="room-canvas">
       <img src={room.bg} alt="" className="room-bg" draggable={false} />
+      {/* Dimming overlay so stickers stand out */}
+      <div className="room-dim" />
       {stickersInRoom.map(({ slug, xPct, yPct }) => {
-        const word = allWords.find(w => w.name.replace(/ /g, '_') === slug)
+        const word = allWords.find(w =>
+          w.name.trim().toLowerCase().replace(/ /g, '_') === slug
+        )
         if (!word) return null
         return (
           <DraggableSticker
@@ -119,11 +123,11 @@ function RoomCanvas({ roomId, stickersInRoom, allWords, onPositionChange, onTap 
   )
 }
 
-export default function StickerBook({ onClose }) {
+export default function StickerBook({ initialRoom = 'island', onClose }) {
   const { t } = useLang()
   const { themes } = useContent()
   const { unlocked, positions, updateStickerPosition } = useStickers()
-  const [activeRoom, setActiveRoom] = useState('island')
+  const [activeRoom, setActiveRoom] = useState(initialRoom)
 
   const allWords = themes.flatMap(th => th.words)
 
@@ -150,7 +154,7 @@ export default function StickerBook({ onClose }) {
 
   return (
     <div className="stickerbook-overlay">
-      {/* Header */}
+      {/* Header — respects system status bar */}
       <div className="stickerbook-header">
         <h2 className="stickerbook-title">{t.stickerbookTitle}</h2>
         <button className="stickerbook-close" onClick={onClose} aria-label="close">✕</button>
