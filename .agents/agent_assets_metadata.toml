@@ -1,5 +1,4 @@
 uploads = []
-outputs = []
 
 [[generated]]
 id = "B2LUzWhYj6rF6CQwPGiFB"
@@ -210,3 +209,45 @@ id = "YheNfOMqKDcMbbNnYurgw"
 uri = "file://attached_assets/icon_v3.png"
 type = "image"
 title = "icon variant 3 dark silhouette gradient bg"
+
+[[outputs]]
+id = "-dhJSoU7MgoGqbGJas4yG"
+uri = "file://public/stickers-test/cat.png"
+type = "image"
+title = "Кот 🐱"
+description = "Животные → Fairy Island"
+
+[[outputs]]
+id = "ZlMYid8EZRfqffknvVLPk"
+uri = "file://public/stickers-test/elephant.png"
+type = "image"
+title = "Слон 🐘"
+description = "Животные → Fairy Island"
+
+[[outputs]]
+id = "g_o_zFLbmCntIkvQtDpuH"
+uri = "file://public/stickers-test/car.png"
+type = "image"
+title = "Машина 🚗"
+description = "Транспорт → Garage"
+
+[[outputs]]
+id = "4mndwsa9_tVsiaL59T-6Q"
+uri = "file://public/stickers-test/bus.png"
+type = "image"
+title = "Автобус 🚌"
+description = "Транспорт → Garage"
+
+[[outputs]]
+id = "KXK4f_I5iLmRl0N82FM1r"
+uri = "file://public/stickers-test/apple.png"
+type = "image"
+title = "Яблоко 🍎"
+description = "Еда/Фрукты"
+
+[[outputs]]
+id = "ceO0_oDV4pSBuItiOcLwy"
+uri = "file://public/stickers-test/banana.png"
+type = "image"
+title = "Банан 🍌"
+description = "Еда/Фрукты"
