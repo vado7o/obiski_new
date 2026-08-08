@@ -8,11 +8,16 @@ import { DifficultyProvider } from './contexts/DifficultyContext.jsx'
 import { ShowTranslationProvider } from './contexts/ShowTranslationContext.jsx'
 import { ShowTextProvider } from './contexts/ShowTextContext.jsx'
 import { PlayFeedbackSoundsProvider } from './contexts/PlayFeedbackSoundsContext.jsx'
+import { StickerProvider } from './contexts/StickerContext.jsx'
 import { useLang } from './contexts/LanguageContext.jsx'
+import { useContent } from './contexts/ContentContext.jsx'
+import { useStickers } from './contexts/StickerContext.jsx'
 import { useAnalytics } from './hooks/useAnalytics.js'
 import ThemeSelector from './components/ThemeSelector.jsx'
 import GameScreen from './components/GameScreen.jsx'
 import VictoryScreen from './components/VictoryScreen.jsx'
+import ChestScreen from './components/ChestScreen.jsx'
+import StickerBook from './components/StickerBook.jsx'
 import AdminPanel from './components/AdminPanel.jsx'
 import UserSoundsModal from './components/UserSoundsModal.jsx'
 
@@ -20,6 +25,20 @@ const SCREEN = {
   SELECT: 'select',
   GAME: 'game',
   VICTORY: 'victory',
+  CHEST: 'chest',
+  STICKERBOOK: 'stickerbook',
+}
+
+const THEME_TO_ROOM = {
+  animals: 'island',
+  insects: 'island',
+  nature: 'island',
+  fruits: 'island',
+  body: 'myroom',
+  clothes: 'myroom',
+  food: 'myroom',
+  vehicles: 'garage',
+  sports: 'worldmap',
 }
 
 const pageVariants = {
@@ -31,9 +50,12 @@ const pageVariants = {
 function AppInner() {
   const { user, ready } = useAuth()
   const { lang } = useLang()
+  const { themes } = useContent()
+  const { unlocked } = useStickers()
   const { trackVisit, trackRound } = useAnalytics()
   const [screen, setScreen] = useState(SCREEN.SELECT)
   const [selectedThemes, setSelectedThemes] = useState([])
+  const [rewardWord, setRewardWord] = useState(null)
   const [adminOpen, setAdminOpen] = useState(false)
   const [userSoundsOpen, setUserSoundsOpen] = useState(false)
   const roundStartedAtRef = useRef(null)
@@ -70,7 +92,15 @@ function AppInner() {
     if (stats) {
       trackRound({ ...stats, startedAt: roundStartedAtRef.current })
     }
-    setScreen(SCREEN.VICTORY)
+    // Pick a reward word from the played themes
+    const allWords = themes.flatMap(t => t.words)
+    const themeWords = allWords.filter(w => selectedThemes.includes(w.themeId))
+    const stickerThemeWords = themeWords.filter(w => THEME_TO_ROOM[w.themeId])
+    const available = stickerThemeWords.filter(w => !unlocked.includes(w.name.replace(/ /g, '_')))
+    const pool = available.length > 0 ? available : stickerThemeWords
+    const word = pool.length > 0 ? pool[Math.floor(Math.random() * pool.length)] : null
+    setRewardWord(word)
+    setScreen(word ? SCREEN.CHEST : SCREEN.VICTORY)
   }
 
   const handlePlayAgain = () => {
@@ -83,7 +113,14 @@ function AppInner() {
       <AnimatePresence mode="wait">
         {screen === SCREEN.SELECT && (
           <motion.div key="select" variants={pageVariants} initial="initial" animate="animate" exit="exit" transition={{ duration: 0.3 }}>
-            <ThemeSelector selected={selectedThemes} onToggle={toggleTheme} onStart={startGame} onOpenAdmin={() => setAdminOpen(true)} onOpenUserSounds={() => setUserSoundsOpen(true)} />
+            <ThemeSelector
+              selected={selectedThemes}
+              onToggle={toggleTheme}
+              onStart={startGame}
+              onOpenAdmin={() => setAdminOpen(true)}
+              onOpenUserSounds={() => setUserSoundsOpen(true)}
+              onOpenStickerbook={() => setScreen(SCREEN.STICKERBOOK)}
+            />
           </motion.div>
         )}
         {screen === SCREEN.GAME && (
@@ -94,6 +131,34 @@ function AppInner() {
         {screen === SCREEN.VICTORY && (
           <motion.div key="victory" variants={pageVariants} initial="initial" animate="animate" exit="exit" transition={{ duration: 0.3 }}>
             <VictoryScreen onPlayAgain={handlePlayAgain} />
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Chest screen — full-screen overlay, shown after game completes */}
+      <AnimatePresence>
+        {screen === SCREEN.CHEST && rewardWord && (
+          <ChestScreen
+            word={rewardWord}
+            onRoomChosen={() => setScreen(SCREEN.VICTORY)}
+            onOpenStickerbook={() => setScreen(SCREEN.STICKERBOOK)}
+            onSkip={() => setScreen(SCREEN.VICTORY)}
+          />
+        )}
+      </AnimatePresence>
+
+      {/* Stickerbook — full-screen overlay */}
+      <AnimatePresence>
+        {screen === SCREEN.STICKERBOOK && (
+          <motion.div
+            key="stickerbook"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.25 }}
+            style={{ position: 'fixed', inset: 0, zIndex: 180 }}
+          >
+            <StickerBook onClose={handlePlayAgain} />
           </motion.div>
         )}
       </AnimatePresence>
@@ -115,11 +180,13 @@ export default function App() {
         <ShowTranslationProvider>
         <ShowTextProvider>
         <PlayFeedbackSoundsProvider>
+        <StickerProvider>
         <AuthProvider>
           <ContentProvider>
             <AppInner />
           </ContentProvider>
         </AuthProvider>
+        </StickerProvider>
         </PlayFeedbackSoundsProvider>
         </ShowTextProvider>
         </ShowTranslationProvider>

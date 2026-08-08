@@ -10,7 +10,7 @@ import { usePlayFeedbackSounds } from '../contexts/PlayFeedbackSoundsContext.jsx
 import { getTitleSound } from '../api.js'
 import './ThemeSelector.css'
 
-export default function ThemeSelector({ selected, onToggle, onStart, onOpenAdmin, onOpenUserSounds }) {
+export default function ThemeSelector({ selected, onToggle, onStart, onOpenAdmin, onOpenUserSounds, onOpenStickerbook }) {
   const { t, lang } = useLang()
   const { themes, loading } = useContent()
   const { isAdmin, adminLogin, adminLogout } = useAuth()
@@ -171,6 +171,13 @@ export default function ThemeSelector({ selected, onToggle, onStart, onOpenAdmin
                     >
                       <span className="lang-label">{t.admin.playFeedbackSounds}</span>
                       {playFeedbackSounds && <span className="lang-check">✓</span>}
+                    </button>
+
+                    <button
+                      className="lang-option"
+                      onClick={() => { closeMenu(); onOpenStickerbook() }}
+                    >
+                      <span className="lang-label">{t.admin.stickerbookMenu}</span>
                     </button>
 
                     <button

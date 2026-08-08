@@ -1,0 +1,190 @@
+.stickerbook-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 180;
+  display: flex;
+  flex-direction: column;
+  background: #0f0a1a;
+}
+
+/* ── Header ── */
+.stickerbook-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 20px;
+  background: linear-gradient(135deg, #1a0a3a, #2d1065);
+  border-bottom: 2px solid rgba(255,255,255,0.1);
+  flex-shrink: 0;
+}
+.stickerbook-title {
+  font-size: 22px;
+  font-weight: 800;
+  color: #fff;
+  margin: 0;
+  text-shadow: 0 2px 8px rgba(124,58,237,0.6);
+}
+.stickerbook-close {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 2px solid rgba(255,255,255,0.25);
+  background: rgba(255,255,255,0.1);
+  color: #fff;
+  font-size: 18px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  -webkit-tap-highlight-color: transparent;
+  transition: background 0.15s;
+}
+.stickerbook-close:hover {
+  background: rgba(255,255,255,0.2);
+}
+
+/* ── Canvas area ── */
+.stickerbook-canvas-wrap {
+  flex: 1;
+  position: relative;
+  overflow: hidden;
+}
+.stickerbook-canvas-inner {
+  position: absolute;
+  inset: 0;
+}
+.room-canvas {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+.room-bg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  pointer-events: none;
+  user-select: none;
+}
+.room-empty {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 80px;
+  opacity: 0.2;
+  pointer-events: none;
+}
+
+/* ── Sticker items ── */
+.sticker-item {
+  position: absolute;
+  width: 80px;
+  height: 80px;
+  cursor: grab;
+  touch-action: none;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+  transform-origin: center;
+  will-change: transform;
+}
+.sticker-item:active {
+  cursor: grabbing;
+}
+.sticker-img {
+  width: 80px;
+  height: 80px;
+  object-fit: contain;
+  pointer-events: none;
+  filter: drop-shadow(0 4px 10px rgba(0,0,0,0.45));
+}
+
+/* ── Count badge ── */
+.stickerbook-count {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  background: rgba(0,0,0,0.55);
+  backdrop-filter: blur(8px);
+  border-radius: 20px;
+  padding: 6px 14px;
+  font-size: 16px;
+  font-weight: 700;
+  color: #fff;
+  border: 1px solid rgba(255,255,255,0.15);
+}
+
+/* ── Tab bar ── */
+.stickerbook-tabs {
+  display: flex;
+  background: linear-gradient(135deg, #1a0a3a, #2d1065);
+  border-top: 2px solid rgba(255,255,255,0.1);
+  flex-shrink: 0;
+}
+.stickerbook-tab {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  padding: 10px 4px 14px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  position: relative;
+  transition: background 0.15s;
+  min-height: 64px;
+  -webkit-tap-highlight-color: transparent;
+}
+.stickerbook-tab:hover {
+  background: rgba(255,255,255,0.07);
+}
+.stickerbook-tab.active {
+  background: rgba(124,58,237,0.25);
+}
+.stickerbook-tab.active::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 20%;
+  right: 20%;
+  height: 3px;
+  border-radius: 0 0 3px 3px;
+  background: #a855f7;
+}
+.tab-icon {
+  font-size: 26px;
+  line-height: 1;
+}
+.tab-label {
+  font-size: 10px;
+  font-weight: 700;
+  color: rgba(255,255,255,0.75);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+.stickerbook-tab.active .tab-label {
+  color: #fff;
+}
+.tab-badge {
+  position: absolute;
+  top: 6px;
+  right: calc(50% - 22px);
+  background: #f59e0b;
+  color: #fff;
+  font-size: 10px;
+  font-weight: 800;
+  min-width: 18px;
+  height: 18px;
+  border-radius: 9px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 4px;
+  border: 2px solid #1a0a3a;
+}
