@@ -102,6 +102,16 @@
   pointer-events: none;
   filter: drop-shadow(0 4px 10px rgba(0,0,0,0.45));
 }
+.sticker-emoji-fb {
+  width: 80px;
+  height: 80px;
+  font-size: 56px;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  filter: drop-shadow(0 4px 10px rgba(0,0,0,0.45));
+}
 
 /* ── Count badge ── */
 .stickerbook-count {

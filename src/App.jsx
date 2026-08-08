@@ -39,6 +39,10 @@ const THEME_TO_ROOM = {
   food: 'myroom',
   vehicles: 'garage',
   sports: 'worldmap',
+  // Production extra themes
+  'theme-42dhuX': 'island',   // wild animals
+  'theme-YduoHf': 'myroom',   // family
+  'theme-p7m4gB': 'myroom',   // vegetables
 }
 
 const pageVariants = {
@@ -96,7 +100,7 @@ function AppInner() {
     const allWords = themes.flatMap(t => t.words)
     const themeWords = allWords.filter(w => selectedThemes.includes(w.themeId))
     const stickerThemeWords = themeWords.filter(w => THEME_TO_ROOM[w.themeId])
-    const available = stickerThemeWords.filter(w => !unlocked.includes(w.name.replace(/ /g, '_')))
+    const available = stickerThemeWords.filter(w => !unlocked.includes(w.name.trim().toLowerCase().replace(/ /g, '_')))
     const pool = available.length > 0 ? available : stickerThemeWords
     const word = pool.length > 0 ? pool[Math.floor(Math.random() * pool.length)] : null
     setRewardWord(word)

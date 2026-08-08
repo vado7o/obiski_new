@@ -25,7 +25,7 @@ export default function ChestScreen({ word, onRoomChosen, onOpenStickerbook, onS
   const [phase, setPhase] = useState('locked')
   const [chosenRoom, setChosenRoom] = useState(null)
 
-  const slug = word ? word.name.replace(/ /g, '_') : ''
+  const slug = word ? word.name.trim().toLowerCase().replace(/ /g, '_') : ''
 
   const handleChestTap = () => {
     if (phase !== 'locked') return
@@ -138,7 +138,14 @@ export default function ChestScreen({ word, onRoomChosen, onOpenStickerbook, onS
                 alt={word.name}
                 className="chest-sticker-img"
                 draggable={false}
+                onError={e => {
+                  e.target.style.display = 'none'
+                  e.target.nextSibling && (e.target.nextSibling.style.display = 'block')
+                }}
               />
+              <span className="chest-sticker-emoji" style={{ display: 'none' }}>
+                {word.emoji || '🎁'}
+              </span>
               <p className="chest-sticker-name">{word.name}</p>
             </motion.div>
           )}

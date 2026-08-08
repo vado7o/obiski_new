@@ -17,7 +17,7 @@ export function StickerProvider({ children }) {
   const [positions, setPositions] = useState(loadPositions)
 
   const unlockSticker = useCallback((wordName, room) => {
-    const slug = wordName.replace(/ /g, '_')
+    const slug = wordName.trim().toLowerCase().replace(/ /g, '_')
     setUnlocked(prev => {
       if (prev.includes(slug)) return prev
       const next = [...prev, slug]
@@ -36,7 +36,7 @@ export function StickerProvider({ children }) {
   }, [])
 
   const moveStickerToRoom = useCallback((wordName, room) => {
-    const slug = wordName.replace(/ /g, '_')
+    const slug = wordName.trim().toLowerCase().replace(/ /g, '_')
     setPositions(prev => {
       const next = {
         ...prev,
@@ -48,7 +48,7 @@ export function StickerProvider({ children }) {
   }, [])
 
   const updateStickerPosition = useCallback((wordName, xPct, yPct) => {
-    const slug = wordName.replace(/ /g, '_')
+    const slug = wordName.trim().toLowerCase().replace(/ /g, '_')
     setPositions(prev => {
       const existing = prev[slug] || { room: 'island' }
       const next = { ...prev, [slug]: { ...existing, xPct, yPct } }

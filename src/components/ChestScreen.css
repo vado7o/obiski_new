@@ -157,6 +157,11 @@
   object-fit: contain;
   filter: drop-shadow(0 8px 24px rgba(255,220,80,0.8));
 }
+.chest-sticker-emoji {
+  font-size: 90px;
+  line-height: 1;
+  filter: drop-shadow(0 8px 24px rgba(255,220,80,0.6));
+}
 .chest-sticker-name {
   margin: 6px 0 0;
   font-size: 18px;

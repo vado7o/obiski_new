@@ -72,11 +72,19 @@ function DraggableSticker({ word, xPct, yPct, onPositionChange, onTap }) {
       transition={{ duration: 0.5, type: 'spring' }}
     >
       <img
-        src={`/stickers/${word.name.replace(/ /g, '_')}.png`}
+        src={`/stickers/${word.name.trim().toLowerCase().replace(/ /g, '_')}.png`}
         alt={word.name}
         className="sticker-img"
         draggable={false}
+        onError={e => {
+          e.target.style.display = 'none'
+          const fb = e.target.parentElement.querySelector('.sticker-emoji-fb')
+          if (fb) fb.style.display = 'flex'
+        }}
       />
+      <span className="sticker-emoji-fb" style={{ display: 'none' }}>
+        {word.emoji || '🎁'}
+      </span>
     </motion.div>
   )
 }
