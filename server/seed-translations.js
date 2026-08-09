@@ -434,13 +434,12 @@ export async function seedTranslations(dbPool) {
     if (result.rowCount > 0) updated++
   }
 
-  // Pass 2: match by name — always overwrite (handles renamed words regardless of id,
-  // and catches '' / NULL / '{}' translations from admin-panel-added words)
+  // Pass 2: match by name — only if translations are empty (preserves manual edits)
   const names = Object.keys(TRANSLATIONS_BY_NAME)
   for (const name of names) {
     const result = await dbPool.query(
       `UPDATE words SET translations = $1
-       WHERE LOWER(name) = LOWER($2)`,
+       WHERE LOWER(name) = LOWER($2) AND (translations IS NULL OR translations = '{}')`,
       [JSON.stringify(TRANSLATIONS_BY_NAME[name]), name]
     )
     if (result.rowCount > 0) updated++
@@ -449,10 +448,10 @@ export async function seedTranslations(dbPool) {
   // Pass 3: fix renamed words — matched by BOTH id AND current name (for rows
   // where id was NOT manually changed). Also try match by name only as fallback.
   for (const entry of TRANSLATIONS_RENAMED) {
-    // Try id+name first (most precise)
+    // Try id+name first (most precise) — only if translations are empty
     let result = await dbPool.query(
       `UPDATE words SET translations = $1
-       WHERE id = $2 AND LOWER(name) = LOWER($3)`,
+       WHERE id = $2 AND LOWER(name) = LOWER($3) AND (translations IS NULL OR translations = '{}')`,
       [JSON.stringify(entry.t), entry.id, entry.name]
     )
     if (result.rowCount > 0) { updated++; continue }
