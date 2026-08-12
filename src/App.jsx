@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { LanguageProvider } from './contexts/LanguageContext.jsx'
 import { ContentProvider } from './contexts/ContentContext.jsx'
@@ -53,25 +53,15 @@ const pageVariants = {
 
 function AppInner() {
   const { user, ready } = useAuth()
-  const { lang } = useLang()
   const { themes } = useContent()
   const { unlocked } = useStickers()
-  const { trackVisit, trackRound } = useAnalytics()
+  const { trackGameStart, trackRound } = useAnalytics()
   const [screen, setScreen] = useState(SCREEN.SELECT)
   const [selectedThemes, setSelectedThemes] = useState([])
   const [rewardWord, setRewardWord] = useState(null)
   const [stickerInitialRoom, setStickerInitialRoom] = useState('island')
   const [adminOpen, setAdminOpen] = useState(false)
   const [userSoundsOpen, setUserSoundsOpen] = useState(false)
-  const roundStartedAtRef = useRef(null)
-  const visitTrackedRef = useRef(false)
-
-  useEffect(() => {
-    if (!visitTrackedRef.current) {
-      visitTrackedRef.current = true
-      trackVisit(lang)
-    }
-  }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     if (!ready || !user) return
@@ -89,13 +79,13 @@ function AppInner() {
   }
 
   const startGame = () => {
-    roundStartedAtRef.current = Date.now()
+    trackGameStart()
     setScreen(SCREEN.GAME)
   }
 
   const handleComplete = (stats) => {
     if (stats) {
-      trackRound({ ...stats, startedAt: roundStartedAtRef.current })
+      trackRound({ themes: stats.themes, difficulty: stats.difficulty })
     }
     // Pick a reward word — always show chest after any win
     const allWords = themes.flatMap(t => t.words)

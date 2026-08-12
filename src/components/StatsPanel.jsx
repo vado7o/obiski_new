@@ -62,6 +62,36 @@ function VisitsChart({ rows }) {
   )
 }
 
+const DEVICE_LABELS = { mobile: '📱 Mobile', desktop: '🖥️ Desktop', unknown: '❓ Unknown' }
+const DIFFICULTY_LABELS = { 3: '3 карточки', 4: '4 карточки', 8: '8 карточек', 10: '10 карточек' }
+
+function ProportionBars({ rows, labelMap, colorClass }) {
+  if (!rows || !rows.length) return null
+  const total = rows.reduce((s, r) => s + Number(r.count), 0)
+  const max = Math.max(...rows.map(r => Number(r.count)), 1)
+  return (
+    <div className="top-themes">
+      {rows.map((r, i) => {
+        const key = String(r.device ?? r.difficulty ?? i)
+        const label = labelMap[key] || key
+        const pct = total > 0 ? Math.round((Number(r.count) / total) * 100) : 0
+        return (
+          <div key={key} className={`top-theme-row ${colorClass || ''}`}>
+            <div className="top-theme-name">{label}</div>
+            <div className="top-theme-bar-wrap">
+              <div
+                className="top-theme-bar"
+                style={{ width: `${Math.round((Number(r.count) / max) * 100)}%` }}
+              />
+            </div>
+            <div className="top-theme-count">{r.count} <span className="pct-label">({pct}%)</span></div>
+          </div>
+        )
+      })}
+    </div>
+  )
+}
+
 function TopThemes({ rows, t }) {
   if (!rows.length) return <p className="stats-empty">{t.admin.statsNoData}</p>
   const max = Math.max(...rows.map(r => Number(r.plays)), 1)
@@ -83,10 +113,14 @@ function TopThemes({ rows, t }) {
   )
 }
 
-const LANG_FLAGS = { ru: '🇷🇺', en: '🇬🇧', es: '🇪🇸', fr: '🇫🇷', de: '🇩🇪', zh: '🇨🇳' }
-
 function shortId(anon_id) {
   return '#' + String(anon_id || '').replace(/-/g, '').slice(0, 8)
+}
+
+function DeviceIcon({ device }) {
+  if (device === 'mobile') return <span title="mobile">📱</span>
+  if (device === 'desktop') return <span title="desktop">🖥️</span>
+  return <span>—</span>
 }
 
 function UsersTable({ users, t }) {
@@ -96,7 +130,7 @@ function UsersTable({ users, t }) {
         <thead>
           <tr>
             <th>{t.admin.statsUserDevice}</th>
-            <th>{t.admin.statsUserLang}</th>
+            <th>{t.admin.statsUserDeviceType}</th>
             <th>{t.admin.statsUserVisits}</th>
             <th>{t.admin.statsUserRounds}</th>
             <th>{t.admin.statsUserLastSeen}</th>
@@ -106,7 +140,7 @@ function UsersTable({ users, t }) {
           {users.map(u => (
             <tr key={u.anon_id}>
               <td className="stats-device-id">{shortId(u.anon_id)}</td>
-              <td className="stats-lang">{LANG_FLAGS[u.lang] || u.lang || '—'}</td>
+              <td className="stats-lang"><DeviceIcon device={u.device} /></td>
               <td className="stats-num">{u.visit_count}</td>
               <td className="stats-num">{u.rounds_count}</td>
               <td className="stats-date">{fmtDateTime(u.last_seen)}</td>
@@ -143,14 +177,13 @@ export default function StatsPanel() {
   if (loading) return <div className="stats-loading">{t.admin.statsLoading}</div>
   if (error) return <div className="stats-error">{error} <button className="btn-mini" onClick={load}>{t.admin.statsRefresh}</button></div>
 
-  const { overview, visitsByDay, topThemes, recentUsers } = data
+  const { overview, visitsByDay, topThemes, deviceBreakdown, difficultyBreakdown, recentUsers } = data
 
   return (
     <div className="stats-panel">
       <div className="stats-overview">
         <StatCard label={t.admin.statsUniqueVisitors} value={overview.unique_visitors} />
         <StatCard label={t.admin.statsVisitorsToday} value={overview.visitors_today} accent />
-        <StatCard label={t.admin.statsRegistered} value={overview.registered_users} />
         <StatCard label={t.admin.statsRoundsTotal} value={overview.total_rounds} />
         <StatCard label={t.admin.statsRoundsToday} value={overview.rounds_today} accent />
       </div>
@@ -162,6 +195,23 @@ export default function StatsPanel() {
         </div>
         <VisitsChart rows={visitsByDay} />
       </div>
+
+      {deviceBreakdown?.length > 0 && (
+        <div className="stats-section">
+          <div className="stats-section-head">{t.admin.statsDeviceBreakdown}</div>
+          <ProportionBars rows={deviceBreakdown} labelMap={DEVICE_LABELS} />
+        </div>
+      )}
+
+      {difficultyBreakdown?.length > 0 && (
+        <div className="stats-section">
+          <div className="stats-section-head">{t.admin.statsDifficultyBreakdown}</div>
+          <ProportionBars
+            rows={difficultyBreakdown}
+            labelMap={DIFFICULTY_LABELS}
+          />
+        </div>
+      )}
 
       {topThemes.length > 0 && (
         <div className="stats-section">

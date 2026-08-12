@@ -19,26 +19,27 @@ function getDevice() {
 
 export function useAnalytics() {
   const anonId = getOrCreateAnonId()
+  const device = getDevice()
 
-  async function trackVisit(lang) {
+  async function trackGameStart() {
     try {
       await fetch('/api/analytics/visit', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ anonId, lang, device: getDevice() }),
+        body: JSON.stringify({ anonId, device }),
       })
     } catch {}
   }
 
-  async function trackRound({ themes, difficulty, cardsTotal, cardsCorrect, startedAt }) {
+  async function trackRound({ themes, difficulty }) {
     try {
       await fetch('/api/analytics/round', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ anonId, themes, difficulty, cardsTotal, cardsCorrect, startedAt }),
+        body: JSON.stringify({ anonId, themes, difficulty, device }),
       })
     } catch {}
   }
 
-  return { trackVisit, trackRound }
+  return { trackGameStart, trackRound }
 }

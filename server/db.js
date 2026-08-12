@@ -101,6 +101,7 @@ export async function ensureSchema() {
   `)
   await pool.query('CREATE INDEX IF NOT EXISTS idx_game_rounds_anon ON game_rounds(anon_id);')
   await pool.query('CREATE INDEX IF NOT EXISTS idx_game_rounds_at  ON game_rounds(ended_at);')
+  await pool.query('ALTER TABLE game_rounds ADD COLUMN IF NOT EXISTS device VARCHAR(20);')
 
   // Feedback sounds: up to 5 per language per type (correct / incorrect)
   await pool.query(`
