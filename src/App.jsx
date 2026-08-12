@@ -62,6 +62,22 @@ function AppInner() {
   const [stickerInitialRoom, setStickerInitialRoom] = useState('island')
   const [adminOpen, setAdminOpen] = useState(false)
   const [userSoundsOpen, setUserSoundsOpen] = useState(false)
+  const [onboardingStep, setOnboardingStep] = useState(() =>
+    localStorage.getItem('obiski_onboarding') === 'done' ? null : 'step1'
+  )
+
+  function handleOnboardingNext() {
+    setOnboardingStep('step2')
+  }
+  function handleOnboardingDismiss() {
+    localStorage.setItem('obiski_onboarding', 'done')
+    setOnboardingStep(null)
+  }
+  function handleOnboardingDone() {
+    localStorage.setItem('obiski_onboarding', 'done')
+    setOnboardingStep(null)
+    setUserSoundsOpen(true)
+  }
 
   useEffect(() => {
     if (!ready || !user) return
@@ -133,6 +149,10 @@ function AppInner() {
               onOpenAdmin={() => setAdminOpen(true)}
               onOpenUserSounds={() => setUserSoundsOpen(true)}
               onOpenStickerbook={() => handleOpenStickerbook('island')}
+              onboardingStep={onboardingStep}
+              onOnboardingNext={handleOnboardingNext}
+              onOnboardingDismiss={handleOnboardingDismiss}
+              onOnboardingDone={handleOnboardingDone}
             />
           </motion.div>
         )}

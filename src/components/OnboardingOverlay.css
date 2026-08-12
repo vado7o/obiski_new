@@ -1,0 +1,105 @@
+/* ── Backdrop ── */
+.onb-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 90; /* ниже app-nav (sticky z-index: 100) — шапка остаётся видна */
+  background: rgba(0, 0, 0, 0.62);
+  cursor: default;
+}
+
+/* ── Tooltip card ── */
+.onb-tooltip {
+  position: fixed;
+  right: 16px;
+  z-index: 5000;
+  background: #fff;
+  border-radius: 16px;
+  padding: 18px 20px 14px;
+  width: 244px;
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.22),
+    0 2px 8px rgba(108, 99, 255, 0.14);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+.onb-tooltip--step1 { top: 62px; }
+.onb-tooltip--step2 { top: 268px; } /* ниже открытого дропдауна */
+
+/* Arrow pointing up-right toward menu button */
+.onb-arrow {
+  position: absolute;
+  top: -9px;
+  right: 22px;
+  width: 0;
+  height: 0;
+  border-left: 9px solid transparent;
+  border-right: 9px solid transparent;
+  border-bottom: 9px solid #fff;
+}
+
+.onb-icon {
+  font-size: 30px;
+}
+
+.onb-text {
+  font-size: 14px;
+  color: #333;
+  line-height: 1.5;
+  margin: 0;
+  text-align: center;
+}
+
+.onb-text-sm {
+  font-size: 13px;
+  color: #444;
+  margin: 0;
+  text-align: center;
+  line-height: 1.45;
+}
+
+.onb-btn-primary {
+  background: #6C63FF;
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  padding: 10px 0;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  width: 100%;
+  transition: background 0.15s;
+}
+.onb-btn-primary:hover { background: #5a52e0; }
+
+.onb-btn-later {
+  background: none;
+  border: none;
+  color: #aaa;
+  font-size: 12px;
+  cursor: pointer;
+  padding: 0;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+.onb-btn-later:hover { color: #777; }
+
+/* ── Spotlight pulse on menu button (step1) ── */
+.onboarding-spotlit {
+  border-radius: 10px !important;
+  animation: onb-pulse 2s ease-in-out infinite;
+}
+
+/* ── Spotlight pulse on "Записать свои звуки" item (step2) ── */
+.onboarding-record-spotlit {
+  background: rgba(108, 99, 255, 0.12) !important;
+  border-radius: 8px;
+  animation: onb-pulse 2s ease-in-out infinite;
+}
+
+@keyframes onb-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(108, 99, 255, 0.55); }
+  50%       { box-shadow: 0 0 0 8px rgba(108, 99, 255, 0); }
+}

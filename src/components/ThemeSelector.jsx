@@ -8,9 +8,13 @@ import { useShowTranslation } from '../contexts/ShowTranslationContext.jsx'
 import { useShowText } from '../contexts/ShowTextContext.jsx'
 import { usePlayFeedbackSounds } from '../contexts/PlayFeedbackSoundsContext.jsx'
 import { getTitleSound } from '../api.js'
+import OnboardingOverlay from './OnboardingOverlay.jsx'
 import './ThemeSelector.css'
 
-export default function ThemeSelector({ selected, onToggle, onStart, onOpenAdmin, onOpenUserSounds, onOpenStickerbook }) {
+export default function ThemeSelector({
+  selected, onToggle, onStart, onOpenAdmin, onOpenUserSounds, onOpenStickerbook,
+  onboardingStep, onOnboardingNext, onOnboardingDismiss, onOnboardingDone,
+}) {
   const { t, lang } = useLang()
   const { themes, loading } = useContent()
   const { isAdmin, adminLogin, adminLogout } = useAuth()
@@ -91,6 +95,11 @@ export default function ThemeSelector({ selected, onToggle, onStart, onOpenAdmin
     return () => window.removeEventListener('scroll', handleScroll)
   }, [menuOpen])
 
+  // Шаг 2 онбординга: автоматически открываем меню
+  useEffect(() => {
+    if (onboardingStep === 'step2') setMenuOpen(true)
+  }, [onboardingStep])
+
   return (
     <div className="theme-selector">
       <motion.div
@@ -105,7 +114,13 @@ export default function ThemeSelector({ selected, onToggle, onStart, onOpenAdmin
         </div>
 
         <div className="menu-wrap" ref={menuRef}>
-          <button className="menu-btn" onClick={() => setMenuOpen(o => !o)}>
+          <button
+            className={`menu-btn ${onboardingStep === 'step1' ? 'onboarding-spotlit' : ''}`}
+            onClick={() => {
+              if (onboardingStep === 'step1') { onOnboardingNext?.(); return }
+              setMenuOpen(o => !o)
+            }}
+          >
             {t.menuBtn}
           </button>
 
@@ -181,8 +196,12 @@ export default function ThemeSelector({ selected, onToggle, onStart, onOpenAdmin
                     </button>
 
                     <button
-                      className="lang-option"
-                      onClick={() => { closeMenu(); onOpenUserSounds() }}
+                      className={`lang-option ${onboardingStep === 'step2' ? 'onboarding-record-spotlit' : ''}`}
+                      onClick={() => {
+                        closeMenu()
+                        if (onboardingStep === 'step2') { onOnboardingDone?.(); return }
+                        onOpenUserSounds()
+                      }}
                     >
                       <span className="lang-label">{t.admin.recordSounds}</span>
                     </button>
@@ -273,6 +292,15 @@ export default function ThemeSelector({ selected, onToggle, onStart, onOpenAdmin
           {canStart ? t.startLearning : t.selectTheme}
         </motion.button>
       </motion.div>
+
+      {/* Онбординг — подсветка меню/записи голоса */}
+      {onboardingStep && (
+        <OnboardingOverlay
+          step={onboardingStep}
+          onNext={onOnboardingNext}
+          onDismiss={onOnboardingDismiss}
+        />
+      )}
 
       <AnimatePresence>
         {adminPwOpen && (
