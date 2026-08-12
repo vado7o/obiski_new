@@ -301,7 +301,7 @@ export default function GameScreen({ selectedThemes, onComplete, onMenu }) {
     <div className="game-screen">
       <div className="game-top">
         <div className="game-nav">
-          <span className="app-title">Obiski</span>
+          <span className="app-title">Абиски</span>
           {(showText || showTranslation) && currentTarget && (
             <div className="word-translation">
               {showText && (

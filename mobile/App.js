@@ -12,7 +12,7 @@ async function requestMicPermission() {
       PermissionsAndroid.PERMISSIONS.RECORD_AUDIO,
       {
         title: 'Доступ к микрофону',
-        message: 'Obiski нужен микрофон для записи ваших звуков',
+        message: 'Абиски нужен микрофон для записи ваших звуков',
         buttonPositive: 'Разрешить',
         buttonNegative: 'Отклонить',
       }
@@ -98,7 +98,8 @@ export default function App() {
       {loading && !error && (
         <View style={styles.loader}>
           <Text style={styles.loaderLogo}>🐾</Text>
-          <Text style={styles.loaderTitle}>Obiski</Text>
+          <Text style={styles.loaderTitle}>Маме слово</Text>
+          <Text style={styles.loaderSubtitle}>Английский без чтения</Text>
           <ActivityIndicator size="large" color="#6C63FF" style={{ marginTop: 20 }} />
         </View>
       )}
@@ -132,6 +133,12 @@ const styles = StyleSheet.create({
     color: '#6C63FF',
     marginTop: 12,
     letterSpacing: 1,
+  },
+  loaderSubtitle: {
+    fontSize: 15,
+    color: '#9b8ec4',
+    marginTop: 6,
+    letterSpacing: 0.3,
   },
   errorBox: {
     flex: 1,

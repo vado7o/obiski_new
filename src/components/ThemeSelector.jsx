@@ -100,7 +100,7 @@ export default function ThemeSelector({ selected, onToggle, onStart, onOpenAdmin
         transition={{ duration: 0.4 }}
       >
         <div className="app-nav-left">
-          <span className="app-title" onClick={handleLogoTap}>Obiski</span>
+          <span className="app-title" onClick={handleLogoTap}>Абиски</span>
           <p className="tagline">{t.tagline}</p>
         </div>
 
