@@ -33,17 +33,17 @@ jobs:
           # Генерируем проект
           npx expo prebuild --platform android --no-install
 
-      - name: Build AAB (Release Mode, Play Store)
+      - name: Build Standalone APK (Release Mode)
         run: |
           cd mobile/android
           chmod +x gradlew
-          # Собираем AAB для загрузки в Google Play
-          ./gradlew bundleRelease --no-daemon
+          # Собираем релизный АПК, который включает в себя весь JS-код
+          ./gradlew assembleRelease --no-daemon
 
-      - name: Upload AAB Artifact
+      - name: Upload APK Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: app-release-aab
-          # Путь к AAB для Google Play
-          path: mobile/android/app/build/outputs/bundle/release/app-release.aab
+          name: app-release-apk
+          # Путь к релизному АПК
+          path: mobile/android/app/build/outputs/apk/release/app-release.apk
 
