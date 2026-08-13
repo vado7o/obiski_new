@@ -30,6 +30,8 @@ export default function ThemeSelector({
   const [adminPwError, setAdminPwError] = useState(false)
   const [adminPwLoading, setAdminPwLoading] = useState(false)
   const menuRef = useRef(null)
+  const menuBtnRef = useRef(null)
+  const recordBtnRef = useRef(null)
   const tapCountRef = useRef(0)
   const lastTapRef = useRef(0)
 
@@ -108,13 +110,19 @@ export default function ThemeSelector({
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4 }}
       >
-        <div className="app-nav-left">
+        {/* Лого затемняется на обоих шагах онбординга */}
+        <div className={`app-nav-left ${onboardingStep ? 'onb-dimmed' : ''}`}>
           <span className="app-title" onClick={handleLogoTap}>Абиски</span>
           <p className="tagline">{t.tagline}</p>
         </div>
 
-        <div className="menu-wrap" ref={menuRef}>
+        {/* В шаг 2 весь menu-wrap поднимается над backdrop (видны кнопка + дропдаун) */}
+        <div
+          className={`menu-wrap ${onboardingStep === 'step2' ? 'onboarding-menu-above' : ''}`}
+          ref={menuRef}
+        >
           <button
+            ref={menuBtnRef}
             className={`menu-btn ${onboardingStep === 'step1' ? 'onboarding-spotlit' : ''}`}
             onClick={() => {
               if (onboardingStep === 'step1') { onOnboardingNext?.(); return }
@@ -196,6 +204,7 @@ export default function ThemeSelector({
                     </button>
 
                     <button
+                      ref={recordBtnRef}
                       className={`lang-option ${onboardingStep === 'step2' ? 'onboarding-record-spotlit' : ''}`}
                       onClick={() => {
                         closeMenu()
@@ -299,6 +308,8 @@ export default function ThemeSelector({
           step={onboardingStep}
           onNext={onOnboardingNext}
           onDismiss={onOnboardingDismiss}
+          menuBtnRef={menuBtnRef}
+          recordBtnRef={recordBtnRef}
         />
       )}
 

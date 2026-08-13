@@ -1,21 +1,20 @@
-/* ── Backdrop ── */
+/* ── Backdrop — поверх всего включая шапку ── */
 .onb-backdrop {
   position: fixed;
   inset: 0;
-  z-index: 90; /* ниже app-nav (sticky z-index: 100) — шапка остаётся видна */
-  background: rgba(0, 0, 0, 0.62);
+  z-index: 400;
+  background: rgba(0, 0, 0, 0.65);
   cursor: default;
 }
 
 /* ── Tooltip card ── */
 .onb-tooltip {
   position: fixed;
-  right: 16px;
   z-index: 5000;
   background: #fff;
   border-radius: 16px;
   padding: 18px 20px 14px;
-  width: 244px;
+  width: 230px;
   box-shadow:
     0 8px 32px rgba(0, 0, 0, 0.22),
     0 2px 8px rgba(108, 99, 255, 0.14);
@@ -25,19 +24,29 @@
   gap: 10px;
 }
 
-.onb-tooltip--step1 { top: 62px; }
-.onb-tooltip--step2 { top: 268px; } /* ниже открытого дропдауна */
-
-/* Arrow pointing up-right toward menu button */
-.onb-arrow {
+/* Стрелка вверх-вправо (шаг 1 — к кнопке Меню) */
+.onb-arrow--up-right {
   position: absolute;
   top: -9px;
-  right: 22px;
+  right: 18px;
   width: 0;
   height: 0;
   border-left: 9px solid transparent;
   border-right: 9px solid transparent;
   border-bottom: 9px solid #fff;
+}
+
+/* Стрелка вправо (шаг 2 — к строке меню) */
+.onb-arrow--right {
+  position: absolute;
+  top: 50%;
+  right: -9px;
+  transform: translateY(-50%);
+  width: 0;
+  height: 0;
+  border-top: 9px solid transparent;
+  border-bottom: 9px solid transparent;
+  border-left: 9px solid #fff;
 }
 
 .onb-icon {
@@ -86,13 +95,28 @@
 }
 .onb-btn-later:hover { color: #777; }
 
-/* ── Spotlight pulse on menu button (step1) ── */
+/* ── Лого/тагline затемняются, когда онбординг активен ── */
+.onb-dimmed {
+  opacity: 0.25;
+  transition: opacity 0.3s;
+  pointer-events: none;
+}
+
+/* ── Кнопка «Меню» выше backdrop (шаг 1) ── */
 .onboarding-spotlit {
+  position: relative;
+  z-index: 500;
   border-radius: 10px !important;
   animation: onb-pulse 2s ease-in-out infinite;
 }
 
-/* ── Spotlight pulse on "Записать свои звуки" item (step2) ── */
+/* ── Весь menu-wrap выше backdrop (шаг 2 — видны и кнопка, и дропдаун) ── */
+.onboarding-menu-above {
+  position: relative;
+  z-index: 500;
+}
+
+/* ── Строка «Записать свои звуки» пульсирует (шаг 2) ── */
 .onboarding-record-spotlit {
   background: rgba(108, 99, 255, 0.12) !important;
   border-radius: 8px;
