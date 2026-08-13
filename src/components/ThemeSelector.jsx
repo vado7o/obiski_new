@@ -306,10 +306,8 @@ export default function ThemeSelector({
       {onboardingStep && (
         <OnboardingOverlay
           step={onboardingStep}
-          onNext={onOnboardingNext}
+          onDone={onOnboardingDone}
           onDismiss={onOnboardingDismiss}
-          menuBtnRef={menuBtnRef}
-          recordBtnRef={recordBtnRef}
         />
       )}
 

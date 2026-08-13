@@ -7,75 +7,45 @@
   cursor: default;
 }
 
-/* ── Tooltip card ── */
+/* ── Tooltip — всегда по центру экрана ── */
 .onb-tooltip {
   position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
   z-index: 5000;
   background: #fff;
-  border-radius: 16px;
-  padding: 18px 20px 14px;
-  width: 230px;
+  border-radius: 20px;
+  padding: 24px 24px 18px;
+  width: 270px;
   box-shadow:
-    0 8px 32px rgba(0, 0, 0, 0.22),
+    0 12px 40px rgba(0, 0, 0, 0.22),
     0 2px 8px rgba(108, 99, 255, 0.14);
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 10px;
-}
-
-/* Стрелка вверх-вправо (шаг 1 — к кнопке Меню) */
-.onb-arrow--up-right {
-  position: absolute;
-  top: -9px;
-  right: 18px;
-  width: 0;
-  height: 0;
-  border-left: 9px solid transparent;
-  border-right: 9px solid transparent;
-  border-bottom: 9px solid #fff;
-}
-
-/* Стрелка вправо (шаг 2 — к строке меню) */
-.onb-arrow--right {
-  position: absolute;
-  top: 50%;
-  right: -9px;
-  transform: translateY(-50%);
-  width: 0;
-  height: 0;
-  border-top: 9px solid transparent;
-  border-bottom: 9px solid transparent;
-  border-left: 9px solid #fff;
+  gap: 12px;
 }
 
 .onb-icon {
-  font-size: 30px;
+  font-size: 34px;
 }
 
 .onb-text {
-  font-size: 14px;
+  font-size: 15px;
   color: #333;
-  line-height: 1.5;
+  line-height: 1.55;
   margin: 0;
   text-align: center;
-}
-
-.onb-text-sm {
-  font-size: 13px;
-  color: #444;
-  margin: 0;
-  text-align: center;
-  line-height: 1.45;
 }
 
 .onb-btn-primary {
   background: #6C63FF;
   color: #fff;
   border: none;
-  border-radius: 10px;
-  padding: 10px 0;
-  font-size: 14px;
+  border-radius: 12px;
+  padding: 12px 0;
+  font-size: 15px;
   font-weight: 600;
   cursor: pointer;
   width: 100%;
@@ -110,7 +80,7 @@
   animation: onb-pulse 2s ease-in-out infinite;
 }
 
-/* ── Весь menu-wrap выше backdrop (шаг 2 — видны и кнопка, и дропдаун) ── */
+/* ── Весь menu-wrap выше backdrop (шаг 2 — видны кнопка + дропдаун) ── */
 .onboarding-menu-above {
   position: relative;
   z-index: 500;
