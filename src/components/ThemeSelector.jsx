@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react'
+import { useState, useRef, useEffect, useLayoutEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useLang } from '../contexts/LanguageContext.jsx'
 import { useContent } from '../contexts/ContentContext.jsx'
@@ -13,7 +13,7 @@ import './ThemeSelector.css'
 
 export default function ThemeSelector({
   selected, onToggle, onStart, onOpenAdmin, onOpenUserSounds, onOpenStickerbook,
-  onboardingStep, onOnboardingNext, onOnboardingDismiss, onOnboardingDone,
+  onboardingStep, onOnboardingNext, onOnboardingDismiss, onOnboardingDone, onMenuOpen,
 }) {
   const { t, lang } = useLang()
   const { themes, loading } = useContent()
@@ -34,6 +34,21 @@ export default function ThemeSelector({
   const recordBtnRef = useRef(null)
   const tapCountRef = useRef(0)
   const lastTapRef = useRef(0)
+
+  // Позиция левой части шапки для оверлея (справа до кнопки «Меню»)
+  const [headerDim, setHeaderDim] = useState(null)
+
+  useLayoutEffect(() => {
+    if (!onboardingStep) { setHeaderDim(null); return }
+    function measure() {
+      if (!menuBtnRef.current) return
+      const rect = menuBtnRef.current.getBoundingClientRect()
+      setHeaderDim({ width: rect.left - 4, height: rect.bottom + 6 })
+    }
+    measure()
+    window.addEventListener('resize', measure)
+    return () => window.removeEventListener('resize', measure)
+  }, [onboardingStep])
 
   useEffect(() => {
     let cancelled = false
@@ -82,25 +97,40 @@ export default function ThemeSelector({
 
   useEffect(() => {
     function handleClick(e) {
+      // Во время шага 2 клик вне меню обрабатывает backdrop (onDismiss)
+      if (onboardingStep === 'step2') return
       if (menuRef.current && !menuRef.current.contains(e.target)) {
         closeMenu()
       }
     }
     if (menuOpen) document.addEventListener('mousedown', handleClick)
     return () => document.removeEventListener('mousedown', handleClick)
-  }, [menuOpen])
+  }, [menuOpen, onboardingStep])
 
   useEffect(() => {
     if (!menuOpen) return
-    function handleScroll() { closeMenu() }
+    function handleScroll() {
+      if (onboardingStep === 'step2') return
+      closeMenu()
+    }
     window.addEventListener('scroll', handleScroll, { passive: true })
     return () => window.removeEventListener('scroll', handleScroll)
-  }, [menuOpen])
+  }, [menuOpen, onboardingStep])
 
   // Шаг 2 онбординга: автоматически открываем меню
   useEffect(() => {
     if (onboardingStep === 'step2') setMenuOpen(true)
   }, [onboardingStep])
+
+  // Локальные обёртки — закрывают меню и вызывают родительский хендлер
+  function localDismiss() {
+    closeMenu()
+    onOnboardingDismiss?.()
+  }
+  function localDone() {
+    closeMenu()
+    onOnboardingDone?.()
+  }
 
   return (
     <div className="theme-selector">
@@ -110,15 +140,14 @@ export default function ThemeSelector({
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4 }}
       >
-        {/* Лого затемняется на обоих шагах онбординга */}
-        <div className={`app-nav-left ${onboardingStep ? 'onb-dimmed' : ''}`}>
+        <div className="app-nav-left">
           <span className="app-title" onClick={handleLogoTap}>Абиски</span>
           <p className="tagline">{t.tagline}</p>
         </div>
 
-        {/* В шаг 2 весь menu-wrap поднимается над backdrop (видны кнопка + дропдаун) */}
+        {/* menu-wrap всегда выше onb-nav-dim (z-index: 2 vs 1) */}
         <div
-          className={`menu-wrap ${onboardingStep === 'step2' ? 'onboarding-menu-above' : ''}`}
+          className={`menu-wrap ${onboardingStep ? 'onboarding-menu-above' : ''}`}
           ref={menuRef}
         >
           <button
@@ -126,7 +155,9 @@ export default function ThemeSelector({
             className={`menu-btn ${onboardingStep === 'step1' ? 'onboarding-spotlit' : ''}`}
             onClick={() => {
               if (onboardingStep === 'step1') { onOnboardingNext?.(); return }
-              setMenuOpen(o => !o)
+              const opening = !menuOpen
+              setMenuOpen(opening)
+              if (opening) onMenuOpen?.()
             }}
           >
             {t.menuBtn}
@@ -282,7 +313,7 @@ export default function ThemeSelector({
       </motion.div>
 
       <motion.div
-        className="start-bar"
+        className={`start-bar ${onboardingStep ? 'onb-dimmed' : ''}`}
         initial={{ opacity: 0, y: 40 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, delay: 0.3 }}
@@ -302,12 +333,22 @@ export default function ThemeSelector({
         </motion.button>
       </motion.div>
 
+      {/* Затемнение левой части шапки (лого + фон) — fixed поверх app-nav */}
+      {/* Правая часть с кнопкой «Меню» остаётся открытой и кликабельной */}
+      {onboardingStep && headerDim && (
+        <div
+          className="onb-header-dim"
+          style={{ width: headerDim.width, height: headerDim.height }}
+          onClick={localDismiss}
+        />
+      )}
+
       {/* Онбординг — подсветка меню/записи голоса */}
       {onboardingStep && (
         <OnboardingOverlay
           step={onboardingStep}
-          onDone={onOnboardingDone}
-          onDismiss={onOnboardingDismiss}
+          onDone={localDone}
+          onDismiss={localDismiss}
         />
       )}
 

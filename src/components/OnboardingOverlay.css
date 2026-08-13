@@ -66,25 +66,42 @@
 }
 .onb-btn-later:hover { color: #777; }
 
-/* ── Лого/тагline приглушаются — находятся в app-nav выше backdrop ── */
-/* Визуально выглядят затемнёнными без z-index трюков */
+/* ── Оверлей для левой части шапки (лого + фон) ── */
+/* position: fixed, z-index: 105 — выше app-nav (100), ниже tooltip (5000) */
+/* Правая часть с кнопкой «Меню» не перекрыта — остаётся кликабельной */
+.onb-header-dim {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 105;
+  background: rgba(0, 0, 0, 0.65);
+  cursor: default;
+}
+
+/* ── start-bar приглушается во время онбординга ── */
 .onb-dimmed {
-  opacity: 0.2;
-  transition: opacity 0.3s;
+  opacity: 0.15;
   pointer-events: none;
 }
 
 /* ── Кнопка «Меню» пульсирует (шаг 1) ── */
-/* app-nav z-index:100 > backdrop z-index:90 → кнопка видна и кликабельна */
 .onboarding-spotlit {
   border-radius: 10px !important;
   animation: onb-pulse 2s ease-in-out infinite;
 }
 
-/* ── Весь menu-wrap выше backdrop (шаг 2 — кнопка + дропдаун видны) ── */
+/* ── menu-wrap в шаг 2: кнопка + дропдаун выше backdrop (z-index 90) ── */
+/* app-nav уже z-index:100 > backdrop z-index:90, так что это опционально */
 .onboarding-menu-above {
   position: relative;
-  z-index: 500;
+  z-index: 2;
+}
+
+/* ── Строка «Записать свои звуки» пульсирует (шаг 2) ── */
+.onboarding-record-spotlit {
+  background: rgba(108, 99, 255, 0.12) !important;
+  border-radius: 8px;
+  animation: onb-pulse 2s ease-in-out infinite;
 }
 
 /* ── Строка «Записать свои звуки» пульсирует (шаг 2) ── */

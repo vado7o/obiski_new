@@ -62,21 +62,39 @@ function AppInner() {
   const [stickerInitialRoom, setStickerInitialRoom] = useState('island')
   const [adminOpen, setAdminOpen] = useState(false)
   const [userSoundsOpen, setUserSoundsOpen] = useState(false)
-  const [onboardingStep, setOnboardingStep] = useState(() =>
-    localStorage.getItem('obiski_onboarding') === 'done' ? null : 'step1'
-  )
+  const [onboardingStep, setOnboardingStep] = useState(() => {
+    const val = localStorage.getItem('obiski_onboarding')
+    // 'done' — всё завершено, 'step1_seen' — шаг 1 отклонён но шаг 2 ещё возможен
+    return val ? null : 'step1'
+  })
 
   function handleOnboardingNext() {
+    // Пользователь нажал кнопку «Меню» во время шага 1
     setOnboardingStep('step2')
   }
   function handleOnboardingDismiss() {
-    localStorage.setItem('obiski_onboarding', 'done')
+    if (onboardingStep === 'step1') {
+      // Отклонил шаг 1 — шаг 2 всё ещё покажем когда откроет меню
+      localStorage.setItem('obiski_onboarding', 'step1_seen')
+    } else {
+      // Отклонил шаг 2 — всё, онбординг завершён
+      localStorage.setItem('obiski_onboarding', 'done')
+    }
     setOnboardingStep(null)
   }
   function handleOnboardingDone() {
+    // «Записать сейчас» — открываем окно записи и завершаем онбординг
     localStorage.setItem('obiski_onboarding', 'done')
     setOnboardingStep(null)
     setUserSoundsOpen(true)
+  }
+  function handleMenuOpen() {
+    // Вызывается при открытии меню в обычном режиме (вне онбординга)
+    // Если шаг 2 ещё не был завершён — показываем его
+    const val = localStorage.getItem('obiski_onboarding')
+    if (val !== 'done') {
+      setOnboardingStep('step2')
+    }
   }
 
   useEffect(() => {
@@ -153,6 +171,7 @@ function AppInner() {
               onOnboardingNext={handleOnboardingNext}
               onOnboardingDismiss={handleOnboardingDismiss}
               onOnboardingDone={handleOnboardingDone}
+              onMenuOpen={handleMenuOpen}
             />
           </motion.div>
         )}
