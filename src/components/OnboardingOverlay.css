@@ -1,15 +1,15 @@
-/* ── Backdrop — z-index 90, НИЖЕ app-nav (sticky z-index: 100) ── */
-/* Это ключевой момент: кнопка «Меню» остаётся кликабельной */
+/* ── Backdrop — z-index 90, ниже app-nav (100) ── */
+/* Закрывает контент и футер; шапку затемняем отдельно через .onb-nav-dark */
 .onb-backdrop {
   position: fixed;
   inset: 0;
   z-index: 90;
-  background: rgba(0, 0, 0, 0.65);
+  background: rgba(0, 0, 0, 0.75);
   cursor: default;
 }
 
-/* ── Tooltip — центр экрана ── */
-/* transform НЕ пишем здесь — framer-motion передаёт x/y сам */
+/* ── Тултип по центру экрана ── */
+/* transform НЕ пишем — framer-motion управляет x/y отдельно от scale */
 .onb-tooltip {
   position: fixed;
   top: 50%;
@@ -28,9 +28,7 @@
   gap: 12px;
 }
 
-.onb-icon {
-  font-size: 34px;
-}
+.onb-icon { font-size: 34px; }
 
 .onb-text {
   font-size: 15px;
@@ -66,21 +64,18 @@
 }
 .onb-btn-later:hover { color: #777; }
 
-/* ── Оверлей для левой части шапки (лого + фон) ── */
-/* position: fixed, z-index: 105 — выше app-nav (100), ниже tooltip (5000) */
-/* Правая часть с кнопкой «Меню» не перекрыта — остаётся кликабельной */
-.onb-header-dim {
-  position: fixed;
-  top: 0;
-  left: 0;
-  z-index: 105;
-  background: rgba(0, 0, 0, 0.65);
-  cursor: default;
+/* ── Шапка затемняется во время онбординга ── */
+/* backdrop-filter и z-index:100 у app-nav создают stacking context,
+   поэтому проще просто менять её фон на тёмный */
+.onb-nav-dark {
+  background: rgba(10, 8, 20, 0.82) !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
 }
 
-/* ── start-bar приглушается во время онбординга ── */
-.onb-dimmed {
-  opacity: 0.15;
+/* Лого и тагline приглушаются на тёмном фоне */
+.onb-nav-dark .app-nav-left {
+  opacity: 0.18;
   pointer-events: none;
 }
 
@@ -90,25 +85,31 @@
   animation: onb-pulse 2s ease-in-out infinite;
 }
 
-/* ── menu-wrap в шаг 2: кнопка + дропдаун выше backdrop (z-index 90) ── */
-/* app-nav уже z-index:100 > backdrop z-index:90, так что это опционально */
+/* ── menu-wrap в шаге 2: кнопка + дропдаун остаются ярко видны в тёмной шапке ── */
 .onboarding-menu-above {
   position: relative;
   z-index: 2;
 }
 
-/* ── Строка «Записать свои звуки» пульсирует (шаг 2) ── */
+/* ── В шаге 2: все строки дропдауна приглушаются ── */
+.onb-dropdown-dim .lang-option {
+  opacity: 0.25;
+  pointer-events: none;
+}
+
+/* ── «Записать свои звуки» пульсирует и видна (шаг 2) ── */
 .onboarding-record-spotlit {
+  opacity: 1 !important;
+  pointer-events: auto !important;
   background: rgba(108, 99, 255, 0.12) !important;
   border-radius: 8px;
   animation: onb-pulse 2s ease-in-out infinite;
 }
 
-/* ── Строка «Записать свои звуки» пульсирует (шаг 2) ── */
-.onboarding-record-spotlit {
-  background: rgba(108, 99, 255, 0.12) !important;
-  border-radius: 8px;
-  animation: onb-pulse 2s ease-in-out infinite;
+/* ── start-bar и любые элементы, которые нужно приглушить ── */
+.onb-dimmed {
+  opacity: 0.15;
+  pointer-events: none;
 }
 
 @keyframes onb-pulse {

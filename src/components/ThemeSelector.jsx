@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect, useLayoutEffect } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useLang } from '../contexts/LanguageContext.jsx'
 import { useContent } from '../contexts/ContentContext.jsx'
@@ -34,21 +34,6 @@ export default function ThemeSelector({
   const recordBtnRef = useRef(null)
   const tapCountRef = useRef(0)
   const lastTapRef = useRef(0)
-
-  // Позиция левой части шапки для оверлея (справа до кнопки «Меню»)
-  const [headerDim, setHeaderDim] = useState(null)
-
-  useLayoutEffect(() => {
-    if (!onboardingStep) { setHeaderDim(null); return }
-    function measure() {
-      if (!menuBtnRef.current) return
-      const rect = menuBtnRef.current.getBoundingClientRect()
-      setHeaderDim({ width: rect.left - 4, height: rect.bottom + 6 })
-    }
-    measure()
-    window.addEventListener('resize', measure)
-    return () => window.removeEventListener('resize', measure)
-  }, [onboardingStep])
 
   useEffect(() => {
     let cancelled = false
@@ -134,8 +119,12 @@ export default function ThemeSelector({
 
   return (
     <div className="theme-selector">
+      {/* Во время онбординга фон шапки меняем на тёмный через onb-nav-dark.
+          Это надёжнее борьбы с z-index: backdrop-filter на app-nav создаёт stacking context
+          вне зависимости от z-index, поэтому backdrop (z-index:90) не может накрыть шапку.
+          Решение: затемнять саму шапку через CSS-класс. */}
       <motion.div
-        className="app-nav"
+        className={`app-nav ${onboardingStep ? 'onb-nav-dark' : ''}`}
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4 }}
@@ -145,7 +134,6 @@ export default function ThemeSelector({
           <p className="tagline">{t.tagline}</p>
         </div>
 
-        {/* menu-wrap всегда выше onb-nav-dim (z-index: 2 vs 1) */}
         <div
           className={`menu-wrap ${onboardingStep ? 'onboarding-menu-above' : ''}`}
           ref={menuRef}
@@ -166,7 +154,7 @@ export default function ThemeSelector({
           <AnimatePresence>
             {menuOpen && (
               <motion.div
-                className="lang-dropdown"
+                className={`lang-dropdown ${onboardingStep === 'step2' ? 'onb-dropdown-dim' : ''}`}
                 initial={{ opacity: 0, y: -8, scale: 0.96 }}
                 animate={{ opacity: 1, y: 0, scale: 1 }}
                 exit={{ opacity: 0, y: -8, scale: 0.96 }}
@@ -332,16 +320,6 @@ export default function ThemeSelector({
           {canStart ? t.startLearning : t.selectTheme}
         </motion.button>
       </motion.div>
-
-      {/* Затемнение левой части шапки (лого + фон) — fixed поверх app-nav */}
-      {/* Правая часть с кнопкой «Меню» остаётся открытой и кликабельной */}
-      {onboardingStep && headerDim && (
-        <div
-          className="onb-header-dim"
-          style={{ width: headerDim.width, height: headerDim.height }}
-          onClick={localDismiss}
-        />
-      )}
 
       {/* Онбординг — подсветка меню/записи голоса */}
       {onboardingStep && (

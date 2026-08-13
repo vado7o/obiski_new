@@ -5,12 +5,10 @@ export default function OnboardingOverlay({ step, onDone, onDismiss }) {
   if (!step) return null
   return (
     <>
-      {/* Затемняющий фон — z-index 90, ниже app-nav (100) */}
-      {/* Клики на кнопку «Меню» проходят сквозь — app-nav выше */}
+      {/* Backdrop покрывает контент под шапкой (z-index 90, ниже app-nav 100) */}
       <div className="onb-backdrop" onClick={onDismiss} />
 
-      {/* Тултип по центру экрана */}
-      {/* x/y передаём через framer-motion чтобы не конфликтовать со scale */}
+      {/* Тултип по центру. x/y через framer-motion, чтобы не конфликтовать со scale */}
       <motion.div
         key={step}
         className="onb-tooltip"
