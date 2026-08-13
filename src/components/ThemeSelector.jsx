@@ -27,6 +27,9 @@ export default function ThemeSelector({
   const [adminPw, setAdminPw] = useState('')
   const [adminPwError, setAdminPwError] = useState(false)
   const [adminPwLoading, setAdminPwLoading] = useState(false)
+  const [voiceHighlight, setVoiceHighlight] = useState(
+    () => !localStorage.getItem('hasClickedVoiceMenu')
+  )
   const menuRef = useRef(null)
   const tapCountRef = useRef(0)
   const lastTapRef = useRef(0)
@@ -184,10 +187,18 @@ export default function ThemeSelector({
                     </button>
 
                     <button
-                      className="lang-option"
-                      onClick={() => { closeMenu(); onOpenUserSounds() }}
+                      className={`lang-option${voiceHighlight ? ' voice-highlight' : ''}`}
+                      onClick={() => {
+                        if (voiceHighlight) {
+                          localStorage.setItem('hasClickedVoiceMenu', 'true')
+                          setVoiceHighlight(false)
+                        }
+                        closeMenu()
+                        onOpenUserSounds()
+                      }}
                     >
                       <span className="lang-label">{t.admin.recordSounds}</span>
+                      {voiceHighlight && <span className="voice-badge">✨!!!</span>}
                     </button>
 
                     {isAdmin && (
