@@ -8,12 +8,10 @@ import { useShowTranslation } from '../contexts/ShowTranslationContext.jsx'
 import { useShowText } from '../contexts/ShowTextContext.jsx'
 import { usePlayFeedbackSounds } from '../contexts/PlayFeedbackSoundsContext.jsx'
 import { getTitleSound } from '../api.js'
-import OnboardingOverlay from './OnboardingOverlay.jsx'
 import './ThemeSelector.css'
 
 export default function ThemeSelector({
   selected, onToggle, onStart, onOpenAdmin, onOpenUserSounds, onOpenStickerbook,
-  onboardingStep, onOnboardingNext, onOnboardingDismiss, onOnboardingDone, onMenuOpen,
 }) {
   const { t, lang } = useLang()
   const { themes, loading } = useContent()
@@ -30,8 +28,6 @@ export default function ThemeSelector({
   const [adminPwError, setAdminPwError] = useState(false)
   const [adminPwLoading, setAdminPwLoading] = useState(false)
   const menuRef = useRef(null)
-  const menuBtnRef = useRef(null)
-  const recordBtnRef = useRef(null)
   const tapCountRef = useRef(0)
   const lastTapRef = useRef(0)
 
@@ -82,49 +78,23 @@ export default function ThemeSelector({
 
   useEffect(() => {
     function handleClick(e) {
-      // Во время шага 2 клик вне меню обрабатывает backdrop (onDismiss)
-      if (onboardingStep === 'step2') return
-      if (menuRef.current && !menuRef.current.contains(e.target)) {
-        closeMenu()
-      }
+      if (menuRef.current && !menuRef.current.contains(e.target)) closeMenu()
     }
     if (menuOpen) document.addEventListener('mousedown', handleClick)
     return () => document.removeEventListener('mousedown', handleClick)
-  }, [menuOpen, onboardingStep])
+  }, [menuOpen])
 
   useEffect(() => {
     if (!menuOpen) return
-    function handleScroll() {
-      if (onboardingStep === 'step2') return
-      closeMenu()
-    }
+    function handleScroll() { closeMenu() }
     window.addEventListener('scroll', handleScroll, { passive: true })
     return () => window.removeEventListener('scroll', handleScroll)
-  }, [menuOpen, onboardingStep])
-
-  // Шаг 2 онбординга: автоматически открываем меню
-  useEffect(() => {
-    if (onboardingStep === 'step2') setMenuOpen(true)
-  }, [onboardingStep])
-
-  // Локальные обёртки — закрывают меню и вызывают родительский хендлер
-  function localDismiss() {
-    closeMenu()
-    onOnboardingDismiss?.()
-  }
-  function localDone() {
-    closeMenu()
-    onOnboardingDone?.()
-  }
+  }, [menuOpen])
 
   return (
     <div className="theme-selector">
-      {/* Во время онбординга фон шапки меняем на тёмный через onb-nav-dark.
-          Это надёжнее борьбы с z-index: backdrop-filter на app-nav создаёт stacking context
-          вне зависимости от z-index, поэтому backdrop (z-index:90) не может накрыть шапку.
-          Решение: затемнять саму шапку через CSS-класс. */}
       <motion.div
-        className={`app-nav ${onboardingStep ? 'onb-nav-dark' : ''}`}
+        className="app-nav"
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4 }}
@@ -134,19 +104,10 @@ export default function ThemeSelector({
           <p className="tagline">{t.tagline}</p>
         </div>
 
-        <div
-          className={`menu-wrap ${onboardingStep ? 'onboarding-menu-above' : ''}`}
-          ref={menuRef}
-        >
+        <div className="menu-wrap" ref={menuRef}>
           <button
-            ref={menuBtnRef}
-            className={`menu-btn ${onboardingStep === 'step1' ? 'onboarding-spotlit' : ''}`}
-            onClick={() => {
-              if (onboardingStep === 'step1') { onOnboardingNext?.(); return }
-              const opening = !menuOpen
-              setMenuOpen(opening)
-              if (opening) onMenuOpen?.()
-            }}
+            className="menu-btn"
+            onClick={() => setMenuOpen(o => !o)}
           >
             {t.menuBtn}
           </button>
@@ -154,7 +115,7 @@ export default function ThemeSelector({
           <AnimatePresence>
             {menuOpen && (
               <motion.div
-                className={`lang-dropdown ${onboardingStep === 'step2' ? 'onb-dropdown-dim' : ''}`}
+                className="lang-dropdown"
                 initial={{ opacity: 0, y: -8, scale: 0.96 }}
                 animate={{ opacity: 1, y: 0, scale: 1 }}
                 exit={{ opacity: 0, y: -8, scale: 0.96 }}
@@ -223,13 +184,8 @@ export default function ThemeSelector({
                     </button>
 
                     <button
-                      ref={recordBtnRef}
-                      className={`lang-option ${onboardingStep === 'step2' ? 'onboarding-record-spotlit' : ''}`}
-                      onClick={() => {
-                        closeMenu()
-                        if (onboardingStep === 'step2') { onOnboardingDone?.(); return }
-                        onOpenUserSounds()
-                      }}
+                      className="lang-option"
+                      onClick={() => { closeMenu(); onOpenUserSounds() }}
                     >
                       <span className="lang-label">{t.admin.recordSounds}</span>
                     </button>
@@ -301,7 +257,7 @@ export default function ThemeSelector({
       </motion.div>
 
       <motion.div
-        className={`start-bar ${onboardingStep ? 'onb-dimmed' : ''}`}
+        className="start-bar"
         initial={{ opacity: 0, y: 40 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, delay: 0.3 }}
@@ -320,15 +276,6 @@ export default function ThemeSelector({
           {canStart ? t.startLearning : t.selectTheme}
         </motion.button>
       </motion.div>
-
-      {/* Онбординг — подсветка меню/записи голоса */}
-      {onboardingStep && (
-        <OnboardingOverlay
-          step={onboardingStep}
-          onDone={localDone}
-          onDismiss={localDismiss}
-        />
-      )}
 
       <AnimatePresence>
         {adminPwOpen && (

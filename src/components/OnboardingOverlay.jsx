@@ -1,19 +1,15 @@
+import { createPortal } from 'react-dom'
 import { motion } from 'framer-motion'
 import './OnboardingOverlay.css'
 
-export default function OnboardingOverlay({ step, onDone, onDismiss }) {
-  if (!step) return null
-  return (
-    <>
-      {/* Backdrop покрывает контент под шапкой (z-index 90, ниже app-nav 100) */}
-      <div className="onb-backdrop" onClick={onDismiss} />
-
-      {/* Тултип по центру. x/y через framer-motion, чтобы не конфликтовать со scale */}
+export default function OnboardingOverlay({ onDone, onDismiss }) {
+  return createPortal(
+    <div className="onb-backdrop" onClick={onDismiss}>
       <motion.div
-        key={step}
-        className="onb-tooltip"
-        initial={{ opacity: 0, scale: 0.92, x: '-50%', y: '-50%' }}
-        animate={{ opacity: 1, scale: 1,   x: '-50%', y: '-50%' }}
+        className="onb-modal"
+        onClick={e => e.stopPropagation()}
+        initial={{ opacity: 0, scale: 0.92 }}
+        animate={{ opacity: 1, scale: 1 }}
         transition={{ type: 'spring', stiffness: 380, damping: 28 }}
       >
         <div className="onb-icon">🎤</div>
@@ -27,6 +23,7 @@ export default function OnboardingOverlay({ step, onDone, onDismiss }) {
           Записать позже
         </button>
       </motion.div>
-    </>
+    </div>,
+    document.body
   )
 }

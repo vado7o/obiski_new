@@ -1,23 +1,20 @@
-/* ── Backdrop — z-index 90, ниже app-nav (100) ── */
-/* Закрывает контент и футер; шапку затемняем отдельно через .onb-nav-dark */
 .onb-backdrop {
   position: fixed;
-  inset: 0;
-  z-index: 90;
-  background: rgba(0, 0, 0, 0.75);
-  cursor: default;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.65);
+  z-index: 999999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-/* ── Тултип по центру экрана ── */
-/* transform НЕ пишем — framer-motion управляет x/y отдельно от scale */
-.onb-tooltip {
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  z-index: 5000;
+.onb-modal {
   background: #fff;
   border-radius: 20px;
-  padding: 24px 24px 18px;
+  padding: 28px 24px 20px;
   width: 270px;
   box-shadow:
     0 12px 40px rgba(0, 0, 0, 0.22),
@@ -28,7 +25,7 @@
   gap: 12px;
 }
 
-.onb-icon { font-size: 34px; }
+.onb-icon { font-size: 36px; }
 
 .onb-text {
   font-size: 15px;
@@ -63,56 +60,3 @@
   text-underline-offset: 2px;
 }
 .onb-btn-later:hover { color: #777; }
-
-/* ── Шапка затемняется во время онбординга ── */
-/* backdrop-filter и z-index:100 у app-nav создают stacking context,
-   поэтому проще просто менять её фон на тёмный */
-.onb-nav-dark {
-  background: rgba(10, 8, 20, 0.82) !important;
-  backdrop-filter: none !important;
-  -webkit-backdrop-filter: none !important;
-}
-
-/* Лого и тагline приглушаются на тёмном фоне */
-.onb-nav-dark .app-nav-left {
-  opacity: 0.18;
-  pointer-events: none;
-}
-
-/* ── Кнопка «Меню» пульсирует (шаг 1) ── */
-.onboarding-spotlit {
-  border-radius: 10px !important;
-  animation: onb-pulse 2s ease-in-out infinite;
-}
-
-/* ── menu-wrap в шаге 2: кнопка + дропдаун остаются ярко видны в тёмной шапке ── */
-.onboarding-menu-above {
-  position: relative;
-  z-index: 2;
-}
-
-/* ── В шаге 2: все строки дропдауна приглушаются ── */
-.onb-dropdown-dim .lang-option {
-  opacity: 0.25;
-  pointer-events: none;
-}
-
-/* ── «Записать свои звуки» пульсирует и видна (шаг 2) ── */
-.onboarding-record-spotlit {
-  opacity: 1 !important;
-  pointer-events: auto !important;
-  background: rgba(108, 99, 255, 0.12) !important;
-  border-radius: 8px;
-  animation: onb-pulse 2s ease-in-out infinite;
-}
-
-/* ── start-bar и любые элементы, которые нужно приглушить ── */
-.onb-dimmed {
-  opacity: 0.15;
-  pointer-events: none;
-}
-
-@keyframes onb-pulse {
-  0%, 100% { box-shadow: 0 0 0 0 rgba(108, 99, 255, 0.55); }
-  50%       { box-shadow: 0 0 0 8px rgba(108, 99, 255, 0); }
-}
