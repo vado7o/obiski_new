@@ -1,18 +1,19 @@
-/* ── Backdrop — поверх всего включая шапку ── */
+/* ── Backdrop — z-index 90, НИЖЕ app-nav (sticky z-index: 100) ── */
+/* Это ключевой момент: кнопка «Меню» остаётся кликабельной */
 .onb-backdrop {
   position: fixed;
   inset: 0;
-  z-index: 400;
+  z-index: 90;
   background: rgba(0, 0, 0, 0.65);
   cursor: default;
 }
 
-/* ── Tooltip — всегда по центру экрана ── */
+/* ── Tooltip — центр экрана ── */
+/* transform НЕ пишем здесь — framer-motion передаёт x/y сам */
 .onb-tooltip {
   position: fixed;
   top: 50%;
   left: 50%;
-  transform: translate(-50%, -50%);
   z-index: 5000;
   background: #fff;
   border-radius: 20px;
@@ -65,22 +66,22 @@
 }
 .onb-btn-later:hover { color: #777; }
 
-/* ── Лого/тагline затемняются, когда онбординг активен ── */
+/* ── Лого/тагline приглушаются — находятся в app-nav выше backdrop ── */
+/* Визуально выглядят затемнёнными без z-index трюков */
 .onb-dimmed {
-  opacity: 0.25;
+  opacity: 0.2;
   transition: opacity 0.3s;
   pointer-events: none;
 }
 
-/* ── Кнопка «Меню» выше backdrop (шаг 1) ── */
+/* ── Кнопка «Меню» пульсирует (шаг 1) ── */
+/* app-nav z-index:100 > backdrop z-index:90 → кнопка видна и кликабельна */
 .onboarding-spotlit {
-  position: relative;
-  z-index: 500;
   border-radius: 10px !important;
   animation: onb-pulse 2s ease-in-out infinite;
 }
 
-/* ── Весь menu-wrap выше backdrop (шаг 2 — видны кнопка + дропдаун) ── */
+/* ── Весь menu-wrap выше backdrop (шаг 2 — кнопка + дропдаун видны) ── */
 .onboarding-menu-above {
   position: relative;
   z-index: 500;

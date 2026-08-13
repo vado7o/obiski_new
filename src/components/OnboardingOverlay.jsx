@@ -5,15 +5,17 @@ export default function OnboardingOverlay({ step, onDone, onDismiss }) {
   if (!step) return null
   return (
     <>
-      {/* Затемняющий фон — поверх всего */}
+      {/* Затемняющий фон — z-index 90, ниже app-nav (100) */}
+      {/* Клики на кнопку «Меню» проходят сквозь — app-nav выше */}
       <div className="onb-backdrop" onClick={onDismiss} />
 
-      {/* Тултип всегда по центру экрана */}
+      {/* Тултип по центру экрана */}
+      {/* x/y передаём через framer-motion чтобы не конфликтовать со scale */}
       <motion.div
         key={step}
         className="onb-tooltip"
-        initial={{ opacity: 0, scale: 0.92 }}
-        animate={{ opacity: 1, scale: 1 }}
+        initial={{ opacity: 0, scale: 0.92, x: '-50%', y: '-50%' }}
+        animate={{ opacity: 1, scale: 1,   x: '-50%', y: '-50%' }}
         transition={{ type: 'spring', stiffness: 380, damping: 28 }}
       >
         <div className="onb-icon">🎤</div>
