@@ -150,7 +150,7 @@ export const translations = {
     backBtn: '‹ Назад',
     language: 'Язык',
     words: (n) => `${n} слов`,
-    selectTheme: 'Выбери тему для начала',
+    selectTheme: 'Выбери темы для начала',
     startLearning: '▶  Начать учёбу',
     themesSelected: (n) => `Выбрано тем: ${n}`,
     tapToHear: 'Нажми, чтобы услышать',
