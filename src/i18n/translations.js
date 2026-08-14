@@ -26,7 +26,7 @@ export const translations = {
     stickerbookTitle: '📚 My Stickerbook',
     stickerbookClose: 'Close',
     rooms: {
-      island: 'Fairy Island',
+      island: 'Magic Meadow',
       myroom: 'My Room',
       worldmap: 'World Map',
       garage: 'Garage',
@@ -167,7 +167,7 @@ export const translations = {
     stickerbookTitle: '📚 Мой стикербук',
     stickerbookClose: 'Закрыть',
     rooms: {
-      island: 'Волшебный остров',
+      island: 'Волшебная полянка',
       myroom: 'Моя комната',
       worldmap: 'Карта мира',
       garage: 'Гараж',
