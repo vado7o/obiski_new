@@ -8,6 +8,7 @@ import { useShowTranslation } from '../contexts/ShowTranslationContext.jsx'
 import { useShowText } from '../contexts/ShowTextContext.jsx'
 import { usePlayFeedbackSounds } from '../contexts/PlayFeedbackSoundsContext.jsx'
 import { getTitleSound } from '../api.js'
+import AboutModal from './AboutModal.jsx'
 import './ThemeSelector.css'
 
 export default function ThemeSelector({
@@ -27,6 +28,7 @@ export default function ThemeSelector({
   const [adminPw, setAdminPw] = useState('')
   const [adminPwError, setAdminPwError] = useState(false)
   const [adminPwLoading, setAdminPwLoading] = useState(false)
+  const [aboutOpen, setAboutOpen] = useState(false)
   const [voiceHighlight, setVoiceHighlight] = useState(
     () => !localStorage.getItem('hasClickedVoiceMenu')
   )
@@ -201,6 +203,14 @@ export default function ThemeSelector({
                       {voiceHighlight && <span className="voice-badge">✨!!!</span>}
                     </button>
 
+                    <div className="menu-divider" />
+                    <button
+                      className="lang-option"
+                      onClick={() => { closeMenu(); setAboutOpen(true) }}
+                    >
+                      <span className="lang-label">❤️ Почему «Абиски»?</span>
+                    </button>
+
                     {isAdmin && (
                       <>
                         <div className="menu-divider" />
@@ -341,6 +351,8 @@ export default function ThemeSelector({
           </motion.div>
         )}
       </AnimatePresence>
+
+      <AboutModal open={aboutOpen} onClose={() => setAboutOpen(false)} />
     </div>
   )
 }
