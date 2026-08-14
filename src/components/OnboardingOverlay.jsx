@@ -14,7 +14,8 @@ export default function OnboardingOverlay({ onDone, onDismiss }) {
       >
         <div className="onb-icon">🎤</div>
         <p className="onb-text">
-          Запишите свой голос, чтобы подбадривать малыша!
+          Запишите свой голос, чтобы подбадривать малыша!<br/>
+          Вашему малышу ооочень это понравится!
         </p>
         <button className="onb-btn-primary" onClick={onDone}>
           Записать сейчас →
