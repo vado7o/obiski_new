@@ -1,5 +1,5 @@
 import { StatusBar } from 'expo-status-bar'
-import { StyleSheet, View, ActivityIndicator, Text, TouchableOpacity, PermissionsAndroid, Platform, Linking } from 'react-native'
+import { StyleSheet, View, ActivityIndicator, Text, Image, TouchableOpacity, PermissionsAndroid, Platform, Linking } from 'react-native'
 import { WebView } from 'react-native-webview'
 import { useRef, useState } from 'react'
 
@@ -97,9 +97,9 @@ export default function App() {
 
       {loading && !error && (
         <View style={styles.loader}>
-          <Text style={styles.loaderLogo}>🐾</Text>
-          <Text style={styles.loaderTitle}>Маме слово</Text>
-          <Text style={styles.loaderSubtitle}>Английский без чтения</Text>
+          <Image source={require('./assets/icon.png')} style={styles.loaderIcon} />
+          <Text style={styles.loaderTitle}>Мамины слова</Text>
+          <Text style={styles.loaderSubtitle}>Абиски — английский без чтения</Text>
           <ActivityIndicator size="large" color="#6C63FF" style={{ marginTop: 20 }} />
         </View>
       )}
@@ -124,8 +124,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  loaderLogo: {
-    fontSize: 64,
+  loaderIcon: {
+    width: 100,
+    height: 100,
+    borderRadius: 22,
   },
   loaderTitle: {
     fontSize: 32,
