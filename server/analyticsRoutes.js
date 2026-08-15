@@ -21,6 +21,23 @@ export function registerAnalyticsRoutes(app) {
     }
   })
 
+  app.post('/api/analytics/about', async (req, res) => {
+    try {
+      const { anonId, device } = req.body || {}
+      if (!anonId || typeof anonId !== 'string' || anonId.length > 64) {
+        return res.status(400).json({ error: 'invalid' })
+      }
+      await query(
+        `INSERT INTO about_views (anon_id, device) VALUES ($1, $2)`,
+        [anonId.slice(0, 64), device || null]
+      )
+      res.json({ ok: true })
+    } catch (err) {
+      console.error('POST /api/analytics/about failed:', err)
+      res.status(500).json({ error: 'failed' })
+    }
+  })
+
   app.post('/api/analytics/round', async (req, res) => {
     try {
       const { anonId, themes, difficulty, device } = req.body || {}
@@ -56,7 +73,8 @@ export function registerAnalyticsRoutes(app) {
             (SELECT COUNT(*)               FROM game_rounds
               WHERE ended_at >= NOW() - INTERVAL '1 day')::int                AS rounds_today,
             (SELECT COUNT(DISTINCT anon_id) FROM app_visits
-              WHERE visited_at >= NOW() - INTERVAL '1 day')::int              AS visitors_today
+              WHERE visited_at >= NOW() - INTERVAL '1 day')::int              AS visitors_today,
+            (SELECT COUNT(DISTINCT anon_id) FROM about_views)::int            AS about_unique_viewers
         `),
         query(`
           SELECT DATE(visited_at AT TIME ZONE 'UTC') AS day,

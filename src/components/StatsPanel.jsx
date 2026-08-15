@@ -186,6 +186,7 @@ export default function StatsPanel() {
         <StatCard label={t.admin.statsVisitorsToday} value={overview.visitors_today} accent />
         <StatCard label={t.admin.statsRoundsTotal} value={overview.total_rounds} />
         <StatCard label={t.admin.statsRoundsToday} value={overview.rounds_today} accent />
+        <StatCard label={t.admin.statsAboutViewers} value={overview.about_unique_viewers} />
       </div>
 
       <div className="stats-section">

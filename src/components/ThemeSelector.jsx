@@ -9,6 +9,7 @@ import { useShowText } from '../contexts/ShowTextContext.jsx'
 import { usePlayFeedbackSounds } from '../contexts/PlayFeedbackSoundsContext.jsx'
 import { getTitleSound } from '../api.js'
 import AboutModal from './AboutModal.jsx'
+import { useAnalytics } from '../hooks/useAnalytics.js'
 import './ThemeSelector.css'
 
 export default function ThemeSelector({
@@ -29,6 +30,7 @@ export default function ThemeSelector({
   const [adminPwError, setAdminPwError] = useState(false)
   const [adminPwLoading, setAdminPwLoading] = useState(false)
   const [aboutOpen, setAboutOpen] = useState(false)
+  const { trackAboutView } = useAnalytics()
   const [voiceHighlight, setVoiceHighlight] = useState(
     () => !localStorage.getItem('hasClickedVoiceMenu')
   )
@@ -206,7 +208,7 @@ export default function ThemeSelector({
                     <div className="menu-divider" />
                     <button
                       className="lang-option"
-                      onClick={() => { closeMenu(); setAboutOpen(true) }}
+                      onClick={() => { closeMenu(); setAboutOpen(true); trackAboutView() }}
                     >
                       <span className="lang-label">❤️ Почему «Абиски»?</span>
                     </button>

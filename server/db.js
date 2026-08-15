@@ -162,6 +162,15 @@ export async function ensureSchema() {
   `)
   // Step 2: Create table if not exists (fresh or post-drop)
   await pool.query(`
+    CREATE TABLE IF NOT EXISTS about_views (
+      id         BIGSERIAL PRIMARY KEY,
+      anon_id    TEXT,
+      device     TEXT,
+      viewed_at  TIMESTAMPTZ DEFAULT NOW()
+    );
+  `)
+
+  await pool.query(`
     CREATE TABLE IF NOT EXISTS win_sound (
       id INTEGER PRIMARY KEY DEFAULT 1,
       lang TEXT NOT NULL DEFAULT 'ru',

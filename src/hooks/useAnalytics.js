@@ -41,5 +41,15 @@ export function useAnalytics() {
     } catch {}
   }
 
-  return { trackGameStart, trackRound }
+  async function trackAboutView() {
+    try {
+      await fetch('/api/analytics/about', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ anonId, device }),
+      })
+    } catch {}
+  }
+
+  return { trackGameStart, trackRound, trackAboutView }
 }
